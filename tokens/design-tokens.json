@@ -1,0 +1,254 @@
+{
+  "$schema": "https://design-tokens.org/draft",
+  "$meta": {
+    "name": "SellMyiPhone Design System",
+    "version": "1.0.0",
+    "description": "Production design tokens for SellMyiPhone — trust-first iPhone resale & instant-payment lead-gen platform (Mumbai, Navi Mumbai, Thane).",
+    "themeMode": "light-first"
+  },
+
+  "color": {
+    "primary": {
+      "$type": "color",
+      "$description": "Trust Blue — primary brand, CTAs, links, active states.",
+      "50":  { "$value": "#EEF4FF" },
+      "100": { "$value": "#D9E6FF" },
+      "200": { "$value": "#BCD3FF" },
+      "300": { "$value": "#8EB6FF" },
+      "400": { "$value": "#5A8FFF" },
+      "500": { "$value": "#2F6BF6" },
+      "600": { "$value": "#1A56DB" },
+      "700": { "$value": "#1546B0" },
+      "800": { "$value": "#163C8C" },
+      "900": { "$value": "#17356F" },
+      "950": { "$value": "#0F2147" }
+    },
+    "secondary": {
+      "$type": "color",
+      "$description": "Indigo accent — gradients, secondary highlights, premium emphasis. Use sparingly.",
+      "50":  { "$value": "#F1F0FF" },
+      "100": { "$value": "#E5E3FF" },
+      "200": { "$value": "#CECBFF" },
+      "300": { "$value": "#ADA6FF" },
+      "400": { "$value": "#8B7DFF" },
+      "500": { "$value": "#6C5CFF" },
+      "600": { "$value": "#5B45F0" },
+      "700": { "$value": "#4C36CC" },
+      "800": { "$value": "#3F2EA6" },
+      "900": { "$value": "#352B80" }
+    },
+    "success": {
+      "$type": "color",
+      "$description": "Success Green — instant payment confirmed, completed states, positive quote deltas.",
+      "50":  { "$value": "#ECFDF3" },
+      "100": { "$value": "#D1FADF" },
+      "200": { "$value": "#A6F4C5" },
+      "300": { "$value": "#6CE9A6" },
+      "400": { "$value": "#32D583" },
+      "500": { "$value": "#12B76A" },
+      "600": { "$value": "#039855" },
+      "700": { "$value": "#027A48" },
+      "800": { "$value": "#05603A" },
+      "900": { "$value": "#054F31" }
+    },
+    "warning": {
+      "$type": "color",
+      "$description": "Amber — pending inspection, attention chips, non-blocking alerts.",
+      "50":  { "$value": "#FFFAEB" },
+      "100": { "$value": "#FEF0C7" },
+      "200": { "$value": "#FEDF89" },
+      "300": { "$value": "#FEC84B" },
+      "400": { "$value": "#FDB022" },
+      "500": { "$value": "#F79009" },
+      "600": { "$value": "#DC6803" },
+      "700": { "$value": "#B54708" },
+      "800": { "$value": "#93370D" },
+      "900": { "$value": "#7A2E0E" }
+    },
+    "error": {
+      "$type": "color",
+      "$description": "Red — validation errors, rejected devices, destructive actions.",
+      "50":  { "$value": "#FEF3F2" },
+      "100": { "$value": "#FEE4E2" },
+      "200": { "$value": "#FECDCA" },
+      "300": { "$value": "#FDA29B" },
+      "400": { "$value": "#F97066" },
+      "500": { "$value": "#F04438" },
+      "600": { "$value": "#D92D20" },
+      "700": { "$value": "#B42318" },
+      "800": { "$value": "#912018" },
+      "900": { "$value": "#7A271A" }
+    },
+    "neutral": {
+      "$type": "color",
+      "$description": "Cool premium gray (Slate). Backgrounds, surfaces, text, borders.",
+      "0":   { "$value": "#FFFFFF" },
+      "50":  { "$value": "#F8FAFC" },
+      "100": { "$value": "#F1F5F9" },
+      "200": { "$value": "#E2E8F0" },
+      "300": { "$value": "#CBD5E1" },
+      "400": { "$value": "#94A3B8" },
+      "500": { "$value": "#64748B" },
+      "600": { "$value": "#475569" },
+      "700": { "$value": "#334155" },
+      "800": { "$value": "#1E293B" },
+      "900": { "$value": "#0F172A" },
+      "950": { "$value": "#020617" }
+    },
+    "brand": {
+      "$type": "color",
+      "$description": "Channel/brand-specific fixed colors.",
+      "whatsapp":       { "$value": "#25D366" },
+      "whatsapp-hover": { "$value": "#1EBE5D" },
+      "apple-ink":      { "$value": "#1D1D1F" }
+    }
+  },
+
+  "semantic": {
+    "$description": "Role tokens — components reference these, never raw palette values.",
+    "background":        { "$value": "{color.neutral.50}",  "$description": "App canvas." },
+    "surface":           { "$value": "{color.neutral.0}",   "$description": "Cards, sheets, inputs." },
+    "surface-subtle":    { "$value": "{color.neutral.50}",  "$description": "Nested/zebra surfaces." },
+    "surface-raised":    { "$value": "{color.neutral.0}",   "$description": "Floating popovers/menus (pair w/ shadow-md)." },
+    "border":            { "$value": "{color.neutral.200}", "$description": "Default hairline border." },
+    "border-strong":     { "$value": "{color.neutral.300}", "$description": "Inputs, dividers needing emphasis." },
+    "text-primary":      { "$value": "{color.neutral.900}", "$description": "Headings, key body. 16.1:1 on surface." },
+    "text-secondary":    { "$value": "{color.neutral.600}", "$description": "Supporting copy. 7.2:1 on surface." },
+    "text-tertiary":     { "$value": "{color.neutral.500}", "$description": "Captions, placeholders (min for AA on white)." },
+    "text-on-brand":     { "$value": "{color.neutral.0}",   "$description": "Text on primary/secondary fills." },
+    "text-disabled":     { "$value": "{color.neutral.400}" },
+    "brand-default":     { "$value": "{color.primary.600}" },
+    "brand-hover":       { "$value": "{color.primary.700}" },
+    "brand-active":      { "$value": "{color.primary.800}" },
+    "brand-subtle":      { "$value": "{color.primary.50}",  "$description": "Tinted backgrounds, selected radio cards." },
+    "focus-ring":        { "$value": "rgba(26,86,219,0.40)", "$description": "4px outer focus ring." },
+    "overlay-scrim":     { "$value": "rgba(15,23,42,0.50)",  "$description": "Modal/sheet backdrop." }
+  },
+
+  "typography": {
+    "$description": "Inter. Each role lists desktop & mobile {size/lineHeight} in px, plus weight & tracking.",
+    "fontFamily": {
+      "sans": { "$value": "'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" },
+      "mono": { "$value": "'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace", "$description": "Prices, IMEI, order IDs — tabular figures." }
+    },
+    "weight": { "regular": 400, "medium": 500, "semibold": 600, "bold": 700 },
+    "scale": {
+      "display-xl": { "desktop": { "size": 64, "lineHeight": 72, "tracking": "-0.022em" }, "mobile": { "size": 40, "lineHeight": 46 }, "weight": 700 },
+      "display-l":  { "desktop": { "size": 56, "lineHeight": 64, "tracking": "-0.022em" }, "mobile": { "size": 36, "lineHeight": 44 }, "weight": 700 },
+      "display-m":  { "desktop": { "size": 44, "lineHeight": 52, "tracking": "-0.02em" },  "mobile": { "size": 32, "lineHeight": 40 }, "weight": 700 },
+      "h1":         { "desktop": { "size": 36, "lineHeight": 44, "tracking": "-0.02em" },  "mobile": { "size": 28, "lineHeight": 36 }, "weight": 700 },
+      "h2":         { "desktop": { "size": 30, "lineHeight": 38, "tracking": "-0.015em" }, "mobile": { "size": 24, "lineHeight": 32 }, "weight": 700 },
+      "h3":         { "desktop": { "size": 24, "lineHeight": 32, "tracking": "-0.01em" },  "mobile": { "size": 20, "lineHeight": 28 }, "weight": 600 },
+      "h4":         { "desktop": { "size": 20, "lineHeight": 28, "tracking": "-0.01em" },  "mobile": { "size": 18, "lineHeight": 26 }, "weight": 600 },
+      "body-lg":    { "desktop": { "size": 18, "lineHeight": 28, "tracking": "0" },        "mobile": { "size": 17, "lineHeight": 26 }, "weight": 400 },
+      "body-md":    { "desktop": { "size": 16, "lineHeight": 24, "tracking": "0" },        "mobile": { "size": 16, "lineHeight": 24 }, "weight": 400, "$description": "Base. 16px floor avoids iOS zoom." },
+      "body-sm":    { "desktop": { "size": 14, "lineHeight": 20, "tracking": "0" },        "mobile": { "size": 14, "lineHeight": 20 }, "weight": 400 },
+      "caption":    { "desktop": { "size": 12, "lineHeight": 16, "tracking": "0.01em" },   "mobile": { "size": 12, "lineHeight": 16 }, "weight": 500 },
+      "label":      { "desktop": { "size": 14, "lineHeight": 20, "tracking": "0.005em" },  "mobile": { "size": 14, "lineHeight": 20 }, "weight": 600 },
+      "overline":   { "desktop": { "size": 12, "lineHeight": 16, "tracking": "0.06em" },   "mobile": { "size": 12, "lineHeight": 16 }, "weight": 600, "$description": "UPPERCASE eyebrow labels." }
+    }
+  },
+
+  "spacing": {
+    "$type": "dimension",
+    "$description": "8pt grid (4pt sub-steps). Values in px.",
+    "0":   { "$value": "0px" },
+    "0.5": { "$value": "2px",   "$description": "Hairline gaps, icon nudges." },
+    "1":   { "$value": "4px",   "$description": "Icon-to-label, chip inset." },
+    "2":   { "$value": "8px",   "$description": "Tight stacks, min touch spacing." },
+    "3":   { "$value": "12px",  "$description": "Compact padding, input gaps." },
+    "4":   { "$value": "16px",  "$description": "Default gutter, card padding (mobile)." },
+    "5":   { "$value": "20px" },
+    "6":   { "$value": "24px",  "$description": "Card padding (desktop), grid gutter." },
+    "8":   { "$value": "32px",  "$description": "Sub-section spacing." },
+    "10":  { "$value": "40px" },
+    "12":  { "$value": "48px",  "$description": "Section padding (mobile)." },
+    "16":  { "$value": "64px",  "$description": "Section padding (tablet)." },
+    "20":  { "$value": "80px",  "$description": "Section padding (desktop)." },
+    "24":  { "$value": "96px",  "$description": "Hero vertical rhythm." },
+    "30":  { "$value": "120px", "$description": "Max section separation (large desktop)." }
+  },
+
+  "radius": {
+    "$type": "dimension",
+    "xs":   { "$value": "4px",    "$description": "Chips, tags, small inputs." },
+    "sm":   { "$value": "8px",    "$description": "Inputs, secondary buttons." },
+    "md":   { "$value": "12px",   "$description": "Primary buttons, badges." },
+    "lg":   { "$value": "16px",   "$description": "Cards, radio cards, dropdowns." },
+    "xl":   { "$value": "24px",   "$description": "Hero panels, modals, feature cards." },
+    "2xl":  { "$value": "32px",   "$description": "Large promotional surfaces." },
+    "full": { "$value": "9999px", "$description": "Pills, avatars, toggle." }
+  },
+
+  "shadow": {
+    "$type": "shadow",
+    "$description": "Layered, very subtle. Ink-tinted (16,24,40) not pure black.",
+    "xs": { "$value": "0 1px 2px rgba(16,24,40,0.05)" },
+    "sm": { "$value": "0 1px 3px rgba(16,24,40,0.10), 0 1px 2px rgba(16,24,40,0.06)" },
+    "md": { "$value": "0 4px 8px -2px rgba(16,24,40,0.10), 0 2px 4px -2px rgba(16,24,40,0.06)" },
+    "lg": { "$value": "0 12px 16px -4px rgba(16,24,40,0.08), 0 4px 6px -2px rgba(16,24,40,0.03)" },
+    "focus": { "$value": "0 0 0 4px rgba(26,86,219,0.40)" },
+    "focus-error": { "$value": "0 0 0 4px rgba(217,45,32,0.35)" }
+  },
+
+  "icon": {
+    "$type": "dimension",
+    "$description": "Lucide React, stroke 1.5 (2 for ≤16px). One family across product.",
+    "xs": { "$value": "16px", "$description": "Inline w/ body-sm, dense chips." },
+    "sm": { "$value": "20px", "$description": "Default inside buttons & inputs." },
+    "md": { "$value": "24px", "$description": "Standalone UI, list items, nav." },
+    "lg": { "$value": "32px", "$description": "Feature cards, empty states." },
+    "xl": { "$value": "40px", "$description": "Hero/marketing accents." }
+  },
+
+  "grid": {
+    "$description": "Mobile-first. Never disable zoom.",
+    "breakpoints": {
+      "sm": { "$value": "640px" },
+      "md": { "$value": "768px" },
+      "lg": { "$value": "1024px" },
+      "xl": { "$value": "1280px" },
+      "2xl": { "$value": "1440px" }
+    },
+    "container": {
+      "maxWidth":  { "$value": "1200px", "$description": "Content max within a 1440 frame." },
+      "padding":   { "mobile": "16px", "tablet": "24px", "desktop": "32px" }
+    },
+    "columns": {
+      "mobile":  { "count": 4,  "gutter": "16px" },
+      "tablet":  { "count": 8,  "gutter": "24px" },
+      "desktop": { "count": 12, "gutter": "24px" }
+    }
+  },
+
+  "motion": {
+    "$description": "Framer Motion friendly. Restraint over spectacle.",
+    "duration": {
+      "instant": { "$value": "100ms", "$description": "Press feedback, color change." },
+      "fast":    { "$value": "200ms", "$description": "Hover, focus, small reveals." },
+      "base":    { "$value": "300ms", "$description": "Accordions, step transitions, modals." },
+      "exit":    { "$value": "180ms", "$description": "~60% of enter — feels responsive." }
+    },
+    "easing": {
+      "standard": { "$value": "cubic-bezier(0.4, 0, 0.2, 1)" },
+      "enter":    { "$value": "cubic-bezier(0.16, 1, 0.3, 1)", "$description": "ease-out, decelerate in." },
+      "exit":     { "$value": "cubic-bezier(0.4, 0, 1, 1)",    "$description": "ease-in, accelerate out." }
+    },
+    "spring": {
+      "soft":  { "type": "spring", "stiffness": 260, "damping": 24, "$description": "Cards, sheets." },
+      "snappy":{ "type": "spring", "stiffness": 400, "damping": 30, "$description": "Buttons, toggles." }
+    },
+    "press": { "scale": 0.97, "$description": "Tappable cards/buttons on :active." }
+  },
+
+  "zIndex": {
+    "base": { "$value": 0 },
+    "raised": { "$value": 10 },
+    "sticky": { "$value": 20 },
+    "header": { "$value": 30 },
+    "dropdown": { "$value": 40 },
+    "overlay": { "$value": 100 },
+    "modal": { "$value": 110 },
+    "toast": { "$value": 200 }
+  }
+}
