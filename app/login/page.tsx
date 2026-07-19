@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Truck, Wallet, Sparkles } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
-import { AuthForm } from "@/components/shared/AuthForm";
+import { PhoneOtpLogin } from "@/components/shared/PhoneOtpLogin";
 import { useStore } from "@/lib/store";
 
 const PERKS = [
@@ -24,7 +24,6 @@ export default function LoginPage() {
   }, [user, router]);
 
   const onSellerSuccess = () => router.replace(selectedModel ? "/sell/storage" : "/");
-  const onAdminSuccess  = () => router.replace("/admin");
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
@@ -71,7 +70,7 @@ No Pressure.
             Honest Deals. Trusted Buyback.
           </p>
 
-          <AuthForm onSuccess={onSellerSuccess} onAdmin={onAdminSuccess} />
+          <PhoneOtpLogin onSuccess={onSellerSuccess} />
 
           <p className="mt-6 text-caption text-text-tertiary text-center">
             Admin accounts are automatically redirected to the dashboard after sign in.

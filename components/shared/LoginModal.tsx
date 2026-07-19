@@ -239,7 +239,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
                       className="mt-0.5 h-4 w-4 shrink-0 accent-brand"
                     />
                     <span>
-                      By continuing, I agree to SellMyiPhone&apos;s{" "}
+                      By continuing, I agree to Mobronix&apos;s{" "}
                       <Link href="/legal/terms-and-conditions" className="font-semibold text-brand">Terms &amp; Conditions</Link>,{" "}
                       <Link href="/legal/terms-of-use" className="font-semibold text-brand">Terms of Use</Link> and{" "}
                       <Link href="/legal/privacy-policy" className="font-semibold text-brand">Privacy Policy</Link>, and to receive

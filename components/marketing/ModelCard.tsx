@@ -9,6 +9,7 @@ import type { Model } from "@/lib/types";
 
 function getMaxPrice(model: Model): number {
   const storages = model.storages as Record<string, unknown>;
+  if (!storages) return 0;
   const allPrices: number[] = [];
   Object.values(storages).forEach((v) => {
     if (typeof v === "number") {
@@ -17,7 +18,7 @@ function getMaxPrice(model: Model): number {
       Object.values(v as Record<string, number>).forEach((p) => allPrices.push(p));
     }
   });
-  return Math.max(...allPrices);
+  return allPrices.length ? Math.max(...allPrices) : 0;
 }
 
 export function ModelCard({ model, onSelect, index = 0 }: { model: Model; onSelect: () => void; index?: number }) {
@@ -62,7 +63,7 @@ export function ModelCard({ model, onSelect, index = 0 }: { model: Model; onSele
           <p className="mt-0.5 text-caption text-text-tertiary">{model.chips.join(" / ")}</p>
         )}
         <p className="mt-1 text-body-sm font-semibold text-success-600 tabular-nums">
-          Up to {fmt(max)}
+          {max > 0 ? `Up to ${fmt(max)}` : "Awaiting Call"}
         </p>
       </div>
     </button>

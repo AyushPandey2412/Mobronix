@@ -96,33 +96,41 @@ export function ModelSelector({ initialModels }: ModelSelectorProps = {}) {
 
   return (
     <div>
-      {/* Category tabs */}
-      <div className="flex gap-1 p-1 bg-neutral-100 rounded-xl w-fit mb-5">
-        {(["iphone", "macbook"] as Category[]).map((cat) => (
-          <button
-            key={cat}
-            onClick={() => switchCategory(cat)}
-            className={cn(
-              "flex items-center gap-2 px-5 py-2 rounded-lg text-body-sm font-semibold transition-all",
-              category === cat
-                ? "bg-surface text-text-primary shadow-sm"
-                : "text-text-tertiary hover:text-text-primary"
-            )}
-          >
-            {cat === "iphone" ? (
-              <svg width="14" height="14" viewBox="0 0 22 30" fill="none">
-                <rect x="1" y="1" width="20" height="28" rx="5" stroke="currentColor" strokeWidth="1.8"/>
-                <rect x="8" y="4" width="6" height="1.4" rx="0.7" fill="currentColor"/>
-              </svg>
-            ) : (
-              <svg width="16" height="14" viewBox="0 0 24 20" fill="none">
-                <rect x="2" y="1" width="20" height="13" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                <path d="M1 14h22l1.5 4H0.5L2 14z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-              </svg>
-            )}
-            {cat === "iphone" ? "iPhone" : "MacBook"}
-          </button>
-        ))}
+      {/* Category Tabs Swipeable Bar */}
+      <div className="no-scrollbar -mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 select-none">
+        {[
+          { id: "iphone", label: "iPhone", type: "catalog" },
+          { id: "macbook", label: "MacBook", type: "catalog" },
+          { id: "Samsung", label: "Samsung", type: "manual" },
+          { id: "OnePlus", label: "OnePlus", type: "manual" },
+          { id: "Xiaomi", label: "Xiaomi", type: "manual" },
+          { id: "Oppo", label: "Oppo", type: "manual" },
+          { id: "Vivo", label: "Vivo", type: "manual" },
+          { id: "Realme", label: "Realme", type: "manual" },
+          { id: "Other", label: "Other", type: "manual" },
+        ].map((cat) => {
+          const active = category === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => {
+                if (cat.type === "catalog") {
+                  switchCategory(cat.id as any);
+                } else {
+                  router.push(`/sell/manual?brand=${encodeURIComponent(cat.id)}`);
+                }
+              }}
+              className={cn(
+                "flex h-[38px] shrink-0 items-center justify-center gap-1.5 rounded-full border px-4 font-bold text-caption transition-all active:scale-[0.98]",
+                active
+                  ? "border-brand bg-primary-50 text-brand"
+                  : "border-border bg-surface text-text-secondary hover:border-border-strong hover:text-text-primary"
+              )}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Search */}

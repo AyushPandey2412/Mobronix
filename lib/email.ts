@@ -5,7 +5,7 @@ import type { Enquiry } from './types'
 
 const ACCENT = '#16A34A'
 const INK = '#171A21'
-const FROM = 'SellMyiPhone <noreply@sellmyiphone.in>'
+const FROM = 'Mobronix <noreply@mobronix.in>'
 
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY
@@ -35,12 +35,12 @@ function deviceLines(enquiry: Enquiry): string {
 
 function shell(title: string, inner: string): string {
   return `<div style="font-family:system-ui,-apple-system,Segoe UI,sans-serif;max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #E4E7EB;border-radius:16px;overflow:hidden">
-    <div style="background:${ACCENT};padding:20px 24px"><span style="color:#fff;font-size:18px;font-weight:800">SellMyiPhone</span></div>
+    <div style="background:${ACCENT};padding:20px 24px"><span style="color:#fff;font-size:18px;font-weight:800">Mobronix</span></div>
     <div style="padding:24px">
       <h2 style="margin:0 0 12px;color:${INK};font-size:20px">${title}</h2>
       ${inner}
     </div>
-    <div style="padding:16px 24px;background:#F6F8F7;color:#94A0AF;font-size:12px">Made in Mumbai · SellMyiPhone</div>
+    <div style="padding:16px 24px;background:#F6F8F7;color:#94A0AF;font-size:12px">Made in Mumbai · Mobronix</div>
   </div>`
 }
 
@@ -61,7 +61,7 @@ export async function sendAdminNotification(enquiry: Enquiry, adminBaseUrl: stri
     <a href="${link}" style="display:inline-block;margin-top:12px;background:${ACCENT};color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Open in Admin →</a>`
   await resend.emails.send({
     from: FROM,
-    to: process.env.ADMIN_EMAIL || 'admin@sellmyiphone.in',
+    to: process.env.ADMIN_EMAIL || 'admin@mobronix.in',
     subject: `New Enquiry ${enquiry.display_id}`,
     html: shell(`New enquiry ${enquiry.display_id}`, inner)
   })

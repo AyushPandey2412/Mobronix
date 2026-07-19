@@ -51,7 +51,7 @@ export default function AdminLoginPage() {
             ))}
           </div>
         </div>
-        <p className="text-primary-200/20 text-caption">Authorized personnel only · SellMyiPhone © 2025</p>
+        <p className="text-primary-200/20 text-caption">Authorized personnel only · Mobronix © 2025</p>
       </div>
 
       {/* Right form panel */}
@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@sellmyiphone.in"
+                placeholder="admin@mobronix.in"
                 className="w-full bg-surface border border-border text-text-primary placeholder:text-text-disabled rounded-md px-4 py-2.5 text-body-sm outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(26,86,219,0.15)] transition-all"
               />
             </div>

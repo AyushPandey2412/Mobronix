@@ -359,7 +359,10 @@ export default function QuotePage() {
             onClose={() => setShowLogin(false)}
             model={model}
             storage={selectedStorage}
-            onSuccess={() => setShowLogin(false)}
+            onSuccess={() => {
+              setShowLogin(false);
+              router.push("/sell/checkout");
+            }}
           />
         </>
       ) : (
@@ -381,7 +384,7 @@ export default function QuotePage() {
           </div>
 
           <StickyBar label={cart.length ? "Total offer" : "Your offer"} value={fmt(grandTotal)} className="mt-6">
-            <Button onClick={() => router.push("/sell/photos")} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
+            <Button onClick={() => router.push("/sell/checkout")} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
               Continue
             </Button>
           </StickyBar>

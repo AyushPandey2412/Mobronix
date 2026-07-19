@@ -11,7 +11,7 @@ import type { Model } from "@/lib/types";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
-  title: "SellMyiPhone — Sell your used iPhone in Mumbai, get paid today",
+  title: "Mobronix — Sell your used device in Mumbai, get paid today",
   description:
     "Get an instant price for your used iPhone, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai & Thane.",
 };
@@ -46,7 +46,7 @@ export default async function HomePage() {
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "SellMyiPhone",
+    name: "Mobronix",
     url: APP_URL,
     logo: `${APP_URL}/icon.png`,
     description: "Trusted iPhone buyback service in Mumbai, Navi Mumbai and Thane. Free doorstep pickup, instant UPI payment.",
@@ -79,7 +79,7 @@ export default async function HomePage() {
   const aggregateRatingJsonLd = {
     "@context": "https://schema.org",
     "@type": "AggregateRating",
-    itemReviewed: { "@type": "Organization", name: "SellMyiPhone" },
+    itemReviewed: { "@type": "Organization", name: "Mobronix" },
     ratingValue: "4.8",
     reviewCount: "12400",
     bestRating: "5",

@@ -5,7 +5,7 @@
  */
 
 // ─── Shared enums ─────────────────────────────────────────────────
-export type ModelCategory    = 'iphone' | 'macbook'
+export type ModelCategory    = 'iphone' | 'macbook' | 'android'
 export type QuestionCategory = 'iphone' | 'macbook' | 'all'
 export type QuestionType     = 'single' | 'multi' | 'matrix'
 
@@ -204,7 +204,7 @@ export interface Profile {
 
 export interface EnquiryDevice {
   model:     string
-  category:  ModelCategory
+  category:  ModelCategory | 'android'
   variant?:  string
   chip?:     string
   ram?:      string
@@ -213,6 +213,7 @@ export interface EnquiryDevice {
   final:     number
   factors:   { label: string; factor: number }[]
   answers:   QuizAnswers
+  responses?: { question: string; answer: string }[]
 }
 
 export interface EnquiryHistory {

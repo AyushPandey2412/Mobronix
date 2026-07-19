@@ -434,8 +434,8 @@ function TrackInner() {
           <EmptyState
             icon={<PackageSearch className="h-7 w-7" />}
             title="No active enquiry"
-            description="Sell your iPhone to see its live status here."
-            action={<Button onClick={() => router.push("/")}>Sell my iPhone</Button>}
+            description="Sell your phone to see its live status here."
+            action={<Button onClick={() => router.push("/")}>Sell my phone</Button>}
           />
         )}
       </div>

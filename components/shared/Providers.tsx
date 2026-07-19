@@ -16,12 +16,60 @@ import { Toaster } from "@/components/ui/Toaster";
  * whole-page flash to prevent. Individual components handle their own
  * hydration if needed.
  */
+import { useEffect } from "react";
+import { createBrowserClient } from "@/lib/supabase/client";
+import { useStore } from "@/lib/store";
+
+function AuthSync() {
+  const setUser = useStore((s) => s.setContact);
+  const logout = useStore((s) => s.logout);
+
+  useEffect(() => {
+    const supabase = createBrowserClient();
+
+    // Check current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const phone = session.user.phone || session.user.user_metadata?.phone || "";
+        const name = session.user.user_metadata?.full_name || "Seller";
+        setUser(name, phone);
+      } else {
+        const currentUser = useStore.getState().user;
+        if (currentUser) {
+          logout();
+        }
+      }
+    });
+
+    // Listen to changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        const phone = session.user.phone || session.user.user_metadata?.phone || "";
+        const name = session.user.user_metadata?.full_name || "Seller";
+        setUser(name, phone);
+      } else {
+        const currentUser = useStore.getState().user;
+        if (currentUser) {
+          logout();
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [setUser, logout]);
+
+  return null;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const clientRef = useRef<QueryClient | null>(null);
   if (!clientRef.current) clientRef.current = makeQueryClient();
 
   return (
     <QueryClientProvider client={clientRef.current}>
+      <AuthSync />
       {children}
       <Toaster />
     </QueryClientProvider>

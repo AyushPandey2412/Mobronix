@@ -24,11 +24,11 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "SellMyiPhone — Sell your used iPhone in Mumbai, get paid today",
-    template: "%s | SellMyiPhone",
+    default: "Mobronix — Sell your used device in Mumbai, get paid today",
+    template: "%s | Mobronix",
   },
   description:
-    "Get an instant price for your used iPhone, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai & Thane.",
+    "Get an instant price for your used device, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai & Thane.",
   keywords: [
     "sell used iPhone Mumbai",
     "sell second hand iPhone",
@@ -43,8 +43,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_IN",
     url: APP_URL,
-    siteName: "SellMyiPhone",
-    title: "SellMyiPhone — Sell your used iPhone in Mumbai, get paid today",
+    siteName: "Mobronix",
+    title: "Mobronix — Sell your used device in Mumbai, get paid today",
     description:
       "Instant price, free doorstep pickup, same-day UPI payment. Trusted by 12,400+ sellers across Mumbai, Navi Mumbai & Thane.",
     images: [
@@ -52,13 +52,13 @@ export const metadata: Metadata = {
         url: "/og-default.png",
         width: 1200,
         height: 630,
-        alt: "SellMyiPhone — Sell your iPhone, get paid today",
+        alt: "Mobronix — Sell your device, get paid today",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SellMyiPhone — Sell your used iPhone in Mumbai, get paid today",
+    title: "Mobronix — Sell your used device in Mumbai, get paid today",
     description:
       "Instant price, free doorstep pickup, same-day UPI payment across Mumbai, Navi Mumbai & Thane.",
     images: ["/og-default.png"],

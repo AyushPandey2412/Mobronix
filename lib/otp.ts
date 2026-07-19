@@ -42,7 +42,7 @@ export async function sendOtp(mobile: string): Promise<SendResult> {
   await kvDel(attemptKey(mobile))                    // reset guesses for the new code
   await kvSet(resendKey(mobile), '1', RESEND_SECS)
 
-  const text = `${code} is your SellMyiPhone verification code. Valid for 5 minutes. Do not share it with anyone.`
+  const text = `${code} is your Mobronix verification code. Valid for 5 minutes. Do not share it with anyone.`
   const sms  = await sendOtpSms(mobile, code, text)
   if (!sms.ok) {
     console.error('[otp] SMS send failed via', sms.provider) // no code/PII logged

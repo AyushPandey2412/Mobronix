@@ -9,7 +9,7 @@ const EXECS = ['Rohan Patil', 'Amit Sharma', 'Sana Khan', 'Vikram Iyer', 'Neha D
 
 const deviceSchema = z.object({
   model: z.string(),
-  category: z.enum(['iphone', 'macbook']).optional().default('iphone'),
+  category: z.enum(['iphone', 'macbook', 'android']).optional().default('iphone'),
   variant: z.string().optional(),
   chip: z.string().optional(),
   ram: z.string().optional(),
@@ -18,14 +18,15 @@ const deviceSchema = z.object({
   final: z.number(),
   factors: z.array(z.object({ label: z.string(), factor: z.number() })).optional().default([]),
   answers: z.record(z.any()).optional().default({}),
+  responses: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
 })
 
 export const createEnquirySchema = z.object({
   devices: z.array(deviceSchema).min(1),
-  address: z.string().min(3),
-  pincode: z.string().regex(/^\d{6}$/),
-  pickup_slot: z.string().min(1),
-  payment_mode: z.enum(['UPI', 'Cash']),
+  address: z.string().min(3).optional(),
+  pincode: z.string().regex(/^\d{6}$/).optional(),
+  pickup_slot: z.string().min(1).optional(),
+  payment_mode: z.enum(['UPI', 'Cash']).optional(),
   photos: z.array(z.object({ slot: z.string(), path: z.string() })).optional().default([]),
   name: z.string().optional(),
   mobile: z.string().optional(),
@@ -80,6 +81,7 @@ async function validateDevicePrices(supabase: SupabaseClient, devices: EnquiryDe
   }
 
   for (const device of devices) {
+    if (device.category === 'android') continue
     if (!Number.isFinite(device.final) || device.final <= 0) {
       throw new Error('Invalid device price')
     }
@@ -106,10 +108,10 @@ export class EnquiryService {
       user_id: context.userId,
       devices,
       total_amount: total,
-      address: input.address,
-      pincode: input.pincode,
-      pickup_slot: input.pickup_slot,
-      payment_mode: input.payment_mode,
+      address: input.address || 'To be collected by phone',
+      pincode: input.pincode || '000000',
+      pickup_slot: input.pickup_slot || 'To be collected by phone',
+      payment_mode: input.payment_mode || 'Cash',
       assigned_exec: assignedExec,
       status: 'new' satisfies EnquiryStatus,
       tracking_step: ENQUIRY_STATUS_STEPS.new,

@@ -53,14 +53,11 @@ export function RouteProgress() {
     return () => document.removeEventListener("click", handler);
   }, [pathname, start]);
 
-  // Complete (and flash to 100%) whenever the route actually changes. Also covers
-  // router.push() navigations that didn't originate from a link click.
+  // Complete (and flash to 100%) whenever the route actually changes.
   useEffect(() => {
     if (firstRender.current) { firstRender.current = false; return; }
-    if (!active) start();
     done();
-    return stop;
-  }, [active, done, pathname, start, stop]);
+  }, [pathname, done]);
 
   if (!active) return null;
 

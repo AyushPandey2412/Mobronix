@@ -15,6 +15,8 @@ import { SLOTS } from "@/lib/data";
 import { fmt, cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import type { DeviceLine } from "@/lib/types";
+import { PhoneOtpLogin } from "@/components/shared/PhoneOtpLogin";
+import { getResponses } from "@/lib/answers";
 
 export default function CheckoutPage() {
   const router             = useRouter();
@@ -32,78 +34,15 @@ export default function CheckoutPage() {
   const patchCurrentEnquiry  = useStore((s) => s.patchCurrentEnquiry); // overwrites with real API values
   const updateEnquiryPickup = useStore((s) => s.updateEnquiryPickup);
 
-  const [sheet,        setSheet]        = useState<"slot" | "pay" | null>(null);
+  const [sheet,        setSheet]        = useState<"pay" | null>(null);
   const [error,        setError]        = useState<string | null>(null);
   const [pincodeError, setPincodeError] = useState(false);
   const [submitting,   setSubmitting]   = useState(false);
 
-  // Seller login fields — name + phone. Prefilled from the store (e.g. the phone
-  // entered at the price-unlock step), ignoring the placeholder "Seller" name.
-  const [contactName,  setContactName]  = useState(user && user.name !== "Seller" ? user.name : "");
-  const [contactPhone, setContactPhone] = useState(user?.mobile ?? "");
-
-  // OTP login state for the checkout gate.
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpCode, setOtpCode] = useState("");
-  const [otpBusy, setOtpBusy] = useState(false);
-  const [devCode, setDevCode] = useState<string | null>(null);
-
-  // Checkout is a LOGIN GATE: the seller must log in (real name + OTP-verified
-  // phone) before they can fill pickup details and submit. A bare phone-unlock
-  // (name "Seller") is not enough — we still need their name + a verified number.
+  // Login is NOT required to browse/quote — only to book the pickup here.
   const loggedIn =
     !!user && /^\d{10}$/.test(user.mobile ?? "") && !!user.name.trim() && user.name !== "Seller";
 
-  // Step 1 — request an OTP for the entered name + phone.
-  const requestOtp = async () => {
-    setError(null);
-    const name  = contactName.trim();
-    const phone = contactPhone.trim();
-    if (!name)                   { setError("Please enter your name to continue."); return; }
-    if (!/^\d{10}$/.test(phone)) { setError("Please enter a valid 10-digit mobile number."); return; }
-    setOtpBusy(true);
-    try {
-      const res  = await fetch("/api/otp/send", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile: phone }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) { setError(data.error || "Couldn't send the code. Please try again."); return; }
-      setOtpSent(true);
-      setOtpCode("");
-      setDevCode(data.devCode ?? null);   // dev only — shown so you can test without the terminal
-      toast("Verification code sent", "success");
-    } catch {
-      setError("Couldn't send the code. Please try again.");
-    } finally {
-      setOtpBusy(false);
-    }
-  };
-
-  // Step 2 — verify the OTP, then "log in" (save name + phone to the store).
-  const verifyAndLogin = async () => {
-    setError(null);
-    const phone = contactPhone.trim();
-    const code  = otpCode.trim();
-    if (!/^\d{4,6}$/.test(code)) { setError("Enter the 6-digit code we sent you."); return; }
-    setOtpBusy(true);
-    try {
-      const res  = await fetch("/api/otp/verify", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile: phone, code }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) { setError(data.error || "Incorrect code."); return; }
-      setContact(contactName.trim(), phone);   // verified → logged in
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } catch {
-      setError("Couldn't verify the code. Please try again.");
-    } finally {
-      setOtpBusy(false);
-    }
-  };
-
-  // Login is NOT required to browse/quote — only to book the pickup here.
   useEffect(() => {
     if (editing) { if (!enquiry) router.replace("/track"); }
     else if (!model || !quote) { router.replace("/"); }
@@ -111,16 +50,22 @@ export default function CheckoutPage() {
 
   const { devices, total } = useMemo(() => {
     if (editing && enquiry) {
-      const d: DeviceLine[] = enquiry.devices?.length
+      const d = (enquiry.devices?.length
         ? enquiry.devices
-        : [{ model: enquiry.model, storage: enquiry.storage, final: enquiry.amount }];
+        : [{ model: enquiry.model, storage: enquiry.storage, final: enquiry.amount }]) as (DeviceLine & { category?: string })[];
       return { devices: d, total: enquiry.amount };
     }
-    const cur: DeviceLine[] =
+    const cur =
       model && selectedStorage && quote
-        ? [{ model: model.name, storage: selectedStorage, final: quote.final }]
+        ? [{ model: model.name, storage: selectedStorage, final: quote.final, category: model.category }]
         : [];
-    const d = [...cart.map((c) => ({ model: c.model, storage: c.storage, final: c.final })), ...cur];
+    const d = [
+      ...cart.map((c) => {
+        const itemModel = useStore.getState().models.find(m => m.id === c.modelId);
+        return { model: c.model, storage: c.storage, final: c.final, category: itemModel?.category ?? 'iphone' };
+      }),
+      ...cur
+    ];
     return { devices: d, total: d.reduce((s, x) => s + x.final, 0) };
   }, [editing, enquiry, model, selectedStorage, quote, cart]);
 
@@ -130,8 +75,8 @@ export default function CheckoutPage() {
 
     // ── Editing existing enquiry — local update only (no contact needed) ───
     if (editing) {
-      if (!checkout.address || !checkout.pincode || !checkout.slot || !checkout.pay) {
-        setError("Please fill the address and pincode, then select a preferred slot and payment mode.");
+      if (!checkout.address || !checkout.pincode || !checkout.pay) {
+        setError("Please fill the address and pincode, then select a payment mode.");
         return;
       }
       if (!/^\d{6}$/.test(checkout.pincode.trim())) { setPincodeError(true); return; }
@@ -150,8 +95,8 @@ export default function CheckoutPage() {
     const name  = user.name;
     const phone = user.mobile;
 
-    if (!checkout.address || !checkout.pincode || !checkout.slot || !checkout.pay) {
-      setError("Please fill the address and pincode, then select a preferred slot and payment mode.");
+    if (!checkout.address || !checkout.pincode || !checkout.pay) {
+      setError("Please fill the address and pincode, then select a payment mode.");
       return;
     }
     if (!/^\d{6}$/.test(checkout.pincode.trim())) {
@@ -177,17 +122,23 @@ export default function CheckoutPage() {
       const toFactors = (bd?: { label: string; factor: number }[]) =>
         (bd ?? []).map((b) => ({ label: b.label, factor: b.factor }));
 
-      const cartDevices = st.cart.map((c) => ({
-        model: c.model, storage: c.storage, category: cat,
-        base: c.base, final: c.final,
-        factors: toFactors(c.breakdown), answers: c.answers ?? {},
-      }));
+      const cartDevices = st.cart.map((c) => {
+        const itemModel = st.models.find(m => m.id === c.modelId);
+        const itemCat = itemModel?.category || "iphone";
+        return {
+          model: c.model, storage: c.storage, category: itemCat,
+          base: c.base, final: c.final,
+          factors: toFactors(c.breakdown), answers: c.answers ?? {},
+          responses: getResponses(c.answers ?? {}, itemCat, st.activeQuestions),
+        };
+      });
       const activeDevice =
         model && selectedStorage && quote
           ? [{
               model: model.name, storage: selectedStorage, category: model.category ?? "iphone",
               base: quote.base, final: quote.final,
               factors: toFactors(quote.breakdown), answers: st.answers ?? {},
+              responses: getResponses(st.answers ?? {}, model.category ?? "iphone", st.activeQuestions),
             }]
           : [];
       const bodyDevices = [...cartDevices, ...activeDevice];
@@ -196,7 +147,7 @@ export default function CheckoutPage() {
         devices:      bodyDevices,
         address:      checkout.address,
         pincode:      checkout.pincode,
-        pickup_slot:  checkout.slot!,
+        pickup_slot:  checkout.slot || "To be collected by phone",
         payment_mode: checkout.pay! as "UPI" | "Cash",
         photos:       uploadedPhotos,  // real Supabase Storage paths
         name,                          // seller contact — now stored on the enquiry
@@ -228,7 +179,7 @@ export default function CheckoutPage() {
         assigned_exec: assignedExec,
       });
 
-      router.push("/sell/confirm");
+      router.push("/track");
     } catch (e: any) {
       setSubmitting(false);
       setError(e.message || "Something went wrong. Please try again.");
@@ -240,7 +191,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <FlowHeader title={editing ? "Edit pickup details" : "Schedule pickup"} back={editing ? "/track" : "/sell/photos"} />
+      <FlowHeader title={editing ? "Edit pickup details" : "Schedule pickup"} back={editing ? "/track" : "/sell/condition"} />
 
       {/* Order summary */}
       <div
@@ -251,12 +202,26 @@ export default function CheckoutPage() {
           {devices.map((d, i) => (
             <div key={i} className="flex items-center justify-between text-body-sm">
               <span className="text-text-secondary">{d.model} · {d.storage}</span>
-              <span className="font-mono font-semibold text-text-primary">{fmt(d.final)}</span>
+              {d.category === 'android' || d.final === 0 ? (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-[10px] font-semibold uppercase">
+                  Awaiting Call
+                </span>
+              ) : (
+                <span className="font-mono font-semibold text-text-primary">{fmt(d.final)}</span>
+              )}
             </div>
           ))}
           <div className="flex items-center justify-between border-t border-dashed border-border pt-2.5">
             <span className="text-body-md font-bold text-text-primary">Total offer</span>
-            <span className="font-mono text-body-md font-extrabold text-text-primary">{fmt(total)}</span>
+            <span className="font-mono text-body-md font-extrabold text-text-primary">
+              {devices.some(d => d.category === 'android' || d.final === 0) ? (
+                <span className="inline-flex items-center px-2 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-caption font-semibold uppercase">
+                  Awaiting Call
+                </span>
+              ) : (
+                fmt(total)
+              )}
+            </span>
           </div>
           {!editing && loggedIn && user && (
             <div className="flex items-center justify-between pt-1 text-caption text-text-tertiary">
@@ -275,68 +240,20 @@ export default function CheckoutPage() {
           className="mt-6 rounded-xl border border-border bg-surface p-5 sm:p-6 animate-m-fade-up"
         >
           <h3 className="text-h4 font-bold text-text-primary">Log in to book your pickup</h3>
-          <p className="mt-1 text-body-sm text-text-secondary">
-            Your offer of <b className="text-text-primary">{fmt(total)}</b> is locked in. Verify your mobile
-            number — we&apos;ll call you on it to confirm your device, the final price &amp; the pickup slot.
+          <p className="mt-1 mb-5 text-body-sm text-text-secondary">
+            {devices.some(d => d.category === 'android' || d.final === 0) ? (
+              <>
+                Your request is ready to submit. Verify your mobile number — we&apos;ll call you on it to confirm your device &amp; the pickup slot.
+              </>
+            ) : (
+              <>
+                Your offer of <b className="text-text-primary">{fmt(total)}</b> is locked in. Verify your mobile
+                number — we&apos;ll call you on it to confirm your device, the final price &amp; the pickup slot.
+              </>
+            )}
           </p>
 
-          {!otpSent ? (
-            /* Step 1 — name + phone → send code */
-            <div className="mt-5 space-y-4">
-              <Input
-                label="Full name"
-                placeholder="e.g. Aisha Khan"
-                leftIcon={<UserIcon className="h-[18px] w-[18px]" />}
-                value={contactName}
-                onChange={(e) => setContactName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && requestOtp()}
-                autoComplete="name"
-              />
-              <Input
-                label="Mobile number"
-                inputMode="numeric"
-                maxLength={10}
-                placeholder="10-digit mobile number"
-                leftIcon={<Phone className="h-[18px] w-[18px]" />}
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                onKeyDown={(e) => e.key === "Enter" && requestOtp()}
-                autoComplete="tel"
-              />
-              {error && <p role="alert" className="text-body-sm font-medium text-error-600">{error}</p>}
-              <Button fullWidth size="lg" isLoading={otpBusy} onClick={requestOtp}>Send verification code</Button>
-            </div>
-          ) : (
-            /* Step 2 — enter the OTP → verify & log in */
-            <div className="mt-5 space-y-4">
-              <p className="text-body-sm text-text-secondary">
-                Enter the 6-digit code sent to <b className="text-text-primary">+91 {contactPhone}</b>.{" "}
-                <button type="button" onClick={() => { setOtpSent(false); setError(null); setDevCode(null); }}
-                  className="font-semibold text-brand">Change number</button>
-              </p>
-              {devCode && (
-                <p className="rounded-lg bg-warning-50 px-3 py-2 text-caption text-warning-800">
-                  Preview mode — your code is <b className="font-mono">{devCode}</b>. (Real SMS not configured yet.)
-                </p>
-              )}
-              <Input
-                label="Verification code"
-                inputMode="numeric"
-                maxLength={6}
-                placeholder="6-digit code"
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                onKeyDown={(e) => e.key === "Enter" && verifyAndLogin()}
-                autoComplete="one-time-code"
-              />
-              {error && <p role="alert" className="text-body-sm font-medium text-error-600">{error}</p>}
-              <Button fullWidth size="lg" isLoading={otpBusy} onClick={verifyAndLogin}>Verify &amp; continue</Button>
-              <button type="button" onClick={requestOtp} disabled={otpBusy}
-                className="w-full text-center text-body-sm font-semibold text-text-tertiary hover:text-brand disabled:opacity-50">
-                Resend code
-              </button>
-            </div>
-          )}
+          <PhoneOtpLogin />
         </div>
       )}
 
@@ -361,14 +278,7 @@ export default function CheckoutPage() {
           error={pincodeError ? "Please enter a valid 6-digit pincode." : null}
         />
 
-        <div>
-          <label className="mb-2 block text-label text-text-primary">Preferred slot</label>
-          <div className="mb-2.5 flex items-start gap-2 rounded-lg border border-primary-100 bg-primary-50 px-3.5 py-2.5 text-caption text-text-secondary">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
-            Our spokesperson will call to confirm your slot. Pick a preferred time — it may vary slightly with availability.
-          </div>
-          <SelectorRow value={checkout.slot} placeholder="Select a preferred slot" onClick={() => setSheet("slot")} />
-        </div>
+        {/* Preferred slot section removed */}
 
         <div>
           <label className="mb-2 block text-label text-text-primary">Payment mode</label>
@@ -391,17 +301,7 @@ export default function CheckoutPage() {
         </Button>
       </StickyBar>
 
-      {/* Slot sheet */}
-      <Sheet open={sheet === "slot"} onClose={() => setSheet(null)} title="Select preferred slot">
-        <div className="flex flex-col">
-          {SLOTS.map((s) => (
-            <SheetOption
-              key={s} label={s} selected={checkout.slot === s}
-              onClick={() => { setCheckout({ slot: s }); setSheet(null); }}
-            />
-          ))}
-        </div>
-      </Sheet>
+      {/* Slot sheet removed */}
 
       {/* Payment sheet */}
       <Sheet open={sheet === "pay"} onClose={() => setSheet(null)} title="Select payment mode">

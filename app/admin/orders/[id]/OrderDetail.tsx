@@ -36,6 +36,8 @@ type DeviceSummary = Partial<EnquiryDevice> & {
   storage?: string
   base?: number
   final?: number
+  category?: string
+  responses?: { question: string; answer: string }[]
 }
 
 export default function OrderDetail({
@@ -56,6 +58,7 @@ export default function OrderDetail({
   const [step,       setStep]       = useState(initial.tracking_step ?? 0)
   const [note,       setNote]       = useState(initial.internal_note || '')
   const [confirmDel, setConfirmDel] = useState(false)
+  const [showResponses, setShowResponses] = useState<Record<number, boolean>>({})
 
   // ── Refetch history from Supabase (always fresh) ──────────────────────────
   const { data: history = initialHistory } = useQuery({
@@ -181,16 +184,52 @@ export default function OrderDetail({
                     <p className="text-caption text-text-tertiary mt-0.5">{[d.variant, d.chip, d.storage].filter(Boolean).join(' · ')}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-caption text-text-tertiary">Base {inr(d.base ?? 0)}</p>
-                    <p className="text-body-sm font-bold text-success-600">{inr(d.final ?? 0)}</p>
+                    {d.category === 'android' ? (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-[10px] font-semibold uppercase">
+                        Awaiting Call
+                      </span>
+                    ) : (
+                      <>
+                        <p className="text-caption text-text-tertiary">Base {inr(d.base ?? 0)}</p>
+                        <p className="text-body-sm font-bold text-success-600">{inr(d.final ?? 0)}</p>
+                      </>
+                    )}
                   </div>
                 </div>
+                {d.responses && d.responses.length > 0 && (
+                  <div className="mt-2.5 pt-2.5 border-t border-dashed border-border-strong">
+                    <button
+                      onClick={() => setShowResponses(prev => ({ ...prev, [i]: !prev[i] }))}
+                      className="text-caption text-brand hover:underline font-semibold flex items-center gap-1"
+                    >
+                      {showResponses[i] ? 'Hide condition answers' : `Show condition answers (${d.responses.length})`}
+                    </button>
+                    {showResponses[i] && (
+                      <div className="mt-2.5 space-y-1.5 pl-2 border-l-2 border-brand bg-white/50 p-2 rounded-r-lg">
+                        {d.responses.map((resp: any, ri: number) => (
+                          <div key={ri} className="text-[11px] leading-tight text-left">
+                            <span className="text-text-secondary font-medium block">{resp.question}</span>
+                            <span className="text-text-primary font-semibold">{resp.answer}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
           <div className="flex justify-between items-center border-t border-border mt-3 pt-3">
             <span className="text-body-sm font-semibold text-text-primary">Total</span>
-            <span className="text-body-sm font-bold text-success-600">{inr(initial.total_amount ?? 0)}</span>
+            <span className="text-body-sm font-bold text-success-600">
+              {((initial.devices as any[])?.some(d => d.category === 'android') || initial.total_amount === 0) ? (
+                <span className="inline-flex items-center px-2 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-caption font-semibold uppercase">
+                  Awaiting Call
+                </span>
+              ) : (
+                inr(initial.total_amount ?? 0)
+              )}
+            </span>
           </div>
         </div>
       </div>

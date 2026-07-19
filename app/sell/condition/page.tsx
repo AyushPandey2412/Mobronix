@@ -85,7 +85,7 @@ export default function ConditionPage() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       computeQuote();
-      router.push("/sell/quote");
+      router.push("/sell/checkout");
     }
   };
 
@@ -139,7 +139,7 @@ export default function ConditionPage() {
           disabled={!proceed}
           rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
         >
-          {isLast ? "See my quote" : "Next"}
+          {isLast ? "Go to Checkout" : "Next"}
         </Button>
       </div>
     </div>

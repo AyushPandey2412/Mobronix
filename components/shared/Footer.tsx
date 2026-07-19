@@ -25,7 +25,7 @@ export function Footer() {
         <div>
           <h4 className="text-label font-semibold text-white">Company</h4>
           <ul className="mt-4 space-y-3 text-body-sm text-neutral-400">
-            <li><Link href="/" className="hover:text-white transition-colors">Sell your iPhone</Link></li>
+            <li><Link href="/" className="hover:text-white transition-colors">Sell your phone</Link></li>
             <li><Link href="/#how" className="hover:text-white transition-colors">How it works</Link></li>
             <li><Link href="/track" className="hover:text-white transition-colors">Track an order</Link></li>
             <li><Link href="/#faq" className="hover:text-white transition-colors">FAQs</Link></li>
@@ -53,7 +53,7 @@ export function Footer() {
               <Phone className="h-4 w-4 shrink-0" /> +91 00000 00000
             </li>
             <li className="flex items-center gap-2">
-              <Mail className="h-4 w-4 shrink-0" /> support@sellmyiphone.in
+              <Mail className="h-4 w-4 shrink-0" /> support@mobronix.in
             </li>
           </ul>
           <div className="mt-5 flex gap-2">
@@ -84,7 +84,7 @@ export function Footer() {
           sponsorship of this website or its services.
         </p>
         <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-caption text-neutral-600">
-          <span>© {new Date().getFullYear()} SellMyiPhone. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Mobronix. All rights reserved.</span>
           <span className="hidden sm:inline">·</span>
           <Link href="/legal/privacy-policy" className="hover:text-neutral-400 transition-colors">Privacy Policy</Link>
           <span>·</span>

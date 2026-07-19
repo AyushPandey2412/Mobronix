@@ -306,7 +306,15 @@ export default function Dashboard({
                     </p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-sans text-body-sm font-bold text-text-primary">{inr(e.total_amount ?? 0)}</p>
+                    <p className="font-sans text-body-sm font-bold text-text-primary">
+                      {((e.devices as any[])?.some(d => d.category === 'android') || e.total_amount === 0) ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-[10px] font-semibold uppercase">
+                          Awaiting Call
+                        </span>
+                      ) : (
+                        inr(e.total_amount ?? 0)
+                      )}
+                    </p>
                     <p className="text-caption text-text-tertiary">{new Date(e.created_at ?? '').toLocaleDateString('en-IN', { day:'numeric', month:'short' })}</p>
                   </div>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"

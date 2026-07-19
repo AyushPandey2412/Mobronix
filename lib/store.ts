@@ -14,6 +14,7 @@ import {
 } from "./data";
 import { calcQuote } from "./quote";
 import { makeEnquiryId } from "./utils";
+import { createBrowserClient } from "./supabase/client";
 import type {
   AnswerMap,
   CartDevice,
@@ -197,7 +198,13 @@ export const useStore = create<AppState>()(
           },
         })),
 
-      logout: () =>
+      logout: () => {
+        try {
+          const supabase = createBrowserClient();
+          supabase.auth.signOut();
+        } catch (e) {
+          console.error("Supabase signOut failed", e);
+        }
         set({
           user: null,
           selectedModelId: null,
@@ -207,7 +214,8 @@ export const useStore = create<AppState>()(
           photos: {},
           cart: [],
           checkout: { ...emptyCheckout },
-        }),
+        });
+      },
 
       selectModel: (id) => set({ selectedModelId: id, selectedStorage: null }),
       setStorage: (s) => set({ selectedStorage: s }),

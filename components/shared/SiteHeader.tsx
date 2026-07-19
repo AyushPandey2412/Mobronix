@@ -41,7 +41,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-header border-b border-border/70 bg-surface/80 backdrop-blur-md">
       <div className="container-app flex h-16 items-center justify-between gap-4">
-        <Link href="/" aria-label="SellMyiPhone home">
+        <Link href="/" aria-label="Mobronix home">
           <Logo />
         </Link>
 

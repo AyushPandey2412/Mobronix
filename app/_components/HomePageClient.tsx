@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight, MessageCircle, ShieldCheck, Truck, Wallet,
@@ -10,8 +9,8 @@ import {
 import { ModelSelector } from "@/components/marketing/ModelSelector";
 import { HowItWorks } from "@/components/marketing/HowItWorks";
 import { WhyUs } from "@/components/marketing/WhyUs";
+import { AndroidBuyback } from "@/components/marketing/AndroidBuyback";
 import { DeviceVisual } from "@/components/shared/DeviceVisual";
-import { getDeviceImageSized } from "@/lib/deviceImages";
 import { fmt } from "@/lib/utils";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { CartBar } from "@/components/shared/CartBar";
@@ -25,6 +24,7 @@ import { REVIEWS, FAQS, STATS } from "@/lib/data";
 import type { Model } from "@/lib/types";
 
 function maxPrice(model: Model): number {
+  if (!model.storages) return 0;
   const out: number[] = [];
   Object.values(model.storages as Record<string, unknown>).forEach((v) => {
     if (typeof v === "number") out.push(v);
@@ -53,34 +53,18 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
   const scrollToModels = () =>
     document.getElementById("models")?.scrollIntoView({ behavior: "smooth" });
 
-  // Top buyback prices — most valuable iPhones, sourced from live model data.
-  const topModels = useMemo(() => {
-    const source = (initialModels && initialModels.length ? initialModels : models)
-      .filter((m) => (m.category ?? "iphone") === "iphone");
-    return [...source].sort((a, b) => maxPrice(b) - maxPrice(a)).slice(0, 8);
-  }, [initialModels, models]);
 
-  const goSell = (m: Model) => {
-    selectModel(m.id);
-    useStore.setState((s) => ({
-      models: s.models.some((x) => x.id === m.id)
-        ? s.models.map((x) => (x.id === m.id ? m : x))
-        : [...s.models, m],
-    }));
-    router.push("/sell/storage");
-  };
 
   return (
     <div>
-      {/* HERO */}
       <section className="relative overflow-hidden bg-mesh">
-        <div className="container-app grid items-center gap-10 py-12 md:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:py-20">
+        <div className="container-app grid items-center gap-8 pt-10 pb-6 md:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:py-20">
           <div>
             <span
               className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-caption font-bold text-primary-700 animate-m-fade-up"
               style={{ animationDelay: `${0 * 60}ms` }}
             >
-              Your iPhone. Your Choice. No Pressure.
+              Your phone. Your Choice. No Pressure.
             </span>
 
             <h1
@@ -94,8 +78,13 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
               Get a Quote, Free of Cost. Free Device Check. Free Pickup at Your Doorstep.
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-3 animate-m-fade-up" style={{ animationDelay: `${3 * 60}ms` }}>
-              <Button size="lg" onClick={scrollToModels} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
+            <div className="mt-7 flex flex-row gap-3 animate-m-fade-up" style={{ animationDelay: `${3 * 60}ms` }}>
+              <Button
+                size="lg"
+                onClick={scrollToModels}
+                rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
+                className="flex-1 sm:flex-initial justify-center text-[13px] sm:text-body-sm px-3 sm:px-5"
+              >
                 Get my price
               </Button>
               <Button
@@ -103,19 +92,13 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
                 variant="outline"
                 leftIcon={<MessageCircle className="h-[18px] w-[18px] text-whatsapp" />}
                 onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919999999999"}`, "_blank")}
+                className="flex-1 sm:flex-initial justify-center text-[13px] sm:text-body-sm px-3 sm:px-5 bg-surface"
               >
                 WhatsApp us
               </Button>
             </div>
 
-            <div className="mt-9 grid max-w-md grid-cols-3 gap-4 border-t border-border pt-6 animate-m-fade-up" style={{ animationDelay: `${4 * 60}ms` }}>
-              {STATS.map((s) => (
-                <div key={s.label}>
-                  <div className="text-h4 font-extrabold tracking-tight text-text-primary tabular-nums">{s.value}</div>
-                  <div className="mt-0.5 text-caption font-semibold text-text-tertiary">{s.label}</div>
-                </div>
-              ))}
-            </div>
+            {/* STATS block removed */}
           </div>
 
           <div
@@ -166,11 +149,11 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
       )}
 
       {/* MODEL SELECTION — passes server-prefetched models as initialData */}
-      <section id="models" className="container-app scroll-mt-24 py-12 md:py-16">
+      <section id="models" className="container-app scroll-mt-24 pt-6 pb-12 md:py-16">
         <SectionHeading
           eyebrow="Get started"
           title="Choose your device"
-          subtitle="Search or pick your iPhone or MacBook to get an instant price estimate."
+          subtitle="Search or pick your phone or MacBook to get an instant price estimate."
         />
         <div className="mt-6">
           <ModelSelector initialModels={initialModels} />
@@ -182,6 +165,9 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
 
       {/* WHY US — bento grid */}
       <WhyUs />
+
+      {/* ANDROID BUYBACK — custom Android manual flow */}
+      <AndroidBuyback />
 
       {/* RESET & HAND OVER */}
       {/* <section className="bg-surface py-14 md:py-20">
@@ -279,48 +265,7 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
       </section>
 
 
-      {/* TOP BUYBACK PRICES — popular models with live prices, click to sell */}
-      <section className="container-app py-14 md:py-20">
-        <SectionHeading
-          eyebrow="Live prices"
-          title="Top buyback prices"
-          subtitle="The most popular iPhones we're buying right now. Tap one to get your exact offer."
-          center
-        />
-        <div
-          className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
-        >
-          {topModels.map((m, i) => {
-            const img = getDeviceImageSized(m, 160);
-            return (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => goSell(m)}
-                style={{ animationDelay: `${i * 60}ms` }}
-                className="group flex items-center gap-3 rounded-xl border border-border bg-surface p-3 text-left shadow-xs transition-all hover:border-primary-200 hover:shadow-sm animate-m-fade-up hover:-translate-y-1 active:scale-[0.98]"
-              >
-                <div className="relative grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg bg-gradient-to-br from-neutral-50 to-neutral-100">
-                  {img && (
-                    <Image src={img} alt={m.name} fill sizes="56px" unoptimized loading="lazy" className="scale-[1.3] object-contain drop-shadow-sm" />
-                  )}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-body-sm font-bold text-text-primary">{m.name}</p>
-                  <p className="text-caption font-semibold text-success-600">Up to {fmt(maxPrice(m))}</p>
-                </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-neutral-300 transition-all group-hover:translate-x-0.5 group-hover:text-brand" />
-              </button>
-            );
-          })}
-        </div>
 
-        <div className="mt-9 flex justify-center">
-          <Button variant="outline" size="lg" onClick={scrollToModels} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
-            See all models &amp; prices
-          </Button>
-        </div>
-      </section>
 
       <CartBar />
     </div>
