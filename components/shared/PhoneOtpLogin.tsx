@@ -8,7 +8,7 @@ import { useStore } from "@/lib/store";
 import { toast } from "@/lib/toast";
 
 export interface PhoneOtpLoginProps {
-  onSuccess?: () => void;
+  onSuccess?: (role: string) => void;
 }
 
 export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
@@ -79,9 +79,9 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
         setError(data.error || "Incorrect code.");
         return;
       }
-      setContact(name, phone);
+      setContact(name, phone, data.user?.role || "seller");
       toast("Successfully logged in", "success");
-      onSuccess?.();
+      onSuccess?.(data.user?.role || "seller");
     } catch {
       setError("Couldn't verify the code. Please try again.");
     } finally {

@@ -23,7 +23,13 @@ export default function LoginPage() {
     if (user) router.replace(user.role === "admin" ? "/admin" : "/");
   }, [user, router]);
 
-  const onSellerSuccess = () => router.replace(selectedModel ? "/sell/storage" : "/");
+  const onSellerSuccess = (role: string) => {
+    if (role === "admin") {
+      router.replace("/admin");
+    } else {
+      router.replace(selectedModel ? "/sell/storage" : "/");
+    }
+  };
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
@@ -34,7 +40,7 @@ export default function LoginPage() {
           <h1
             className="max-w-md text-[2.75rem] font-extrabold leading-[1.1] tracking-[-0.02em] animate-m-fade-up"
           >
-            Your iPhone.
+            Your Phone.
 Your Choice.
 No Pressure.
           </h1>

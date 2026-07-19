@@ -137,7 +137,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
         setError(data.error || "Incorrect code.");
         return;
       }
-      setContact(contactName.trim(), phone);
+      setContact(contactName.trim(), phone, data.user?.role || "seller");
       toast("Login successful", "success");
       onSuccess?.();
       onClose();

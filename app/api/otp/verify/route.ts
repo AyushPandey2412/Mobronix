@@ -96,13 +96,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: signInError.message }, { status: 400 })
     }
 
+    // Fetch profile role to return the correct user role instantly
+    const { data: profileRole } = await serviceClient
+      .from('profiles')
+      .select('role')
+      .eq('id', signInData.user.id)
+      .single()
+    const role = profileRole?.role || 'seller'
+
     return NextResponse.json({
       ok: true,
       session: signInData.session,
       user: {
         name: signInData.user?.user_metadata?.full_name || 'Seller',
         mobile: body.mobile,
-        role: 'seller'
+        role
       }
     })
 
