@@ -48,7 +48,7 @@ export function QuestionBody({ question, answer, onAnswer }: Props) {
   }
 
   if (question.type === "multi" && question.opts) {
-    const ans = (answer as number[]) || [];
+    const ans = Array.isArray(answer) ? answer : [];
     const toggle = (oi: number) => {
       const label = question.opts![oi].label;
       const exists = ans.includes(oi);
