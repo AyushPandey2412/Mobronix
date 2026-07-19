@@ -11,7 +11,7 @@ Single scannable narrative: *trust → quote → reassure → convert.* One prim
 
 | # | Section | Pattern |
 |---|---|---|
-| 1 | **Hero** | Left: Overline → Display XL/L headline ("Sell your iPhone. Get paid instantly.") → body-lg sub → **Model Selector** (search + popular chips) as primary CTA → trust strip (`ShieldCheck`, `Star 4.9`, `Truck`). Right: iPhone visual / quote card preview. Mobile: stacked, headline → selector → trust. `bg-brand-gradient` only as subtle accent, not full bleed. |
+| 1 | **Hero** | Left: Overline → Display XL/L headline ("Sell your Phone. Get paid instantly.") → body-lg sub → **Model Selector** (search + popular chips) as primary CTA → trust strip (`ShieldCheck`, `Star 4.9`, `Truck`). Right: iPhone visual / quote card preview. Mobile: stacked, headline → selector → trust. `bg-brand-gradient` only as subtle accent, not full bleed. |
 | 2 | **Model Selector** | Search input (`Search` icon, autocomplete) + grid of popular models (radio cards w/ thumbnail). Selecting → `/sell/device`. Can be hero-embedded + repeated mid-page. |
 | 3 | **How It Works** | 4 Process cards w/ connector line (desktop): Select model → Get quote → Free pickup → Instant payment. Icons `Smartphone`/`Wallet`/`Truck`/`IndianRupee`. |
 | 4 | **Benefits** | 3–6 Feature cards: Best price, Instant UPI/bank payment, Free doorstep pickup, 100% safe & data-wiped, No haggling, Same-day in Mumbai. |

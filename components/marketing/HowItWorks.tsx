@@ -344,7 +344,7 @@ export function HowItWorks() {
             Simple, Fast &amp; Hassle-Free
           </h2>
           <p className="mx-auto mt-2 max-w-xl text-[13px] text-text-secondary md:text-body-md">
-            Selling your iPhone is as easy as 1, 2, 3.
+            Selling your Phone is as easy as 1, 2, 3.
           </p>
         </div>
 
