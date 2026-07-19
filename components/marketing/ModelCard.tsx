@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
-import { fmt } from "@/lib/utils";
+import { fmt, cn } from "@/lib/utils";
 import { getDeviceImageSized } from "@/lib/deviceImages";
 import type { Model } from "@/lib/types";
 
@@ -32,39 +32,59 @@ export function ModelCard({ model, onSelect, index = 0 }: { model: Model; onSele
       type="button"
       onClick={onSelect}
       style={{ animationDelay: `${index * 40}ms` }}
-      className="animate-m-fade-up group flex flex-col items-start gap-3 rounded-lg border border-border bg-surface p-4 text-left shadow-xs transition-all hover:-translate-y-1 active:scale-[0.98] hover:border-primary-200 hover:shadow-sm"
+      className="animate-m-fade-up group flex flex-col items-stretch rounded-2xl border border-border/80 bg-surface p-4 text-left shadow-xs transition-all duration-300 hover:-translate-y-1 active:scale-[0.98] hover:border-brand/35 hover:shadow-[0_8px_30px_rgba(0,0,0,0.035)]"
     >
-      <div className="flex w-full items-start justify-between">
-        {/* Device image — Apple CDN with fallback SVG */}
-        <div className="relative grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-to-br from-neutral-50 to-neutral-100">
-          {imgSrc && !imgErr ? (
-            <Image
-              src={imgSrc}
-              alt={model.name}
-              fill
-              sizes="80px"
-              className="scale-[1.3] object-contain drop-shadow-sm"
-              unoptimized
-              loading="lazy"
-              placeholder="blur"
-              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCA1NiA1NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIGZpbGw9IiNGM0Y0RjYiLz48L3N2Zz4="
-              onError={() => setImgErr(true)}
-            />
-          ) : (
-            isMac ? <LaptopGlyph /> : <PhoneGlyph />
-          )}
-        </div>
-        <ChevronRight className="h-5 w-5 text-neutral-300 transition-all group-hover:translate-x-0.5 group-hover:text-brand" />
+      {/* Center device image container */}
+      <div className="relative flex aspect-square w-full items-center justify-center rounded-xl bg-gradient-to-b from-neutral-50/50 to-neutral-100/50 p-4 overflow-hidden">
+        {imgSrc && !imgErr ? (
+          <Image
+            src={imgSrc}
+            alt={model.name}
+            fill
+            sizes="(max-width: 768px) 150px, 200px"
+            className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
+            unoptimized
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCA1NiA1NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIGZpbGw9IiNGM0Y0RjYiLz48L3N2Zz4="
+            onError={() => setImgErr(true)}
+          />
+        ) : (
+          <span className="text-neutral-400 transform transition-transform duration-300 group-hover:scale-105">
+            {isMac ? <LaptopGlyph /> : <PhoneGlyph />}
+          </span>
+        )}
       </div>
 
-      <div className="w-full">
-        <h3 className="text-body-md font-bold leading-snug text-text-primary">{model.name}</h3>
-        {model.chips && (
-          <p className="mt-0.5 text-caption text-text-tertiary">{model.chips.join(" / ")}</p>
-        )}
-        <p className="mt-1 text-body-sm font-semibold text-success-600 tabular-nums">
-          {max > 0 ? `Up to ${fmt(max)}` : "Awaiting Call"}
-        </p>
+      {/* Content */}
+      <div className="mt-4 flex flex-1 flex-col justify-between">
+        <div>
+          <h3 className="text-body-sm sm:text-body-md font-extrabold leading-snug text-text-primary group-hover:text-brand transition-colors line-clamp-2">
+            {model.name}
+          </h3>
+          {model.chips && (
+            <p className="mt-1 text-caption text-text-tertiary line-clamp-1">
+              {model.chips.join(" / ")}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <span
+            className={cn(
+              "inline-flex items-center rounded-full px-2.5 py-0.5 text-caption font-bold border",
+              max > 0
+                ? "bg-emerald-50/80 border-emerald-100 text-emerald-700"
+                : "bg-neutral-50 border-neutral-200/80 text-text-tertiary"
+            )}
+          >
+            {max > 0 ? `Up to ${fmt(max)}` : "Awaiting Call"}
+          </span>
+
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-neutral-50 border border-neutral-100 text-neutral-400 group-hover:bg-brand group-hover:border-brand group-hover:text-white transition-all duration-300">
+            <ChevronRight className="h-3.5 w-3.5" />
+          </span>
+        </div>
       </div>
     </button>
   );

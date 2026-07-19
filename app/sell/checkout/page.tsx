@@ -274,7 +274,11 @@ export default function CheckoutPage() {
           placeholder="e.g. 400001"
           leftIcon={<MapPin className="h-[18px] w-[18px]" />}
           value={checkout.pincode}
-          onChange={(e) => setCheckout({ pincode: e.target.value.replace(/\D/g, "") })}
+          onChange={(e) => {
+            const val = e.target.value.replace(/\D/g, "");
+            setCheckout({ pincode: val });
+            if (val.length === 6) setPincodeError(false);
+          }}
           error={pincodeError ? "Please enter a valid 6-digit pincode." : null}
         />
 

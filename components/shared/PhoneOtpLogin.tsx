@@ -98,7 +98,10 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
             placeholder="e.g. Aisha Khan"
             leftIcon={<UserIcon className="h-[18px] w-[18px]" />}
             value={contactName}
-            onChange={(e) => setContactName(e.target.value)}
+            onChange={(e) => {
+              setContactName(e.target.value);
+              setError(null);
+            }}
             onKeyDown={(e) => e.key === "Enter" && requestOtp()}
             autoComplete="name"
           />
@@ -109,7 +112,10 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
             placeholder="10-digit mobile number"
             leftIcon={<Phone className="h-[18px] w-[18px]" />}
             value={contactPhone}
-            onChange={(e) => setContactPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+            onChange={(e) => {
+              setContactPhone(e.target.value.replace(/\D/g, "").slice(0, 10));
+              setError(null);
+            }}
             onKeyDown={(e) => e.key === "Enter" && requestOtp()}
             autoComplete="tel"
           />
@@ -145,7 +151,10 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
             maxLength={6}
             placeholder="6-digit code"
             value={otpCode}
-            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            onChange={(e) => {
+              setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6));
+              setError(null);
+            }}
             onKeyDown={(e) => e.key === "Enter" && verifyAndLogin()}
             autoComplete="one-time-code"
           />

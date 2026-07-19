@@ -104,4 +104,4 @@ insert into public.reviews (name, city, rating, review_text, is_published) value
   ('Neha Desai', 'Navi Mumbai', 5, 'Sold two iPhones together and got a combined deal. Super easy and fully insured pickup.', true);
 
 -- ===== Promote an admin (edit the email, then run after that user signs up) =====
--- update public.profiles set role = 'admin' where email = 'admin@sellmyiphone.in';
+-- update public.profiles set role = 'admin' where email = 'ayushpandey5248@gmail.com';

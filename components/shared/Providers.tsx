@@ -27,32 +27,39 @@ function AuthSync() {
   useEffect(() => {
     const supabase = createBrowserClient();
 
-    // Check current session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const phone = session.user.phone || session.user.user_metadata?.phone || "";
-        const name = session.user.user_metadata?.full_name || "Seller";
-        setUser(name, phone);
-      } else {
+    const syncUser = async (session: any) => {
+      if (!session?.user) {
         const currentUser = useStore.getState().user;
         if (currentUser) {
           logout();
         }
+        return;
       }
+      const phone = session.user.phone || session.user.user_metadata?.phone || "";
+      const name = session.user.user_metadata?.full_name || "Seller";
+      
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single();
+        const role = profile?.role || "seller";
+        setUser(name, phone, role);
+      } catch (err) {
+        console.error("AuthSync error fetching profile role", err);
+        setUser(name, phone, "seller");
+      }
+    };
+
+    // Check current session on mount
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      syncUser(session);
     });
 
     // Listen to changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        const phone = session.user.phone || session.user.user_metadata?.phone || "";
-        const name = session.user.user_metadata?.full_name || "Seller";
-        setUser(name, phone);
-      } else {
-        const currentUser = useStore.getState().user;
-        if (currentUser) {
-          logout();
-        }
-      }
+      syncUser(session);
     });
 
     return () => {

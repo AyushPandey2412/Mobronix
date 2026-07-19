@@ -73,7 +73,7 @@ interface AppState {
   signup: (name: string, mobile: string, password: string) => { ok: boolean; role?: "seller"; error?: string };
   phoneLogin: (mobile: string) => { ok: boolean; role?: "seller"; error?: string };
   /** Set the seller's contact name + phone (used by the checkout contact form). */
-  setContact: (name: string, mobile: string) => void;
+  setContact: (name: string, mobile: string, role?: string) => void;
   logout: () => void;
 
   // ---- catalog ----
@@ -189,12 +189,12 @@ export const useStore = create<AppState>()(
         return { ok: true, role: "seller" };
       },
 
-      setContact: (name, mobile) =>
+      setContact: (name, mobile, role) =>
         set((st) => ({
           user: {
             name: name.trim() || st.user?.name || "Seller",
             mobile: mobile.trim() || st.user?.mobile || "",
-            role: st.user?.role === "admin" ? "admin" : "seller",
+            role: (role || st.user?.role || "seller") as "seller" | "admin",
           },
         })),
 
