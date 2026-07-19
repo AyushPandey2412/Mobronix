@@ -8,6 +8,7 @@ import { useToast } from '@/components/ToastHost'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { cn } from '@/lib/utils'
 import { inr } from '@/lib/format'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import {
   QK,
   fetchEnquiryHistory,
@@ -200,18 +201,38 @@ export default function OrderDetail({
                   <div className="mt-2.5 pt-2.5 border-t border-dashed border-border-strong">
                     <button
                       onClick={() => setShowResponses(prev => ({ ...prev, [i]: !prev[i] }))}
-                      className="text-caption text-brand hover:underline font-semibold flex items-center gap-1"
+                      className="text-caption text-brand hover:text-brand-hover font-semibold inline-flex items-center gap-1.5 transition-colors"
                     >
-                      {showResponses[i] ? 'Hide condition answers' : `Show condition answers (${d.responses.length})`}
+                      <span>
+                        {showResponses[i] ? 'Hide condition answers' : `Show condition answers (${d.responses.length})`}
+                      </span>
+                      {showResponses[i] ? (
+                        <ChevronUp className="h-3.5 w-3.5" />
+                      ) : (
+                        <ChevronDown className="h-3.5 w-3.5" />
+                      )}
                     </button>
                     {showResponses[i] && (
-                      <div className="mt-2.5 space-y-1.5 pl-2 border-l-2 border-brand bg-white/50 p-2 rounded-r-lg">
-                        {d.responses.map((resp: any, ri: number) => (
-                          <div key={ri} className="text-[11px] leading-tight text-left">
-                            <span className="text-text-secondary font-medium block">{resp.question}</span>
-                            <span className="text-text-primary font-semibold">{resp.answer}</span>
-                          </div>
-                        ))}
+                      <div className="mt-3 space-y-2.5 pl-3 border-l-2 border-brand/40 animate-m-fade-in bg-white/40 p-3 rounded-r-xl border border-border/60">
+                        {d.responses.map((resp: any, ri: number) => {
+                          const isYes = resp.answer?.toLowerCase() === 'yes';
+                          const isNo = resp.answer?.toLowerCase() === 'no';
+                          return (
+                            <div key={ri} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 py-1 border-b border-border/30 last:border-b-0">
+                              <span className="text-[12px] font-medium text-text-secondary pr-4 leading-normal">{resp.question}</span>
+                              <div className="shrink-0 flex sm:justify-end">
+                                <span className={cn(
+                                  "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all shadow-2xs",
+                                  isYes && "bg-success-50 text-success-700 ring-1 ring-inset ring-success-200",
+                                  isNo && "bg-error-50 text-error-700 ring-1 ring-inset ring-error-200",
+                                  !isYes && !isNo && "bg-neutral-100 text-text-primary ring-1 ring-inset ring-neutral-200"
+                                )}>
+                                  {resp.answer}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
