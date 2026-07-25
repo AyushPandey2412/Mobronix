@@ -6,7 +6,7 @@
 
 // ─── Shared enums ─────────────────────────────────────────────────
 export type ModelCategory    = 'iphone' | 'macbook' | 'android'
-export type QuestionCategory = 'iphone' | 'macbook' | 'all'
+export type QuestionCategory = 'iphone' | 'macbook' | 'android' | 'all'
 export type QuestionType     = 'single' | 'multi' | 'matrix'
 
 export type EnquiryStatus =

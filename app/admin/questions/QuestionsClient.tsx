@@ -10,7 +10,7 @@ import { formatFactorDelta } from '@/lib/pricing'
 import { QK, QK_PUBLIC, upsertQuestion, patchQuestion, deleteQuestion } from '@/lib/adminQueries'
 import type { Question, QuestionCategory, QuestionOption, QuestionType } from '@/lib/types'
 
-type Tab = 'iphone' | 'macbook'
+type Tab = 'iphone' | 'macbook' | 'android'
 
 export default function QuestionsClient({ questions }: { questions: Question[] }) {
   const sb    = useMemo(() => createBrowserClient(), [])
@@ -61,11 +61,11 @@ export default function QuestionsClient({ questions }: { questions: Question[] }
       </div>
 
       <div className="flex gap-1 p-1 bg-neutral-100 rounded-lg w-fit">
-        {(['iphone','macbook'] as Tab[]).map(t => (
+        {(['iphone','macbook','android'] as Tab[]).map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={cn('px-4 py-1.5 rounded-md text-body-sm font-medium transition-all',
+            className={cn('px-4 py-1.5 rounded-md text-body-sm font-medium transition-all capitalize',
               tab === t ? 'bg-surface text-text-primary shadow-xs' : 'text-text-tertiary hover:text-text-primary')}>
-            {t === 'iphone' ? 'iPhone' : 'MacBook'}
+            {t}
           </button>
         ))}
       </div>
@@ -77,7 +77,7 @@ export default function QuestionsClient({ questions }: { questions: Question[] }
             <button onClick={() => setCreating(true)} className="mt-3 text-brand text-body-sm font-medium hover:underline">Add the first one</button>
           </div>
         )}
-        {list.map(q => (
+        {list.map((q, i) => (
           <div key={q.id} className="flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3.5 shadow-xs hover:shadow-sm transition-shadow">
             <div className="flex flex-col gap-0.5 mt-0.5">
               <button onClick={() => moveMutation.mutate({ q, dir: -1 })} disabled={moveMutation.isPending}
@@ -95,7 +95,7 @@ export default function QuestionsClient({ questions }: { questions: Question[] }
                   {TYPE_LABEL[q.type ?? 'single'] || q.type}
                 </span>
                 {q.category === 'all' && <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-neutral-100 text-text-tertiary text-caption font-semibold">All devices</span>}
-                <span className="font-mono text-caption text-text-disabled">#{q.order_index}</span>
+                <span className="font-mono text-caption text-text-disabled">#{i + 1}</span>
               </div>
               <p className="text-body-sm font-semibold text-text-primary">{q.question_text}</p>
               {q.hint_text && <p className="text-caption text-text-tertiary mt-0.5">{q.hint_text}</p>}
@@ -201,6 +201,7 @@ function QuestionEditor({ sb, toast, qc, defaultCategory, question, onClose }: a
             <select value={category} onChange={e=>setCategory(e.target.value as QuestionCategory)} className={selectCls}>
               <option value="iphone">iPhone</option>
               <option value="macbook">MacBook</option>
+              <option value="android">Android</option>
               <option value="all">All devices</option>
             </select></div>
           <div><label className="block text-caption font-medium text-text-secondary mb-1.5">Type</label>
