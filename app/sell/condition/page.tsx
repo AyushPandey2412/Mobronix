@@ -56,6 +56,21 @@ export default function ConditionPage() {
     useStore.setState({ activeQuestions: questions });
   }, [questions]);
 
+  // Load saved step index on mount or when questions array resolves
+  useEffect(() => {
+    const saved = useStore.getState().lastSeenStep || 0;
+    if (saved < questions.length) {
+      setIndex(saved);
+    } else {
+      setIndex(0);
+    }
+  }, [questions]);
+
+  // Persist the current question index to store
+  useEffect(() => {
+    useStore.setState({ lastSeenStep: index });
+  }, [index]);
+
   const total    = questions.length;
   const question = questions[index];
   const answer   = answers[index] as Answer | undefined;
