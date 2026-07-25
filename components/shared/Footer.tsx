@@ -14,7 +14,7 @@ export function Footer() {
           <Logo light />
           <p className="mt-4 max-w-xs text-body-sm leading-relaxed text-neutral-400">
             Honest Deals. Trusted Buyback. Free doorstep pickup, instant price estimate, same-day
-            UPI payment across Mumbai, Navi Mumbai &amp; Thane.
+            UPI payment across Mumbai, Navi Mumbai, Thane &amp; Sangli.
           </p>
           <div className="mt-5 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-caption font-semibold text-neutral-200">
             <ShieldCheck className="h-4 w-4 text-success-400" /> IMEI-verified &amp; insured pickups
@@ -47,7 +47,7 @@ export function Footer() {
           <h4 className="text-label font-semibold text-white">Reach us</h4>
           <ul className="mt-4 space-y-3 text-body-sm text-neutral-400">
             <li className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 shrink-0" /> Mumbai · Navi Mumbai · Thane
+              <MapPin className="h-4 w-4 shrink-0" /> Mumbai · Navi Mumbai · Thane · Sangli
             </li>
             <li className="flex items-center gap-2">
               <Phone className="h-4 w-4 shrink-0" /> +91 00000 00000

@@ -52,7 +52,7 @@ export function AndroidBuyback() {
             {
               icon: Truck,
               title: "Doorstep Pickup & Inspection",
-              desc: "We pick up from your home across Mumbai, Navi Mumbai, and Thane. Fast inspection at your gate.",
+              desc: "We pick up from your home across Mumbai, Navi Mumbai, Thane, and Sangli. Fast inspection at your gate.",
               delay: "150ms",
             },
           ].map((item, idx) => (

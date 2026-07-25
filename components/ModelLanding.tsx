@@ -24,9 +24,9 @@ function describe(model: Model): string {
   const tiers = Object.keys(model.storages)
   const range = tiers.length > 1 ? `${tiers[0]} to ${tiers[tiers.length - 1]}` : tiers[0]
   if (model.category === 'macbook') {
-    return `Sell your ${model.name} in Mumbai, Navi Mumbai or Thane and get up to ${inr(max)} with free doorstep pickup and instant UPI payout. We buy every configuration across ${range}, ${(model.chips || []).join(', ') || 'all chips'} — get an honest, condition-based quote in under two minutes.`
+    return `Sell your ${model.name} in Mumbai, Navi Mumbai, Thane or Sangli and get up to ${inr(max)} with free doorstep pickup and instant UPI payout. We buy every configuration across ${range}, ${(model.chips || []).join(', ') || 'all chips'} — get an honest, condition-based quote in under two minutes.`
   }
-  return `Get the best price when you sell your ${model.name} in Mumbai, Navi Mumbai and Thane — up to ${inr(max)} depending on condition and storage (${range}). Free doorstep pickup, IMEI-verified inspection and instant payout via UPI or cash. Answer a few quick questions to see your exact offer.`
+  return `Get the best price when you sell your ${model.name} in Mumbai, Navi Mumbai, Thane and Sangli — up to ${inr(max)} depending on condition and storage (${range}). Free doorstep pickup, IMEI-verified inspection and instant payout via UPI or cash. Answer a few quick questions to see your exact offer.`
 }
 
 export async function ModelLanding({ category, slug }: { category: ModelCategory; slug: string }) {
@@ -141,7 +141,7 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
 
       <div className="mt-10 rounded-card bg-accent-soft border border-accent-border p-6 text-center">
         <p className="font-semibold">Ready to sell your {model.name}?</p>
-        <p className="text-sm text-ink-soft mt-1">Free doorstep pickup across Mumbai, Navi Mumbai &amp; Thane.</p>
+        <p className="text-sm text-ink-soft mt-1">Free doorstep pickup across Mumbai, Navi Mumbai, Thane &amp; Sangli.</p>
         <Link href={startUrl} className="mt-4 inline-flex rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-white hover:bg-accent-deep">
           Get My Price →
         </Link>

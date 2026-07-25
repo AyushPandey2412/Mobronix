@@ -13,7 +13,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   title: "Mobronix — Sell your used device in Mumbai, get paid today",
   description:
-    "Get an instant price for your used iPhone, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai & Thane.",
+    "Get an instant price for your used iPhone, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai, Thane & Sangli.",
 };
 
 // Revalidate the page every 5 minutes — model prices occasionally change.
@@ -49,14 +49,14 @@ export default async function HomePage() {
     name: "Mobronix",
     url: APP_URL,
     logo: `${APP_URL}/icon.png`,
-    description: "Trusted iPhone buyback service in Mumbai, Navi Mumbai and Thane. Free doorstep pickup, instant UPI payment.",
+    description: "Trusted iPhone buyback service in Mumbai, Navi Mumbai, Thane and Sangli. Free doorstep pickup, instant UPI payment.",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Mumbai",
       addressRegion: "Maharashtra",
       addressCountry: "IN",
     },
-    areaServed: ["Mumbai", "Navi Mumbai", "Thane"],
+    areaServed: ["Mumbai", "Navi Mumbai", "Thane", "Sangli"],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",

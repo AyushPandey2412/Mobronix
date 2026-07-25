@@ -58,7 +58,7 @@ No Pressure.
           </div>
         </div>
         <div className="flex items-center gap-2 text-body-sm text-white/80">
-          <Sparkles className="h-4 w-4" /> 12,400+ devices bought across Mumbai, Navi Mumbai &amp; Thane
+          <Sparkles className="h-4 w-4" /> 12,400+ devices bought across Mumbai, Navi Mumbai, Thane &amp; Sangli
         </div>
         <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-24 right-12 h-60 w-60 rounded-full bg-secondary-400/20 blur-3xl" />
