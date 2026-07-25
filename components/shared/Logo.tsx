@@ -26,13 +26,13 @@ export function Logo({
   }
 
   return (
-    <span className={cn("relative inline-block h-10 w-[208px] shrink-0", className)}>
+    <span className={cn("relative inline-block h-10 w-[200px] shrink-0", className)}>
       <Image
         src="/logo.png"
         alt="Mobronix Logo"
         fill
         priority
-        sizes="208px"
+        sizes="200px"
         className={cn("object-contain object-left", light && "brightness-0 invert")}
       />
     </span>
