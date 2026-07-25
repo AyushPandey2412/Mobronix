@@ -230,6 +230,7 @@ export const useStore = create<AppState>()(
           answers: {},
           quote: null,
           photos: {},
+          lastSeenStep: 0,
         }),
 
       computeQuote: () => {

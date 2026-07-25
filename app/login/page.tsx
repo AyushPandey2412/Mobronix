@@ -35,7 +35,7 @@ export default function LoginPage() {
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* Brand panel */}
       <div className="relative hidden overflow-hidden bg-brand-gradient p-12 text-white lg:flex lg:flex-col lg:justify-between">
-        <Logo className="text-white [&_span]:text-white" />
+        <Logo light />
         <div>
           <h1
             className="max-w-md text-[2.75rem] font-extrabold leading-[1.1] tracking-[-0.02em] animate-m-fade-up"

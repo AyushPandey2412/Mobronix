@@ -11,7 +11,7 @@ export function Footer() {
       <div className="container-app grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         {/* Brand */}
         <div>
-          <Logo className="text-white [&_span]:text-white" />
+          <Logo light />
           <p className="mt-4 max-w-xs text-body-sm leading-relaxed text-neutral-400">
             Honest Deals. Trusted Buyback. Free doorstep pickup, instant price estimate, same-day
             UPI payment across Mumbai, Navi Mumbai &amp; Thane.

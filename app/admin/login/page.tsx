@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-background flex">
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-primary-950">
-        <Logo className="[&_span:last-child]:text-white [&_.text-brand]:text-primary-300" />
+        <Logo light />
         <div>
           <h1 className="text-4xl font-extrabold text-white leading-tight tracking-tight">
             Manage every<br />
