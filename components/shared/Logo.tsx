@@ -12,13 +12,13 @@ export function Logo({
 }) {
   if (mark) {
     return (
-      <span className={cn("relative inline-block h-8 w-8 shrink-0", className)}>
+      <span className={cn("relative inline-block h-10 w-10 shrink-0", className)}>
         <Image
           src="/logo-mark.png"
           alt="Mobronix Mark"
           fill
           priority
-          sizes="32px"
+          sizes="40px"
           className={cn("object-contain", light && "brightness-0 invert")}
         />
       </span>
@@ -26,13 +26,13 @@ export function Logo({
   }
 
   return (
-    <span className={cn("relative inline-block h-8 w-[160px] shrink-0", className)}>
+    <span className={cn("relative inline-block h-10 w-[208px] shrink-0", className)}>
       <Image
         src="/logo.png"
         alt="Mobronix Logo"
         fill
         priority
-        sizes="160px"
+        sizes="208px"
         className={cn("object-contain object-left", light && "brightness-0 invert")}
       />
     </span>
