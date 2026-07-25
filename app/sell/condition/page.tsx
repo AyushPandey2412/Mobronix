@@ -56,6 +56,22 @@ export default function ConditionPage() {
     useStore.setState({ activeQuestions: questions });
   }, [questions]);
 
+  const total    = questions.length;
+  const question = questions[index];
+  const answer   = answers[index] as Answer | undefined;
+  const proceed  = question ? canProceed(question, answer) : false;
+
+  // Skip remaining questions if selecting "no issues" on Question 7
+  const shouldSkipRemaining = useMemo(() => {
+    if (!question || question.type !== "single" || answer === undefined || answer === null) return false;
+    const opt = question.opts?.[answer as number];
+    if (!opt) return false;
+    const label = opt.label.toLowerCase();
+    return label.includes("skip to the next step") || label.includes("no issues. skip") || label.includes("skip to next");
+  }, [question, answer]);
+
+  const isLast   = index === total - 1 || shouldSkipRemaining;
+
   if (!model) return null;
 
   if (isLoading) {
@@ -72,12 +88,6 @@ export default function ConditionPage() {
       </div>
     );
   }
-
-  const total    = questions.length;
-  const question = questions[index];
-  const answer   = answers[index] as Answer | undefined;
-  const proceed  = question ? canProceed(question, answer) : false;
-  const isLast   = index === total - 1;
 
   const next = () => {
     if (!isLast) {
