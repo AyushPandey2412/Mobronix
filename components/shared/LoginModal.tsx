@@ -209,7 +209,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
                 <div className="mt-5 space-y-4">
                   <Input
                     label="Full name"
-                    placeholder="e.g. Aisha Khan"
+                    placeholder="e.g. Rohit Kumar"
                     leftIcon={<UserIcon className="h-[18px] w-[18px]" />}
                     value={contactName}
                     onChange={(e) => {

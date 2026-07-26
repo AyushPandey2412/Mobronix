@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/", label: "Sell" },
   { href: "/#how", label: "How it works" },
+  { href: "/#about", label: "About Us" },
   { href: "/track", label: "Track Order" },
 ];
 
@@ -22,20 +23,34 @@ export function SiteHeader() {
   const user = useStore((s) => s.user);
 
   // Scroll-spy: on the home page, highlight the nav item whose section is in
-  // view. "" = top (Sell), "how" = How it works section.
+  // view.
   const [activeSection, setActiveSection] = useState("");
 
   useEffect(() => {
     if (pathname !== "/") { setActiveSection(""); return; }
-    const el = document.getElementById("how");
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => setActiveSection(entry.isIntersecting ? "how" : ""),
-      // Treat the section as active once it reaches the upper-middle of the viewport.
-      { rootMargin: "-45% 0px -50% 0px" }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
+    
+    const sections = ["how", "about"];
+    const observers = sections.map((id) => {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveSection(id);
+          } else {
+            setActiveSection((prev) => (prev === id ? "" : prev));
+          }
+        },
+        { rootMargin: "-30% 0px -60% 0px" }
+      );
+      obs.observe(el);
+      return obs;
+    });
+
+    return () => {
+      observers.forEach((obs) => obs?.disconnect());
+    };
   }, [pathname]);
 
   return (

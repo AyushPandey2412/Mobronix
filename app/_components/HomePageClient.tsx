@@ -98,6 +98,17 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
               </Button>
             </div>
 
+            <div className="mt-4 md:hidden flex justify-center animate-m-fade-up" style={{ animationDelay: `${3.5 * 60}ms` }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-[12px] font-semibold text-brand hover:underline"
+                onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
+              >
+                Know more about us ↓
+              </Button>
+            </div>
+
             {/* STATS block removed */}
           </div>
 
@@ -168,6 +179,59 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
 
       {/* ANDROID BUYBACK — custom Android manual flow */}
       <AndroidBuyback />
+
+      {/* ABOUT US — core mission and key stats */}
+      <section id="about" className="scroll-mt-24 py-10 md:py-20 bg-background border-t border-border/40">
+        <div className="container-app">
+          <SectionHeading
+            eyebrow="Our Story"
+            title="About Mobronix"
+            subtitle="Simplifying device buyback with honesty, speed, and premium local service."
+          />
+          <div className="mt-8 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] items-center">
+            <div className="space-y-4">
+              <p className="text-body-md text-text-secondary leading-relaxed">
+                At <strong>Mobronix</strong>, we believe selling your old electronics shouldn&apos;t be a hassle. We are dedicated to providing a transparent, stress-free platform to help you unlock the maximum value from your used iPhones and MacBooks.
+              </p>
+              <p className="text-body-md text-text-secondary leading-relaxed">
+                Serving Mumbai, Navi Mumbai, Thane, and Sangli, we cut out the middleman and the endless haggling. Our certified technicians come directly to your doorstep, perform a precise inspection using professional diagnostics, and transfer your payout instantly on the spot.
+              </p>
+              <p className="text-body-md text-text-secondary leading-relaxed">
+                We are committed to building long-term trust. That is why we guarantee honest condition-based pricing, zero hidden fees, and absolute security with verified data deletion protocols for every device we purchase.
+              </p>
+            </div>
+            
+            <div className="grid gap-4 sm:grid-cols-1">
+              <div className="rounded-2xl border border-primary-100 bg-primary-50/50 p-5 shadow-xs">
+                <h4 className="text-body-md font-bold text-primary-900 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-brand" /> Honest Valuations
+                </h4>
+                <p className="mt-1 text-body-sm text-text-secondary">
+                  Our calculations are based directly on real-time market value and the precise condition options you select. No unexpected lowballs.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-primary-100 bg-primary-50/50 p-5 shadow-xs">
+                <h4 className="text-body-md font-bold text-primary-900 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" /> Professional Service
+                </h4>
+                <p className="mt-1 text-body-sm text-text-secondary">
+                  From instant quotation to doorstep verification and instant UPI/cash payouts, our experience is tailored to feel premium.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-primary-100 bg-primary-50/50 p-5 shadow-xs">
+                <h4 className="text-body-md font-bold text-primary-900 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-amber-500" /> Data Safety First
+                </h4>
+                <p className="mt-1 text-body-sm text-text-secondary">
+                  We assist and guide you through complete system resets and account sign-outs, ensuring none of your personal files remain.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* RESET & HAND OVER */}
       {/* <section className="bg-surface py-14 md:py-20">

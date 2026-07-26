@@ -95,7 +95,7 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
         <div className="space-y-4 animate-m-fade-up">
           <Input
             label="Full name"
-            placeholder="e.g. Aisha Khan"
+            placeholder="e.g. Rohit Kumar"
             leftIcon={<UserIcon className="h-[18px] w-[18px]" />}
             value={contactName}
             onChange={(e) => {
