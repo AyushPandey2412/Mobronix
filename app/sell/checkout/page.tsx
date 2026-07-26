@@ -207,7 +207,9 @@ export default function CheckoutPage() {
                   Awaiting Call
                 </span>
               ) : (
-                <span className="font-mono font-semibold text-text-primary">{fmt(d.final)}</span>
+                <span className="font-mono font-semibold text-text-primary">
+                  {!editing && !loggedIn ? "₹XX,XXX" : fmt(d.final)}
+                </span>
               )}
             </div>
           ))}
@@ -219,7 +221,7 @@ export default function CheckoutPage() {
                   Awaiting Call
                 </span>
               ) : (
-                fmt(total)
+                !editing && !loggedIn ? "₹XX,XXX" : fmt(total)
               )}
             </span>
           </div>
@@ -247,7 +249,7 @@ export default function CheckoutPage() {
               </>
             ) : (
               <>
-                Your offer of <b className="text-text-primary">{fmt(total)}</b> is locked in. Verify your mobile
+                Your offer of <b className="text-text-primary">{!editing && !loggedIn ? "₹XX,XXX" : fmt(total)}</b> is locked in. Verify your mobile
                 number — we&apos;ll call you on it to confirm your device, the final price &amp; the pickup slot.
               </>
             )}
