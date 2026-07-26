@@ -156,7 +156,7 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
           subtitle="Search or pick your phone or MacBook to get an instant price estimate."
         />
         <div className="mt-6">
-          <ModelSelector initialModels={initialModels} />
+          <ModelSelector initialModels={initialModels} limit={10} />
         </div>
       </section>
 
