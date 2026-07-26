@@ -10,8 +10,14 @@ export function AndroidBuyback() {
   const { ref, shown } = useReveal<HTMLElement>();
 
   return (
-    <section ref={ref} className="bg-neutral-50 border-y border-border py-12 md:py-20 scroll-mt-24">
-      <div className="container-app grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+    <section
+      ref={ref}
+      className="bg-primary-50/25 border-y border-primary-100/40 py-16 md:py-24 scroll-mt-24 relative overflow-hidden"
+    >
+      {/* Subtle light-blue glow background circle for depth */}
+      <div className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 h-[350px] w-[350px] rounded-full bg-brand/5 blur-[100px] -z-10" />
+
+      <div className="container-app grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         {/* Left column */}
         <div className={shown ? "animate-m-fade-up" : "opacity-0"}>
           <span className="text-[11px] font-bold uppercase tracking-wider text-brand md:text-overline">
@@ -28,13 +34,14 @@ export function AndroidBuyback() {
               size="lg"
               onClick={() => router.push("/sell/manual?brand=Other")}
               rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
+              className="bg-brand hover:bg-brand-hover text-white shadow-md shadow-brand/15"
             >
               Sell Android device
             </Button>
           </div>
         </div>
 
-        {/* Right column (Bento features grid) */}
+        {/* Right column (Bento features grid with light glassmorphic cards) */}
         <div className="grid gap-4 sm:grid-cols-2">
           {[
             {
@@ -42,18 +49,21 @@ export function AndroidBuyback() {
               title: "All Brands Accepted",
               desc: "From Samsung S-series and OnePlus to Xiaomi, Vivo, and Realme — sell any Android model.",
               delay: "50ms",
+              badgeClass: "bg-brand text-white shadow-[0_4px_15px_rgba(26,86,219,0.25)]",
             },
             {
               icon: HelpCircle,
               title: "No Catalog Limits",
               desc: "Don't see your specific variant? Simply enter your details manually to get a custom call quote.",
               delay: "100ms",
+              badgeClass: "bg-brand text-white shadow-[0_4px_15px_rgba(26,86,219,0.25)]",
             },
             {
               icon: Truck,
               title: "Doorstep Pickup & Inspection",
               desc: "We pick up from your home across Mumbai, Navi Mumbai, Thane, and Sangli. Fast inspection at your gate.",
               delay: "150ms",
+              badgeClass: "bg-emerald-600 text-white shadow-[0_4px_15px_rgba(16,185,129,0.25)]",
             },
           ].map((item, idx) => (
             <div
@@ -61,12 +71,12 @@ export function AndroidBuyback() {
               style={shown ? { animationDelay: item.delay } : undefined}
               className={`${
                 shown ? "animate-m-fade-up" : "opacity-0"
-              } rounded-2xl border border-border bg-surface p-5 shadow-xs flex flex-col justify-between ${
+              } rounded-2xl border border-white/60 bg-white/70 backdrop-blur-md p-5 shadow-[0_8px_30px_rgba(26,86,219,0.02)] flex flex-col justify-between hover:border-brand/20 hover:bg-white hover:shadow-[0_8px_30px_rgba(26,86,219,0.06)] transition-all duration-300 ${
                 idx === 2 ? "sm:col-span-2 flex-row gap-4 items-center" : ""
               }`}
             >
               <div className="flex gap-4 items-start">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-brand">
+                <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${item.badgeClass}`}>
                   <item.icon className="h-5 w-5" />
                 </span>
                 <div>

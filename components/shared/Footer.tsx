@@ -8,7 +8,7 @@ import { toast } from "@/lib/toast";
 export function Footer() {
   return (
     <footer className="mt-12 border-t border-border bg-neutral-900 text-neutral-300">
-      <div className="container-app grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="container-app grid gap-10 pt-12 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         {/* Brand */}
         <div>
           <Logo light />

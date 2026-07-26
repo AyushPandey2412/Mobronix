@@ -41,14 +41,8 @@ const nextConfig = {
     ],
   },
 
-  // Retired in-page wizard routes → main flow (home model picker). The SEO
-  // landing pages /sell/iphone/[slug] and /sell/macbook/[slug] are unaffected
-  // (these sources are exact, not wildcards).
   async redirects() {
-    return [
-      { source: "/sell/iphone",  destination: "/", permanent: false },
-      { source: "/sell/macbook", destination: "/", permanent: false },
-    ];
+    return [];
   },
 
   // ── Security headers ───────────────────────────────────────────────────────

@@ -19,11 +19,19 @@ export interface ModelSelectorProps {
   /** Server-prefetched models — used as TanStack Query initialData so there is
    *  zero loading flash on cold page visits. Falls back to local data if empty. */
   initialModels?: Model[];
+  limit?: number;
+  categoryFilter?: "iphone" | "macbook";
+  hideTabs?: boolean;
 }
 
 type Category = "iphone" | "macbook";
 
-export function ModelSelector({ initialModels }: ModelSelectorProps = {}) {
+export function ModelSelector({
+  initialModels,
+  limit,
+  categoryFilter,
+  hideTabs = false,
+}: ModelSelectorProps = {}) {
   const router      = useRouter();
   const selectModel = useStore((s) => s.selectModel);
 
@@ -36,8 +44,6 @@ export function ModelSelector({ initialModels }: ModelSelectorProps = {}) {
     queryFn:     () => fetchPublicModels(sb),
     staleTime:   5 * 60 * 1000,  // 5 min — prices rarely change mid-session
     initialData: initialModels && initialModels.length > 0 ? initialModels : undefined,
-    // initialData from the server is treated as fresh for staleTime — no
-    // client fetch fires on the first render when the server already provided data.
   });
 
   // Use Supabase models when available, otherwise fall back to local seed data
@@ -55,7 +61,7 @@ export function ModelSelector({ initialModels }: ModelSelectorProps = {}) {
     return MACBOOK_MODELS; // local fallback
   }, [supabaseModels]);
 
-  const [category, setCategory] = useState<Category>("iphone");
+  const [category, setCategory] = useState<Category>(categoryFilter || "iphone");
   const [series,   setSeries]   = useState("All");
   const [query,    setQuery]    = useState("");
 
@@ -72,6 +78,13 @@ export function ModelSelector({ initialModels }: ModelSelectorProps = {}) {
     [sourceModels, series, query]
   );
 
+  const displayedModels = useMemo(() => {
+    if (limit && limit > 0) {
+      return filtered.slice(0, limit);
+    }
+    return filtered;
+  }, [filtered, limit]);
+
   const switchCategory = (cat: Category) => {
     setCategory(cat);
     setSeries("All");
@@ -80,58 +93,54 @@ export function ModelSelector({ initialModels }: ModelSelectorProps = {}) {
 
   const onSelect = (m: Model) => {
     selectModel(m.id);
-    // Also sync the live Supabase model into Zustand store so the sell flow
-    // (storage page, quote page, etc.) has the correct prices
     useStore.setState((s) => ({
       models: s.models.some((x) => x.id === m.id)
         ? s.models.map((x) => (x.id === m.id ? m : x))
         : [...s.models, m],
     }));
-    // Login gate disabled here for now — auth is requested later, inline on the
-    // checkout step, right before the enquiry is submitted (Cashify-style).
-    // To re-enable the gate at product selection, restore the line below:
-    // router.push(user ? "/sell/storage" : "/login");
     router.push("/sell/storage");
   };
 
   return (
     <div>
       {/* Category Tabs Swipeable Bar */}
-      <div className="no-scrollbar -mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 select-none">
-        {[
-          { id: "iphone", label: "iPhone", type: "catalog" },
-          { id: "macbook", label: "MacBook", type: "catalog" },
-          { id: "Samsung", label: "Samsung", type: "manual" },
-          { id: "OnePlus", label: "OnePlus", type: "manual" },
-          { id: "Xiaomi", label: "Xiaomi", type: "manual" },
-          { id: "Oppo", label: "Oppo", type: "manual" },
-          { id: "Vivo", label: "Vivo", type: "manual" },
-          { id: "Realme", label: "Realme", type: "manual" },
-          { id: "Other", label: "Other", type: "manual" },
-        ].map((cat) => {
-          const active = category === cat.id;
-          return (
-            <button
-              key={cat.id}
-              onClick={() => {
-                if (cat.type === "catalog") {
-                  switchCategory(cat.id as any);
-                } else {
-                  router.push(`/sell/manual?brand=${encodeURIComponent(cat.id)}`);
-                }
-              }}
-              className={cn(
-                "flex h-[38px] shrink-0 items-center justify-center gap-1.5 rounded-full border px-4 font-bold text-caption transition-all active:scale-[0.98]",
-                active
-                  ? "border-brand bg-primary-50 text-brand"
-                  : "border-border bg-surface text-text-secondary hover:border-border-strong hover:text-text-primary"
-              )}
-            >
-              {cat.label}
-            </button>
-          );
-        })}
-      </div>
+      {!hideTabs && (
+        <div className="no-scrollbar -mx-5 mb-5 flex gap-2 overflow-x-auto px-5 pb-1 select-none">
+          {[
+            { id: "iphone", label: "iPhone", type: "catalog" },
+            { id: "macbook", label: "MacBook", type: "catalog" },
+            { id: "Samsung", label: "Samsung", type: "manual" },
+            { id: "OnePlus", label: "OnePlus", type: "manual" },
+            { id: "Xiaomi", label: "Xiaomi", type: "manual" },
+            { id: "Oppo", label: "Oppo", type: "manual" },
+            { id: "Vivo", label: "Vivo", type: "manual" },
+            { id: "Realme", label: "Realme", type: "manual" },
+            { id: "Other", label: "Other", type: "manual" },
+          ].map((cat) => {
+            const active = category === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  if (cat.type === "catalog") {
+                    switchCategory(cat.id as any);
+                  } else {
+                    router.push(`/sell/manual?brand=${encodeURIComponent(cat.id)}`);
+                  }
+                }}
+                className={cn(
+                  "flex h-[38px] shrink-0 items-center justify-center gap-1.5 rounded-full border px-4 font-bold text-caption transition-all active:scale-[0.98]",
+                  active
+                    ? "border-brand bg-primary-50 text-brand"
+                    : "border-border bg-surface text-text-secondary hover:border-border-strong hover:text-text-primary"
+                )}
+              >
+                {cat.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {/* Search */}
       <div className="relative">
@@ -168,14 +177,28 @@ export function ModelSelector({ initialModels }: ModelSelectorProps = {}) {
 
       {/* Model grid */}
       {!isLoading && (
-        filtered.length ? (
-          <div
-            key={`${category}-${series}-${query}`}
-            className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
-          >
-            {filtered.map((m, i) => (
-              <ModelCard key={m.id} model={m} onSelect={() => onSelect(m)} index={i} />
-            ))}
+        displayedModels.length ? (
+          <div>
+            <div
+              key={`${category}-${series}-${query}`}
+              className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+            >
+              {displayedModels.map((m, i) => (
+                <ModelCard key={m.id} model={m} onSelect={() => onSelect(m)} index={i} />
+              ))}
+            </div>
+
+            {/* View all button if items count exceeds limit */}
+            {limit && filtered.length > limit && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={() => router.push(`/sell/${category}`)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-brand/5 border border-brand/10 hover:bg-brand/10 text-brand font-bold text-body-sm px-6 py-3 transition-all"
+                >
+                  View all {category === "iphone" ? "iPhone" : "MacBook"} →
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <EmptyState
