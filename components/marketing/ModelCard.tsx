@@ -27,10 +27,10 @@ export function ModelCard({ model, onSelect, index = 0 }: { model: Model; onSele
   const imgSrc  = getDeviceImageSized(model, 400);
   const [imgErr, setImgErr] = useState(false);
 
-  const isFinishSelect = imgSrc ? imgSrc.includes("finish-select") : false;
+  const isSelectImage = imgSrc ? (imgSrc.includes("finish-select") || imgSrc.includes("-select")) : false;
   const imgScaleClass = isMac
     ? "scale-100 group-hover:scale-[1.05]"
-    : isFinishSelect
+    : isSelectImage
       ? "scale-[1.38] group-hover:scale-[1.45]"
       : "scale-[1.05] group-hover:scale-[1.12]";
 
