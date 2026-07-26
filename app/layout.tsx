@@ -73,7 +73,10 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
   icons: {
-    icon: "/icon.png",
+    icon: [
+      { url: "/icon.png", type: "image/png" }
+    ],
+    shortcut: "/favicon.ico",
     apple: "/apple-icon.png",
   },
 };
