@@ -30,10 +30,10 @@ Browser (client)
     │   (models, questions,                         ─ models table
     │    admin CRUD)                                ─ questions table
     │                                               ─ enquiries table
-    ├─ fetch('/api/enquiry') ──► Next.js API route ──► Supabase service client
+    │   ├─ fetch('/api/enquiry') ──► Next.js API route ──► Supabase service client
     │   (submit sell request)        (server-side)      (bypasses RLS, needed
     │                                                    for guest inserts)
-    └─ Supabase auth (sign in / sign up via email)
+    │   └─ Supabase auth (sign in / sign up via email)
 ```
 
 **Key principle:** The browser never uses the service role key. The anon key is used for all client-side Supabase calls. The service role key is only used inside Next.js API routes (`app/api/`) which run server-side.
@@ -251,7 +251,7 @@ Both are sent with `Promise.allSettled()` — if email fails, the enquiry is sti
 
 **To enable email:** Set `RESEND_API_KEY` in `.env.local`. Without it, `getResend()` returns null and all emails are silently skipped — useful for local development.
 
-**From address:** `SellMyiPhone <noreply@sellmyiphone.in>` — change at the top of `lib/email.ts`. You must verify the domain in Resend before it will send.
+**From address:** `Mobronix <noreply@mobronix.in>` — change at the top of `lib/email.ts`. You must verify the domain in Resend before it will send.
 
 ---
 

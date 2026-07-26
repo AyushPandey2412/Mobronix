@@ -1,14 +1,14 @@
-# DEPLOY.md — Deploying SellMyiPhone to Vercel
+# DEPLOY.md — Deploying Mobronix to Vercel
 
-A complete, step-by-step guide to take this Next.js 15 app live on Vercel.
+A complete, step-by-step guide to take this Next.js 14 app live on Vercel.
 Follow the steps in order. Steps marked **⚠️ REQUIRED** will block the deploy if skipped.
 
 ---
 
 ## 0. What you're deploying
 
-- **Framework:** Next.js 15 (App Router) — Vercel auto-detects this.
-- **Database / Auth:** Supabase (already set up — project ref `tndbjposrliqshigmdvm`).
+- **Framework:** Next.js 14 (App Router) — Vercel auto-detects this.
+- **Database / Auth:** Supabase.
 - **Email (optional):** Resend.
 - **No `vercel.json` needed** — defaults are correct for Next.js.
 
@@ -17,43 +17,6 @@ Follow the steps in order. Steps marked **⚠️ REQUIRED** will block the deplo
 ## 1. ⚠️ REQUIRED — Make the production build pass
 
 Vercel runs `next build`, which **type-checks and lints** the whole project.
-This repo currently has **~40 pre-existing TypeScript errors** in 15 files
-(admin pages, `lib/quote.ts`, `lib/store.ts`, `lib/email.ts`, sell pages, etc.).
-They don't affect `next dev` (which doesn't type-check), but **they WILL fail the
-Vercel build.** You have two options:
-
-### Option A (fast — get it live now) — tell Next to not fail the build on these
-
-Edit **`next.config.mjs`** and add `typescript` + `eslint` blocks:
-
-```js
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  poweredByHeader: false,
-
-  // ── Allow the production build to succeed despite pre-existing TS/ESLint issues.
-  //    Remove these once the underlying errors are fixed (Option B).
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
-
-  experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion"],
-  },
-  // ...keep the existing images + headers config below unchanged...
-};
-
-export default nextConfig;
-```
-
-> This ships the app with the known type issues unresolved (the app still runs).
-> It's the quickest path to a working deploy.
-
-### Option B (proper — fix the errors)
-
-Run `npx tsc --noEmit` locally, fix each reported error, until it's clean. Then you
-don't need the ignore flags. (Ask and I can fix all 40 for you — it's mostly small
-type-safety fixes like optional fields and a couple of undefined variables.)
 
 **Verify locally before deploying:**
 ```bash
@@ -71,7 +34,7 @@ Variables). Add each for the **Production** (and Preview) environment:
 
 | Variable | Public? | Value / where to get it |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | public | `https://tndbjposrliqshigmdvm.supabase.co` (Supabase → Settings → API) |
+| `NEXT_PUBLIC_SUPABASE_URL` | public | `https://your-project.supabase.co` (Supabase → Settings → API) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | public | Supabase → Settings → API → anon/publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | **secret** | Supabase → Settings → API → service_role/secret key. **Server-only — never expose.** |
 | `NEXT_PUBLIC_APP_URL` | public | Your live URL, e.g. `https://your-app.vercel.app` (set after first deploy, see Step 6) |
@@ -90,19 +53,12 @@ Notes:
 
 ## 3. Supabase production setup
 
-The current Supabase project is **already migrated and seeded**, so if you keep using it,
-you can skip to 3c. If you create a **fresh** Supabase project for production, do all of 3.
-
 ### 3a. Run the migrations (only for a new project)
 Supabase → SQL Editor → run these files in order from `supabase/migrations/`:
 ```
 001_initial.sql
 002_grants.sql
-003_performance.sql
-004_photo_upload_policy.sql
-005_sequential_enq_number.sql
-006_service_role_grants.sql   ← needed so guest enquiries can be inserted
-supabase/seed.sql             ← loads 52 models, 26 questions, 6 reviews
+supabase/seed.sql             ← loads models, categories, questions, reviews
 ```
 
 ### 3b. Storage
@@ -133,7 +89,6 @@ This folder is **not yet a git repo**. Vercel deploys from a Git repo (recommend
 via the CLI (Step 5, Option 2).
 
 ```bash
-cd merged_final
 git init
 git add .
 git commit -m "Initial commit"
@@ -153,8 +108,7 @@ them in Vercel (Step 2).
 ### Option 1 — Git import (recommended)
 1. Go to [vercel.com/new](https://vercel.com/new) → **Import** your GitHub repo.
 2. **Framework Preset:** Next.js (auto-detected).
-3. **Root Directory:** if your repo root *is* `merged_final`, leave as `./`. If you pushed
-   the parent folder, set Root Directory to `merged_final`.
+3. **Root Directory:** `./`
 4. **Build & Output Settings:** leave defaults
    - Build command: `next build` (default)
    - Install command: `npm install` (default)
@@ -165,7 +119,6 @@ them in Vercel (Step 2).
 ### Option 2 — Vercel CLI
 ```bash
 npm i -g vercel
-cd merged_final
 vercel            # follow prompts (first deploy = preview)
 vercel --prod     # promote to production
 ```
@@ -262,16 +215,12 @@ Then repeat Step 6 with the custom domain (update `NEXT_PUBLIC_APP_URL` + Supaba
   (`images.remotePatterns`), so `next/image` works in production.
 - **Security headers:** `next.config.mjs` sets `X-Frame-Options`, `X-Content-Type-Options`,
   `Referrer-Policy`, `Permissions-Policy`, and HSTS (production only).
-- **Supabase clients:** use `@supabase/ssr` (Next 15-compatible async cookies).
-- **`next dev --turbopack`** is only for local dev speed — it does **not** affect the Vercel build.
+- **Supabase clients:** use `@supabase/ssr` (Next 14-compatible async cookies).
 
 ---
 
 ## 11. Security reminders
 
-- Your `.env.local` with real keys is sitting in a `Downloads` folder. Before going live,
-  consider **rotating** the Supabase keys (Supabase → Settings → API → roll keys) and the
-  DB password, and store secrets only in Vercel.
 - Never commit `.env.local` (it's already git-ignored).
 - The `SUPABASE_SERVICE_ROLE_KEY` bypasses all row-level security — it must only ever be
   used server-side (it already is, in the API routes).
@@ -279,8 +228,7 @@ Then repeat Step 6 with the custom domain (update `NEXT_PUBLIC_APP_URL` + Supaba
 ---
 
 ### TL;DR (minimum to go live)
-1. Add `typescript.ignoreBuildErrors` + `eslint.ignoreDuringBuilds` to `next.config.mjs` (Step 1A).
-2. `git init` + push to GitHub.
-3. Import on Vercel, add all env vars (Step 2), deploy.
-4. Set `NEXT_PUBLIC_APP_URL` + Supabase redirect URLs to the live URL, redeploy.
-5. Promote your admin user, run the checklist.
+1. Push to GitHub.
+2. Import on Vercel, add all env vars (Step 2), deploy.
+3. Set `NEXT_PUBLIC_APP_URL` + Supabase redirect URLs to the live URL, redeploy.
+4. Promote your admin user, run the checklist.

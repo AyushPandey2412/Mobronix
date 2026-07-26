@@ -11,9 +11,9 @@ import type { Model } from "@/lib/types";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
-  title: "Mobronix — Sell your used device in Mumbai, get paid today",
+  title: "Mobronix — Sell your used iPhone or MacBook in Mumbai, get paid today",
   description:
-    "Get an instant price for your used iPhone, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai, Thane & Sangli.",
+    "Get an instant price for your used iPhone or MacBook, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai, Thane & Sangli.",
 };
 
 // Revalidate the page every 5 minutes — model prices occasionally change.

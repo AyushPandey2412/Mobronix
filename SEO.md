@@ -11,12 +11,17 @@ Everything that is implemented, where it lives, how to verify it, and what still
 | `/` (homepage) | ✅ Yes | Primary landing page |
 | `/#how` | ✅ Yes | In sitemap |
 | `/#faq` | ✅ Yes | In sitemap |
-| `/sell/storage` | ✅ Yes | Model selection — indexable entry point |
+| `/sell/iphone` | ✅ Yes | iPhone category page |
+| `/sell/macbook` | ✅ Yes | MacBook category page |
+| `/sell/iphone/[slug]` | ✅ Yes | Dynamic iPhone model landing page |
+| `/sell/macbook/[slug]` | ✅ Yes | Dynamic MacBook model landing page |
+| `/sell/storage` | ❌ noindex | Stateful wizard step (blocked in robots.txt) |
 | `/sell/condition` | ❌ noindex | Stateful wizard step |
 | `/sell/quote` | ❌ noindex | Personalised output |
 | `/sell/photos` | ❌ noindex | Upload flow |
 | `/sell/checkout` | ❌ noindex | Personal details |
 | `/sell/confirm` | ❌ noindex | Post-submission |
+| `/sell/manual` | ❌ noindex | Android manual quote flow (blocked in robots.txt) |
 | `/cart` | ❌ noindex | Session state |
 | `/track` | ❌ noindex | Private order data |
 | `/account` | ❌ noindex | Private user data |
@@ -31,11 +36,11 @@ Everything that is implemented, where it lives, how to verify it, and what still
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL),   // makes relative OG image URLs absolute
   title: {
-    default: "SellMyiPhone — Sell your used iPhone in Mumbai, get paid today",
-    template: "%s | SellMyiPhone",   // child pages just set title: "Track Your Order"
+    default: "Mobronix — Sell your used iPhone or MacBook in Mumbai, get paid today",
+    template: "%s | Mobronix",   // child pages just set title: "Track Your Order"
   },
-  description: "...",
-  keywords: ["sell used iPhone Mumbai", "iPhone buyback Mumbai", ...],
+  description: "Get an instant price for your used iPhone or MacBook, free doorstep pickup...",
+  keywords: ["sell used iPhone Mumbai", "iPhone buyback Mumbai", "sell used MacBook Mumbai", ...],
   openGraph: { type, locale, url, siteName, title, description, images },
   twitter:   { card: "summary_large_image", ... },
   alternates: { canonical: APP_URL },
@@ -43,7 +48,7 @@ export const metadata: Metadata = {
 }
 ```
 
-**To change:** Edit `app/layout.tsx`. The title template means child pages only need to set `title: "Page Name"` and get `"Page Name | SellMyiPhone"` automatically.
+**To change:** Edit `app/layout.tsx`. The title template means child pages only need to set `title: "Page Name"` and get `"Page Name | Mobronix"` automatically.
 
 **OG image:** `/public/og-default.png` (1200×630). All pages share this until per-page dynamic OG images are added (see section 6).
 
@@ -51,16 +56,16 @@ export const metadata: Metadata = {
 
 ## 2. Structured data (JSON-LD) — `app/page.tsx`
 
-Two JSON-LD blocks are injected via `<script type="application/ld+json">` directly in the homepage JSX (homepage is a client component so `export const metadata` cannot include JSON-LD):
+Two JSON-LD blocks are injected via `<script type="application/ld+json">` directly in the homepage JSX (homepage is a server component that renders `HomePageClient` which is client-side, but the LD-JSON is injected during SSR):
 
 ### Organization
 ```json
 {
   "@type": "Organization",
-  "name": "SellMyiPhone",
-  "url": "https://sellmyiphone.in",
-  "logo": "https://sellmyiphone.in/icon.png",
-  "areaServed": ["Mumbai", "Navi Mumbai", "Thane"],
+  "name": "Mobronix",
+  "url": "https://mobronix.in",
+  "logo": "https://mobronix.in/icon.png",
+  "areaServed": ["Mumbai", "Navi Mumbai", "Thane", "Sangli"],
   "address": { "@type": "PostalAddress", "addressLocality": "Mumbai", ... }
 }
 ```
@@ -77,7 +82,7 @@ Mirrors the 5 FAQs visible on the homepage (`FAQS` array in `app/page.tsx`). Eve
 ## 3. Page-level metadata
 
 ### Homepage — `app/page.tsx`
-Homepage is `"use client"` so metadata is set in `app/layout.tsx` (default). The page's `<h1>` is: `"Sell your used iPhone. Get paid today."` — carries the primary keyword intent.
+Homepage metadata sets title and description focusing on both iPhones and MacBooks. The page's primary `<h1>` elements carry keyword intent: "Honest Deals. Trusted Buyback."
 
 ### Sell flow pages — all `"use client"` with noindex
 ```ts
@@ -91,7 +96,7 @@ Applied to: `/sell/storage`, `/sell/condition`, `/sell/quote`, `/sell/photos`, `
 ### Track page — `app/track/page.tsx`
 ```ts
 export const metadata = {
-  title: "Track Your Order",  // → "Track Your Order | SellMyiPhone"
+  title: "Track Your Order",  // → "Track Your Order | Mobronix"
   robots: { index: false, follow: false },
 }
 ```
@@ -115,6 +120,7 @@ Protected by middleware + not in sitemap. Robots.txt disallows `/admin`.
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /admin/
 Disallow: /account
 Disallow: /sell/storage
 Disallow: /sell/condition
@@ -122,9 +128,11 @@ Disallow: /sell/quote
 Disallow: /sell/photos
 Disallow: /sell/checkout
 Disallow: /sell/confirm
+Disallow: /sell/manual
+Disallow: /track
 Disallow: /cart
 Disallow: /api/
-Sitemap: https://sellmyiphone.in/sitemap.xml
+Sitemap: https://mobronix.in/sitemap.xml
 ```
 
 **To verify:** Visit `https://yourdomain.com/robots.txt` after deploy.
@@ -133,14 +141,18 @@ Sitemap: https://sellmyiphone.in/sitemap.xml
 
 ## 5. Sitemap — `app/sitemap.ts`
 
-Currently lists 4 static pages:
+Dynamically lists static category routes, legal pages, and all individual active iPhone and MacBook model landing pages:
 
 | URL | Priority | Change frequency |
 |-----|----------|-----------------|
 | `/` | 1.0 | daily |
 | `/#how` | 0.6 | monthly |
 | `/#faq` | 0.5 | monthly |
-| `/sell/storage` | 0.9 | weekly |
+| `/sell/iphone` | 0.9 | weekly |
+| `/sell/macbook` | 0.9 | weekly |
+| `/sell/iphone/[slug]` | 0.8 | weekly |
+| `/sell/macbook/[slug]` | 0.8 | weekly |
+| `/legal/*` | 0.3 | yearly |
 
 **To verify:** Visit `https://yourdomain.com/sitemap.xml` after deploy. Submit to Google Search Console.
 
@@ -150,46 +162,12 @@ Currently lists 4 static pages:
 
 ### 🔴 High priority
 
-**Model landing pages** — The biggest SEO gap. There are no indexable per-model pages (e.g. `/sell/iphone-16-pro`). The old P2 project had `app/sell/iphone/[slug]/page.tsx` with server-rendered model pages, but they were removed during the merge because they called Supabase at build time.
-
-To add them back:
-1. Create `app/sell/iphone/[slug]/page.tsx`
-2. Use `generateStaticParams()` to pre-render one page per model from the `MODELS` array in `lib/data.ts`
-3. Use `generateMetadata()` to produce unique titles like `"Sell iPhone 16 Pro — Get Upto ₹90,000 | SellMyiPhone"`
-4. Add `Product` + `BreadcrumbList` JSON-LD
-5. Add these URLs to `sitemap.ts`
-
-Example structure:
-```tsx
-// app/sell/iphone/[slug]/page.tsx
-import { MODELS } from '@/lib/data'
-
-export function generateStaticParams() {
-  return MODELS.map(m => ({ slug: m.id }))
-}
-
-export function generateMetadata({ params }) {
-  const model = MODELS.find(m => m.id === params.slug)
-  const maxPrice = Math.max(...Object.values(model.storages as Record<string, number>))
-  return {
-    title: `Sell ${model.name} — Get Upto ₹${maxPrice.toLocaleString('en-IN')}`,
-    description: `Sell your ${model.name} in Mumbai. Get an instant price, free doorstep pickup, and same-day UPI payment.`,
-    alternates: { canonical: `/sell/iphone/${params.slug}` },
-  }
-}
-```
-
----
-
 **Per-model OG images** — All pages currently share `/og-default.png`. Per-model dynamic images via `next/og` would significantly improve click-through from social/WhatsApp shares.
 
 Create `app/sell/iphone/[slug]/opengraph-image.tsx`:
 ```tsx
 import { ImageResponse } from 'next/og'
-export default function Image({ params }) {
-  const model = MODELS.find(m => m.id === params.slug)
-  return new ImageResponse(<div>Sell {model.name} — Get Upto ₹{maxPrice}</div>)
-}
+// ... fetch model and dynamically generate image card response
 ```
 
 ---
@@ -210,17 +188,17 @@ export default function Image({ params }) {
 
 **Google Search Console** — After deploy, add property, submit sitemap, monitor for crawl errors.
 
-**Google Business Profile** — For local SEO in Mumbai/Navi Mumbai/Thane — create or claim a profile and link to the site.
+**Google Business Profile** — For local SEO in Mumbai/Navi Mumbai/Thane/Sangli — create or claim a profile and link to the site.
 
 **Schema for LocalBusiness** — Add `LocalBusiness` schema alongside `Organization` on the homepage for better local search visibility.
 
-**Review schema** — The `REVIEWS` array on the homepage is rendered as visible text but not as `AggregateRating` schema. Adding it could trigger star ratings in search results.
+**Review schema** — The `REVIEWS` array on the homepage is rendered as visible text. Adding it as `AggregateRating` schema could trigger star ratings in search results.
 
 ```ts
 const aggregateRating = {
   "@context": "https://schema.org",
   "@type": "AggregateRating",
-  "itemReviewed": { "@type": "Organization", "name": "SellMyiPhone" },
+  "itemReviewed": { "@type": "Organization", "name": "Mobronix" },
   "ratingValue": "4.8",
   "reviewCount": "12400",
   "bestRating": "5",
@@ -235,11 +213,11 @@ After deploying to production, check each of these:
 
 ```
 □ https://yourdomain.com/robots.txt
-  → /admin, /account, /sell/*, /api/ are disallowed
+  → /admin, /account, /sell/storage, /sell/manual, /api/ are disallowed
   → sitemap URL is listed
 
 □ https://yourdomain.com/sitemap.xml
-  → lists /, /#how, /#faq, /sell/storage
+  → lists /, /#how, /#faq, /sell/iphone, /sell/macbook, and all per-model landing pages
   → submit URL to Google Search Console → Sitemaps
 
 □ Google Rich Results Test — paste homepage URL

@@ -3,13 +3,13 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
-  description: "Terms of Use for SellMyiPhone — please read carefully before using our services.",
+  description: "Terms of Use for Mobronix — please read carefully before using our services.",
 };
 
 const SECTIONS = [
   {
     heading: "1. Our Role",
-    body: `SellMyiPhone acts as a platform that connects sellers with authorised third-party buyers. In some cases, SellMyiPhone or its partners may directly purchase your device. In other cases, your transaction may be with a third-party buyer. Third-party buyers are responsible for their own transactions with you. SellMyiPhone is not responsible for problems caused by a third-party buyer unless required by law.`,
+    body: `Mobronix acts as a platform that connects sellers with authorised third-party buyers. In some cases, Mobronix or its partners may directly purchase your device. In other cases, your transaction may be with a third-party buyer. Third-party buyers are responsible for their own transactions with you. Mobronix is not responsible for problems caused by a third-party buyer unless required by law.`,
   },
   {
     heading: "2. Legal Ownership of Your Device",
@@ -21,7 +21,7 @@ const SECTIONS = [
       "The device is not involved in any legal dispute.",
       "The device does not have any unpaid loan, EMI, lien, or claim.",
     ],
-    intro: "By selling a device through SellMyiPhone, you confirm that:",
+    intro: "By selling a device through Mobronix, you confirm that:",
   },
   {
     heading: "3. Estimated Price and Device Inspection",
@@ -84,18 +84,18 @@ const SECTIONS = [
       "Sign out of iCloud, Google, Find My Device, and all other accounts.",
       "Factory reset the device.",
     ],
-    outro: "SellMyiPhone may help you reset your device if requested. However, SellMyiPhone is not responsible for any loss of your personal data.",
+    outro: "Mobronix may help you reset your device if requested. However, Mobronix is not responsible for any loss of your personal data.",
   },
   {
     heading: "9. Liability",
     body: null,
-    intro: "SellMyiPhone is not responsible for:",
+    intro: "Mobronix is not responsible for:",
     bullets: [
       "Loss of personal data if you do not back up or erase your device.",
       "Problems caused by third-party buyers.",
       "Damage or loss caused by events outside our control.",
     ],
-    outro: "SellMyiPhone will be responsible for loss or damage to your device only if it happens because of our negligence.",
+    outro: "Mobronix will be responsible for loss or damage to your device only if it happens because of our negligence.",
   },
   {
     heading: "10. Your Agreement to Sell",
@@ -107,7 +107,7 @@ const SECTIONS = [
   },
   {
     heading: "12. Changes to These Terms",
-    body: "SellMyiPhone may update these Terms of Use at any time. If you continue to use our website, app, or services after changes are posted, it means you accept the updated Terms.",
+    body: "Mobronix may update these Terms of Use at any time. If you continue to use our website, app, or services after changes are posted, it means you accept the updated Terms.",
   },
   {
     heading: "13. Communication",
@@ -118,7 +118,8 @@ const SECTIONS = [
   },
   {
     heading: "14. Contact Us",
-    body: "For any questions or concerns, contact us at support@sellmyiphone.in or call +91 00000 00000.",
+    // TODO: Replace "+91 00000 00000" with the real business support phone number before going live.
+    body: "For any questions or concerns, contact us at support@mobronix.in or call +91 00000 00000.",
   },
 ];
 
@@ -139,7 +140,7 @@ export default function TermsOfUsePage() {
       </div>
 
       <div className="mb-8 rounded-lg border border-primary-100 bg-primary-50 px-5 py-4 text-body-sm text-text-secondary leading-relaxed">
-        These Terms of Use are a legal agreement between <strong className="text-text-primary">you</strong> (the person selling a device), <strong className="text-text-primary">SellMyiPhone</strong> (our platform), and <strong className="text-text-primary">third-party buyers</strong> who may purchase your device through us. SellMyiPhone helps customers sell, recycle, or resell used electronic devices. By using our website, app, or services, you agree to these Terms.
+        These Terms of Use are a legal agreement between <strong className="text-text-primary">you</strong> (the person selling a device), <strong className="text-text-primary">Mobronix</strong> (our platform), and <strong className="text-text-primary">third-party buyers</strong> who may purchase your device through us. Mobronix helps customers sell, recycle, or resell used electronic devices. By using our website, app, or services, you agree to these Terms.
       </div>
 
       <div className="space-y-10">
@@ -164,7 +165,7 @@ export default function TermsOfUsePage() {
       </div>
 
       <div className="mt-12 border-t border-border pt-8 text-body-sm text-text-tertiary">
-        By using SellMyiPhone&apos;s services, you confirm that you have read, understood, and agreed to these Terms of Use.{" "}
+        By using Mobronix&apos;s services, you confirm that you have read, understood, and agreed to these Terms of Use.{" "}
         <Link href="/legal/privacy-policy" className="text-brand hover:underline">Privacy Policy</Link>
         {" · "}
         <Link href="/legal/terms-and-conditions" className="text-brand hover:underline">Terms and Conditions</Link>

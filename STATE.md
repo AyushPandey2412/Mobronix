@@ -73,7 +73,7 @@ The single Zustand store holds everything about the active user session and the 
 | Field | Type | Purpose |
 |-------|------|---------|
 | `models` | `Model[]` | All models. Seeded from `lib/data.ts`. Overwritten by TanStack Query with Supabase data. |
-| `questions` | `Question[]` | iPhone condition questions. Seeded from `lib/data.ts`. |
+| `questions` | `Question[]` | Condition questions. Seeded from `lib/data.ts`. |
 | `enquiries` | `Enquiry[]` | Demo seed enquiries. Not persisted. |
 
 #### Settings
@@ -113,7 +113,7 @@ All actions are in `lib/store.ts`. Call them via `useStore(s => s.actionName)`.
 | Action | What it does |
 |--------|-------------|
 | `setCheckout(patch)` | Merges a partial `CheckoutForm` into `checkout`. |
-| `submitEnquiry()` | Builds a local `Enquiry` object from current state and saves it to `enquiry`. Does **not** call the API — the checkout page does that separately then calls `patchCurrentEnquiry`. |
+| `submitEnquiry()` | Builds a local `Enquiry` object from current state and saves it to `enquiry`. Does **not** call the API. |
 | `patchCurrentEnquiry(patch)` | Merges a partial `Enquiry` into the current `enquiry`. Used by checkout to overwrite the local ID with the real `display_id` and `assigned_exec` from the API response. |
 
 ### Tracking actions
@@ -138,7 +138,7 @@ All actions are in `lib/store.ts`. Call them via `useStore(s => s.actionName)`.
 
 ## 4. Zustand persistence
 
-**Key:** `"sellmyiphone"` in localStorage.
+**Key:** `"mobronix"` in localStorage.
 
 Only these fields are persisted (everything else is recomputed or fetched):
 
@@ -162,17 +162,15 @@ Only these fields are persisted (everything else is recomputed or fetched):
 
 | Field | Why not persisted |
 |-------|-----------------|
-| `models` | Comes from Supabase via TanStack Query. Would be stale and ~80KB. |
+| `models` | Comes from Supabase via TanStack Query. Would be stale. |
 | `questions` | Same — comes from Supabase. |
-| `enquiries` | Admin list — not needed in localStorage. Supabase is the source of truth. |
+| `enquiries` | Admin list — not needed in localStorage. |
 | `editingEnquiry` | Transient UI state — reset on next visit. |
 | `checkout` | Cleared after submit. |
 
-**To add a new persisted field:** Add it to the `partialize` object in `lib/store.ts`.
-
 **To clear persisted state programmatically:**
 ```ts
-localStorage.removeItem('sellmyiphone')
+localStorage.removeItem('mobronix')
 // or
 useStore.persist.clearStorage()
 ```
@@ -243,14 +241,14 @@ All `mutationFn` implementations live in `lib/adminQueries.ts`. Components impor
 
 | Function | Used in | What it does |
 |----------|---------|-------------|
-| `patchModel(sb, { id, patch })` | ProductsClient | Updates specific fields (is_active, sort_order). |
+| `patchModel(sb, { id, patch })` | ProductsClient | Updates specific fields. |
 | `upsertModel(sb, { payload, existingId? })` | ProductsClient | Creates or updates a full model. |
 
 ### Question mutations (QuestionsClient)
 
 | Function | Used in | What it does |
 |----------|---------|-------------|
-| `patchQuestion(sb, { id, patch })` | QuestionsClient | Updates specific fields (order_index). |
+| `patchQuestion(sb, { id, patch })` | QuestionsClient | Updates specific fields. |
 | `upsertQuestion(sb, { payload, existingId? })` | QuestionsClient | Creates or updates a full question. |
 | `deleteQuestion(sb, id)` | QuestionsClient | Deletes one question. |
 
@@ -258,7 +256,7 @@ All `mutationFn` implementations live in `lib/adminQueries.ts`. Components impor
 
 ## 8. Cache invalidation
 
-When a mutation succeeds, it calls `qc.invalidateQueries(...)` to mark the relevant cache as stale. TanStack Query then refetches in the background — the UI updates automatically.
+When a mutation succeeds, it calls `qc.invalidateQueries(...)` to mark the relevant cache as stale. TanStack Query then refetches in the background.
 
 **The full chain:**
 
@@ -287,8 +285,6 @@ Admin bulk-updates or bulk-deletes (Dashboard)
             qc.invalidateQueries(QK.enquiries())
 ```
 
-**To add a new mutation that should refresh the sell flow:** Add `qc.invalidateQueries({ queryKey: QK_PUBLIC.models() })` in the `onSuccess` callback.
-
 ---
 
 ## 9. How data flows through the sell flow
@@ -302,8 +298,7 @@ Homepage (app/page.tsx — server component)
     └─ HomePageClient renders ModelSelector with initialModels
            │
            ├─ useQuery(QK_PUBLIC.models(), { initialData: initialModels })
-           │   No client fetch needed on first load — initialData is used.
-           │   After 5 min staleTime, next visit refetches from Supabase.
+           │   No client fetch needed on first load.
            │
            └─ User taps a model
                    │
@@ -333,7 +328,7 @@ Homepage (app/page.tsx — server component)
     ├─ submitEnquiry() — builds local Enquiry in Zustand
     └─ patchCurrentEnquiry({ id, display_id, exec }) — overwrites with real API values
 
-/sell/confirm — reads enquiry from Zustand (has real display_id now)
+/sell/confirm — reads enquiry from Zustand
 
 /track — reads enquiry from Zustand
 ```
@@ -362,96 +357,4 @@ Homepage (app/page.tsx — server component)
 
 /admin/questions (app/admin/questions/page.tsx — client component)
     └─ useQuery(QK.questions())
-```
-
----
-
-## 11. Common changes
-
-### Add a new field to the sell flow
-
-1. Add the field to `AppState` interface in `lib/store.ts`.
-2. Initialize it in the `create()` call (usually `null` or `{}`).
-3. Add a setter action.
-4. Add it to `partialize` if it should survive page refresh.
-5. Reset it in `resetSellFlow()` and `submitEnquiry()`.
-
-### Add a new condition question to the quiz
-
-1. Go to `/admin/questions` in the app and add it there — it saves to Supabase.
-2. It will appear in the condition flow for customers immediately (TanStack Query caches for 5 min).
-3. If you also want it in the local fallback (for demo mode without Supabase), add it to `lib/data.ts` → `QUESTIONS` or `MAC_QUESTIONS`.
-
-### Change the quote calculation
-
-Edit `lib/quote.ts` → `calcQuote(base, answers, questions)`. The function multiplies the base price by each answer's factor, clamps negative deductions, and rounds to the nearest 100.
-
-### Make a new admin query (e.g. fetch recent reviews)
-
-1. Add the query key to `QK` in `lib/adminQueries.ts`:
-   ```ts
-   reviews: () => ['reviews'] as const,
-   ```
-2. Add the `queryFn`:
-   ```ts
-   export async function fetchReviews(sb: SupabaseClient) {
-     const { data, error } = await sb.from('reviews').select('*').order('created_at', { ascending: false })
-     if (error) throw error
-     return data
-   }
-   ```
-3. Use in a component:
-   ```ts
-   const { data: reviews } = useQuery({
-     queryKey: QK.reviews(),
-     queryFn: () => fetchReviews(sb),
-   })
-   ```
-
-### Change the TanStack Query cache duration
-
-Edit `lib/queryClient.ts`:
-```ts
-defaultOptions: {
-  queries: {
-    staleTime: 2 * 60 * 1000,  // 2 minutes instead of 1
-    gcTime:    10 * 60 * 1000, // 10 minutes garbage collection
-  }
-}
-```
-
-Or override per-query:
-```ts
-useQuery({
-  queryKey: QK.models(),
-  queryFn: () => fetchModels(sb),
-  staleTime: 10 * 60 * 1000,  // models change rarely — cache longer
-})
-```
-
-### Force a cache refresh manually
-
-```ts
-const qc = useQueryClient()
-qc.invalidateQueries({ queryKey: QK.models() })  // marks stale, refetches
-// or
-qc.refetchQueries({ queryKey: QK.models() })      // refetches immediately
-```
-
-### Access Zustand state outside React
-
-```ts
-import { useStore } from '@/lib/store'
-
-// Get current state snapshot
-const state = useStore.getState()
-
-// Set state
-useStore.setState({ selectedModelId: 'iphone-16' })
-
-// Subscribe to changes
-const unsub = useStore.subscribe((state) => {
-  console.log('enquiry changed:', state.enquiry)
-})
-unsub() // cleanup
 ```

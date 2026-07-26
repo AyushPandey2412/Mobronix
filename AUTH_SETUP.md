@@ -1,6 +1,6 @@
 # AUTH_SETUP.md — Google Login + Mobile OTP (Backend + Frontend)
 
-How to add **real** Google sign-in and **phone-number OTP** login to SellMyiPhone,
+How to add **real** Google sign-in and **phone-number OTP** login to Mobronix,
 using Supabase Auth. Covers Supabase/Google config (backend) and the exact code
 to add to this project (frontend).
 
@@ -23,7 +23,7 @@ to add to this project (frontend).
     - `http://localhost:3000`
     - `https://your-app.vercel.app` (your production URL)
   - **Authorized redirect URIs** — add the **Supabase** callback (Supabase shows it on the provider page):
-    - `https://tndbjposrliqshigmdvm.supabase.co/auth/v1/callback`
+    - `https://your-project.supabase.co/auth/v1/callback`
   - Copy the **Client ID** and **Client Secret**.
 
 **2) Supabase Dashboard** → **Authentication → Providers → Google**
@@ -225,8 +225,7 @@ async function verify() {
 ```
 
 UI: show the phone input + **Send OTP** first; after `sent`, show a 6-digit OTP input +
-**Verify & Continue**. (Your `PriceUnlockModal` already has the phone field and layout —
-just swap its `phoneLogin` call for `send()` / `verify()` and add the OTP step.)
+**Verify & Continue**.
 
 ### B5. Make the seller flow respect real auth
 

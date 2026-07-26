@@ -1,10 +1,10 @@
-# SETUP.md — How to run, configure, and deploy SellMyiPhone
+# SETUP.md — How to run, configure, and deploy Mobronix
 
 ---
 
 ## What this project is
 
-A Next.js 15 app that lets users get an instant buyback quote for their used iPhone and book a doorstep pickup. Admins manage orders, products, and condition questions through a Supabase-backed dashboard.
+A Next.js 14 app that lets users get an instant buyback quote for their used iPhone or MacBook and book a doorstep pickup. Admins manage orders, products, and condition questions through a Supabase-backed dashboard.
 
 **Two auth systems coexist:**
 - **Users** (sellers) — Zustand local auth (`name + password`, any name works, any password works). No database needed.
@@ -25,8 +25,6 @@ A Next.js 15 app that lets users get an instant buyback quote for their used iPh
 ## 2. Install dependencies
 
 ```bash
-unzip practice.zip
-cd merged_final
 npm install
 ```
 
@@ -92,12 +90,7 @@ npx supabase db push
 
 ### 5b. Seed with sample data (optional)
 
-```sql
--- Run in Supabase SQL Editor
--- Pastes in iPhone models, MacBook models, condition questions, reviews
-```
-
-Run `supabase/seed.sql` in the SQL Editor.
+Run `supabase/seed.sql` in the SQL Editor to insert models, categories, questions, and reviews.
 
 ### 5c. Create your admin account
 
@@ -157,7 +150,7 @@ NEXT_PUBLIC_WHATSAPP_NUMBER
 Go to `/admin` → Products → Edit any model or add new.
 
 **Option B — Edit static data (works in demo mode too)**  
-Edit `lib/data.ts`. The `MODELS` array has every iPhone with storage → price mapping:
+Edit `lib/data.ts`. The `MODELS` and `MACBOOK_MODELS` arrays have every model with storage → price mapping:
 
 ```ts
 { id: "16pro", name: "iPhone 16 Pro", series: "16 Series", storages: { "128GB": 58000, "256GB": 65000 } },
@@ -205,20 +198,11 @@ export const SLOTS = [
 
 ## 12. Changing colours
 
-The design uses two systems — edit `tailwind.config.ts`:
+The design uses Tailwind CSS — edit global styles in `app/globals.css` and configuration in `tailwind.config.ts`:
 
-**P1 — blue (frontend / user-facing):**
+**Brand Colors:**
 ```ts
-brand: { DEFAULT: "var(--brand)" }   // → --brand: var(--color-primary-600) in globals.css
-// Primary: #1A56DB (Trust Blue)
-// Change: update --color-primary-600 in app/globals.css
-```
-
-**P2 — green (admin panel):**
-```ts
-accent: "#16A34A",     // main green CTA
-"accent-deep": "#0E7C39",
-"accent-soft": "#E7F7ED",
+brand: { DEFAULT: "var(--brand)" }   // → --brand: var(--color-primary-600) (#1A56DB Trust Blue) in globals.css
 ```
 
 ---
@@ -242,4 +226,3 @@ accent: "#16A34A",     // main green CTA
 | Change admin status options | `app/admin/orders/[id]/OrderDetail.tsx` → `ADMIN_STATUSES` |
 | Change demo admin credentials | `lib/store.ts` → `login()` function (line ~138) |
 | Add new Supabase table | Create `supabase/migrations/003_*.sql` |
-

@@ -19,6 +19,7 @@ export default function robots(): MetadataRoute.Robots {
           '/sell/photos',
           '/sell/checkout',
           '/sell/confirm',
+          '/sell/manual',
           '/track',
           '/cart',
           '/api/',

@@ -167,7 +167,7 @@ export async function landingMetadata(category: ModelCategory, slug: string) {
     title,
     description,
     alternates: { canonical },
-    openGraph: { title: `${title} | SellMyiPhone`, description, url: canonical, images: ['/og-default.png'] },
+    openGraph: { title: `${title} | Mobronix`, description, url: canonical, images: ['/og-default.png'] },
     twitter: { card: 'summary_large_image' as const }
   }
 }

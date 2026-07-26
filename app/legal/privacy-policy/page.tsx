@@ -3,13 +3,14 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How SellMyiPhone collects, uses, and protects your information.",
+  description: "How Mobronix collects, uses, and protects your information.",
 };
 
 const SECTIONS = [
   {
     heading: "Who We Are",
-    body: "SellMyiPhone is a mobile retail and service business based in Thane, India. For privacy-related questions, contact us at support@sellmyiphone.in or call +91 00000 00000.",
+    // TODO: Replace "+91 00000 00000" with the real business support phone number before going live.
+    body: "Mobronix is a mobile retail and service business based in Thane, India. For privacy-related questions, contact us at support@mobronix.in or call +91 00000 00000.",
   },
   {
     heading: "Information We Collect",
@@ -57,7 +58,7 @@ const SECTIONS = [
       },
       {
         sub: "3. Marketing and Updates",
-        body: "We may send you offers, promotions, updates, and newsletters through SMS, Email, WhatsApp, phone calls, and other communication channels. You can stop promotional messages at any time by contacting us at support@sellmyiphone.in.",
+        body: "We may send you offers, promotions, updates, and newsletters through SMS, Email, WhatsApp, phone calls, and other communication channels. You can stop promotional messages at any time by contacting us at support@mobronix.in.",
       },
       {
         sub: "4. Improve Our Services",
@@ -102,7 +103,7 @@ const SECTIONS = [
       "Object to marketing messages",
       "Withdraw your consent where applicable",
     ],
-    outro: "To request any of these, email us at support@sellmyiphone.in. We will try to respond within 30 days.",
+    outro: "To request any of these, email us at support@mobronix.in. We will try to respond within 30 days.",
   },
   {
     heading: "How Long We Keep Your Information",
@@ -118,7 +119,8 @@ const SECTIONS = [
   },
   {
     heading: "Contact Us",
-    body: "If you have questions, concerns, or complaints about this Privacy Policy or your personal information, contact us at support@sellmyiphone.in or call +91 00000 00000.",
+    // TODO: Replace "+91 00000 00000" with the real business support phone number before going live.
+    body: "If you have questions, concerns, or complaints about this Privacy Policy or your personal information, contact us at support@mobronix.in or call +91 00000 00000.",
   },
 ];
 
@@ -180,7 +182,7 @@ export default function PrivacyPolicyPage() {
       </div>
 
       <div className="mb-8 rounded-lg border border-primary-100 bg-primary-50 px-5 py-4 text-body-sm text-text-secondary leading-relaxed">
-        At SellMyiPhone, we respect your privacy and work to keep your personal information safe. This Privacy Policy explains what information we collect, why we collect it, how we use it, and how we protect it. By using our website or services, you agree to this Privacy Policy.
+        At Mobronix, we respect your privacy and work to keep your personal information safe. This Privacy Policy explains what information we collect, why we collect it, how we use it, and how we protect it. By using our website or services, you agree to this Privacy Policy.
       </div>
 
       <div className="space-y-10">
@@ -188,7 +190,7 @@ export default function PrivacyPolicyPage() {
       </div>
 
       <div className="mt-12 border-t border-border pt-8 text-body-sm text-text-tertiary">
-        By using SellMyiPhone&apos;s website and services, you confirm that you have read and understood this Privacy Policy.{" "}
+        By using Mobronix&apos;s website and services, you confirm that you have read and understood this Privacy Policy.{" "}
         <Link href="/legal/terms-of-use" className="text-brand hover:underline">Terms of Use</Link>
         {" · "}
         <Link href="/legal/terms-and-conditions" className="text-brand hover:underline">Terms and Conditions</Link>

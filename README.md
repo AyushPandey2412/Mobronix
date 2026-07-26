@@ -1,6 +1,6 @@
-# SellMyiPhone
+# Mobronix
 
-A production **Next.js 14** app for a used iPhone & MacBook resale business serving **Mumbai, Navi Mumbai & Thane**. Customers get an instant condition-based quote, schedule a free doorstep pickup, and get paid by UPI/cash on inspection.
+A production **Next.js 14** app for a used iPhone & MacBook resale business serving **Mumbai, Navi Mumbai, Thane & Sangli**. Customers get an instant condition-based quote, schedule a free doorstep pickup, and get paid by UPI/cash on inspection.
 
 **Stack:** Next.js 14 (App Router, TypeScript strict) · Tailwind · Supabase (Postgres, Auth, Storage, Realtime, RLS) · TanStack Query · Zod · React Hook Form · Resend · Vercel.
 
@@ -13,17 +13,17 @@ cp .env.local .env.local   # fill in real keys (see SETUP.md)
 npm run dev
 ```
 
-Open <http://localhost:3000>. Full, non-developer-friendly instructions are in **`SETUP.md`**.
+Open <http://localhost:3000>. Full instructions are in **`SETUP.md`**.
 
 ## Docs
 
-- **`SETUP.md`** — step-by-step setup + a common-errors fix table (written for non-developers).
+- **`SETUP.md`** — step-by-step setup + a common-errors fix table.
 - **`PROJECT_INDEX.md`** — file-by-file map and "I want to change X → edit this file" guide.
 - **`SEO.md`** — SEO strategy, structured-data inventory, and verification checklist.
 
 ## What's inside
 
-- **Home** — Cashify-style marketing page: hero, How It Works, iPhone/MacBook catalog (list layout), Why Sell, tips, Customer Stories, FAQ. Brand green `#16A34A`.
+- **Home** — Cashify-style marketing page: hero, How It Works, iPhone/MacBook catalog (list layout), Why Sell, tips, Customer Stories, FAQ. Brand primary blue `#1A56DB`.
 - **Sell flow** — guest-browsable wizard; login wall appears only at the quiz end (Google / Phone OTP / Email). MacBook adds variant → chip → RAM steps. Real photo upload to Supabase Storage.
 - **Track** — search by enquiry ID or phone, realtime stepper, edit pickup, cancel with reason, post-pickup rating.
 - **Account** — Account / Settings / Referral sub-tabs.

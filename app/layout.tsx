@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Mobronix",
   },
   description:
-    "Get an instant price for your used device, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai, Thane & Sangli.",
+    "Get an instant price for your used iPhone or MacBook, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai, Thane & Sangli.",
   keywords: [
     "sell used iPhone Mumbai",
     "sell second hand iPhone",
@@ -39,6 +39,10 @@ export const metadata: Metadata = {
     "iPhone resale price India",
     "sell iPhone online Mumbai",
     "instant cash for iPhone",
+    "sell used MacBook Mumbai",
+    "MacBook buyback Mumbai",
+    "sell old MacBook online India",
+    "instant cash for MacBook",
   ],
   openGraph: {
     type: "website",
@@ -47,7 +51,7 @@ export const metadata: Metadata = {
     siteName: "Mobronix",
     title: "Mobronix — Sell your used device in Mumbai, get paid today",
     description:
-      "Instant price, free doorstep pickup, same-day UPI payment. Trusted by 12,400+ sellers across Mumbai, Navi Mumbai, Thane & Sangli.",
+      "Instant price for your iPhone or MacBook, free doorstep pickup, same-day UPI payment. Trusted by 12,400+ sellers across Mumbai, Navi Mumbai, Thane & Sangli.",
     images: [
       {
         url: "/og-default.png",
@@ -61,7 +65,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Mobronix — Sell your used device in Mumbai, get paid today",
     description:
-      "Instant price, free doorstep pickup, same-day UPI payment across Mumbai, Navi Mumbai, Thane & Sangli.",
+      "Instant price for your iPhone or MacBook, free doorstep pickup, same-day UPI payment across Mumbai, Navi Mumbai, Thane & Sangli.",
     images: ["/og-default.png"],
   },
   alternates: {

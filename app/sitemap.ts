@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next'
+import { getModels } from '@/lib/data'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const static_pages: MetadataRoute.Sitemap = [
     {
       url:             APP_URL,
@@ -23,7 +24,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority:        0.5,
     },
     {
-      url:             `${APP_URL}/sell/storage`,
+      url:             `${APP_URL}/sell/iphone`,
+      lastModified:    new Date(),
+      changeFrequency: 'weekly',
+      priority:        0.9,
+    },
+    {
+      url:             `${APP_URL}/sell/macbook`,
       lastModified:    new Date(),
       changeFrequency: 'weekly',
       priority:        0.9,
@@ -41,5 +48,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority:        0.3,
   }))
 
-  return [...static_pages, ...legal_pages]
+  // Dynamic model pages — one entry per active iPhone and MacBook model.
+  const [iphoneModels, macbookModels] = await Promise.all([
+    getModels('iphone').catch(() => []),
+    getModels('macbook').catch(() => []),
+  ])
+
+  const model_pages: MetadataRoute.Sitemap = [
+    ...iphoneModels.map((m) => ({
+      url:             `${APP_URL}/sell/iphone/${m.slug}`,
+      lastModified:    new Date(),
+      changeFrequency: 'weekly' as const,
+      priority:        0.8,
+    })),
+    ...macbookModels.map((m) => ({
+      url:             `${APP_URL}/sell/macbook/${m.slug}`,
+      lastModified:    new Date(),
+      changeFrequency: 'weekly' as const,
+      priority:        0.8,
+    })),
+  ]
+
+  return [...static_pages, ...legal_pages, ...model_pages]
 }
