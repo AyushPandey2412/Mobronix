@@ -21,6 +21,16 @@ const nextConfig = {
         hostname: "store.storeimages.cdn-apple.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "support.apple.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "km.support.apple.com",
+        pathname: "/**",
+      },
       // Supabase Storage — public objects (admin-uploaded images) AND the
       // signed/authenticated paths used for the PRIVATE enquiry-photos bucket.
       {
@@ -57,7 +67,7 @@ const nextConfig = {
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://store.storeimages.cdn-apple.com https://*.supabase.co",
+      "img-src 'self' data: blob: https://store.storeimages.cdn-apple.com https://support.apple.com https://km.support.apple.com https://*.supabase.co",
       "font-src 'self' data:",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
       "frame-ancestors 'none'",
