@@ -177,9 +177,6 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
       {/* WHY US — bento grid */}
       <WhyUs />
 
-      {/* ANDROID BUYBACK — custom Android manual flow */}
-      <AndroidBuyback />
-
       {/* ABOUT US — core mission and key stats */}
       <section id="about" className="scroll-mt-24 py-10 md:py-20 bg-background border-t border-border/40">
         <div className="container-app">
