@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/", label: "Sell" },
   { href: "/#how", label: "How it works" },
-  { href: "/#about", label: "About Us" },
+  { href: "/about", label: "About Us" },
   { href: "/track", label: "Track Order" },
 ];
 
@@ -29,7 +29,7 @@ export function SiteHeader() {
   useEffect(() => {
     if (pathname !== "/") { setActiveSection(""); return; }
     
-    const sections = ["how", "about"];
+    const sections = ["how"];
     const observers = sections.map((id) => {
       const el = document.getElementById(id);
       if (!el) return null;
