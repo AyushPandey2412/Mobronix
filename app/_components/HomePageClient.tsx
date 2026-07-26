@@ -179,7 +179,7 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
       <WhyUs />
 
       {/* ABOUT US — smaller homepage overview */}
-      <section id="about" className="scroll-mt-24 py-12 md:py-20 bg-background border-t border-border/40">
+      <section id="about" className="scroll-mt-24 py-12 md:py-20 bg-primary-50/50 border-t border-b border-primary-100/80">
         <div className="container-app">
           <div className="text-center max-w-3xl mx-auto">
             <span className="text-[11px] sm:text-caption font-bold text-brand uppercase tracking-wider bg-primary-50 border border-primary-100 rounded-full px-3 py-1">
