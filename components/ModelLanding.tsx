@@ -2,12 +2,12 @@
 // Distinct from the stateful wizard (which is noindex). This is the SEO surface.
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getModelBySlug, getModels, getReviews } from '@/lib/data'
+import { getModelBySlug, getModels } from '@/lib/data'
 import { getMaxPrice } from '@/lib/pricing'
 import { inr } from '@/lib/format'
 import type { Model, ModelCategory } from '@/lib/types'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.mobronix.com'
 
 /** Flatten storages to [{ tier, price }] for the table, handling both formats. */
 function priceRows(model: Model): { tier: string; price: number }[] {
@@ -39,11 +39,10 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
   }
   const model: Model = found
 
-  const [allModels, reviews] = await Promise.all([getModels(category), getReviews()])
+  const allModels = await getModels(category)
   const related = allModels.filter((m) => m.series === model.series && m.slug !== model.slug).slice(0, 3)
   const rows = priceRows(model)
   const maxPrice = getMaxPrice(model)
-  const avgRating = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : '4.8'
 
   const productLd = {
     '@context': 'https://schema.org',
@@ -59,8 +58,7 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
       highPrice: maxPrice,
       offerCount: rows.length,
       availability: 'https://schema.org/InStock'
-    },
-    aggregateRating: { '@type': 'AggregateRating', ratingValue: avgRating, reviewCount: reviews.length || 120 }
+    }
   }
 
   const crumbsLd = {

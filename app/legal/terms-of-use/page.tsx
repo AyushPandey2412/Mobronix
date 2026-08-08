@@ -118,8 +118,7 @@ const SECTIONS = [
   },
   {
     heading: "14. Contact Us",
-    // TODO: Replace "+91 00000 00000" with the real business support phone number before going live.
-    body: "For any questions or concerns, contact us at support@mobronix.in or call +91 00000 00000.",
+    body: "For any questions or concerns, contact us at officialmobronix@gmail.com or call +91 77009 02077.",
   },
 ];
 

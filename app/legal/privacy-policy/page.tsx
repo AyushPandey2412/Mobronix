@@ -9,8 +9,7 @@ export const metadata: Metadata = {
 const SECTIONS = [
   {
     heading: "Who We Are",
-    // TODO: Replace "+91 00000 00000" with the real business support phone number before going live.
-    body: "Mobronix is a mobile retail and service business based in Thane, India. For privacy-related questions, contact us at support@mobronix.in or call +91 00000 00000.",
+    body: "Mobronix is a mobile retail and service business based in Thane, India. For privacy-related questions, contact us at officialmobronix@gmail.com or call +91 77009 02077.",
   },
   {
     heading: "Information We Collect",
@@ -58,7 +57,7 @@ const SECTIONS = [
       },
       {
         sub: "3. Marketing and Updates",
-        body: "We may send you offers, promotions, updates, and newsletters through SMS, Email, WhatsApp, phone calls, and other communication channels. You can stop promotional messages at any time by contacting us at support@mobronix.in.",
+        body: "We may send you offers, promotions, updates, and newsletters through SMS, Email, WhatsApp, phone calls, and other communication channels. You can stop promotional messages at any time by contacting us at officialmobronix@gmail.com.",
       },
       {
         sub: "4. Improve Our Services",
@@ -103,7 +102,7 @@ const SECTIONS = [
       "Object to marketing messages",
       "Withdraw your consent where applicable",
     ],
-    outro: "To request any of these, email us at support@mobronix.in. We will try to respond within 30 days.",
+    outro: "To request any of these, email us at officialmobronix@gmail.com. We will try to respond within 30 days.",
   },
   {
     heading: "How Long We Keep Your Information",
@@ -119,8 +118,7 @@ const SECTIONS = [
   },
   {
     heading: "Contact Us",
-    // TODO: Replace "+91 00000 00000" with the real business support phone number before going live.
-    body: "If you have questions, concerns, or complaints about this Privacy Policy or your personal information, contact us at support@mobronix.in or call +91 00000 00000.",
+    body: "If you have questions, concerns, or complaints about this Privacy Policy or your personal information, contact us at officialmobronix@gmail.com or call +91 77009 02077.",
   },
 ];
 

@@ -89,22 +89,11 @@ export default async function HomePage() {
     ],
   };
 
-  const aggregateRatingJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "AggregateRating",
-    itemReviewed: { "@type": "Organization", name: "Mobronix" },
-    ratingValue: "4.8",
-    reviewCount: "12400",
-    bestRating: "5",
-    worstRating: "1",
-  };
-
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aggregateRatingJsonLd) }} />
       <HomePageClient initialModels={initialModels} />
     </>
   );

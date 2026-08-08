@@ -69,7 +69,7 @@ export default function AdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@mobronix.in"
+                placeholder="officialmobronix@gmail.com"
                 className="w-full bg-surface border border-border text-text-primary placeholder:text-text-disabled rounded-md px-4 py-2.5 text-body-sm outline-none focus:border-brand focus:shadow-[0_0_0_3px_rgba(26,86,219,0.15)] transition-all"
               />
             </div>

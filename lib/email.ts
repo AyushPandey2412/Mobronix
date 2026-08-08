@@ -5,7 +5,8 @@ import type { Enquiry } from './types'
 
 const ACCENT = '#16A34A'
 const INK = '#171A21'
-const FROM = 'Mobronix <noreply@mobronix.in>'
+const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'officialmobronix@gmail.com'
+const FROM = process.env.RESEND_FROM_EMAIL || `Mobronix <${CONTACT_EMAIL}>`
 
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY
@@ -61,7 +62,7 @@ export async function sendAdminNotification(enquiry: Enquiry, adminBaseUrl: stri
     <a href="${link}" style="display:inline-block;margin-top:12px;background:${ACCENT};color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Open in Admin →</a>`
   await resend.emails.send({
     from: FROM,
-    to: process.env.ADMIN_EMAIL || 'admin@mobronix.in',
+    to: process.env.ADMIN_EMAIL || CONTACT_EMAIL,
     subject: `New Enquiry ${enquiry.display_id}`,
     html: shell(`New enquiry ${enquiry.display_id}`, inner)
   })
