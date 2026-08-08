@@ -19,6 +19,40 @@ import { Toaster } from "@/components/ui/Toaster";
 import { useEffect } from "react";
 import { createBrowserClient } from "@/lib/supabase/client";
 import { useStore } from "@/lib/store";
+import { AUTH_ACTIVITY_COOKIE, AUTH_SESSION_MAX_AGE_MS, AUTH_SESSION_MAX_AGE_SECONDS } from "@/lib/authSession";
+
+const STORE_KEY = "sellmyiphone";
+
+function readActivityAt() {
+  const cookie = document.cookie
+    .split("; ")
+    .find((item) => item.startsWith(`${AUTH_ACTIVITY_COOKIE}=`));
+  const value = cookie?.split("=")[1];
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function writeActivityAt(value = Date.now()) {
+  const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `${AUTH_ACTIVITY_COOKIE}=${value}; Max-Age=${AUTH_SESSION_MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure}`;
+  useStore.setState({ authSessionTouchedAt: value });
+}
+
+function clearActivityAt() {
+  document.cookie = `${AUTH_ACTIVITY_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`;
+  useStore.setState({ authSessionTouchedAt: null });
+}
+
+function clearLegacyLocalStorage() {
+  try {
+    window.localStorage.removeItem(STORE_KEY);
+    Object.keys(window.localStorage)
+      .filter((key) => key.startsWith("sb-"))
+      .forEach((key) => window.localStorage.removeItem(key));
+  } catch {
+    // Browser storage may be unavailable in private modes.
+  }
+}
 
 function AuthSync() {
   const setUser = useStore((s) => s.setContact);
@@ -27,14 +61,29 @@ function AuthSync() {
   useEffect(() => {
     const supabase = createBrowserClient();
 
-    const syncUser = async (session: any) => {
+    clearLegacyLocalStorage();
+
+    const syncUser = async (session: any, freshSignIn = false) => {
       if (!session?.user) {
         const currentUser = useStore.getState().user;
         if (currentUser) {
           logout();
         }
+        clearActivityAt();
         return;
       }
+
+      const now = Date.now();
+      const lastActivityAt = readActivityAt();
+      if (!freshSignIn && (!lastActivityAt || now - lastActivityAt > AUTH_SESSION_MAX_AGE_MS)) {
+        await supabase.auth.signOut();
+        clearActivityAt();
+        logout();
+        return;
+      }
+
+      writeActivityAt(now);
+
       const phone = session.user.phone || session.user.user_metadata?.phone || "";
       const name = session.user.user_metadata?.full_name || "Seller";
       
@@ -44,10 +93,9 @@ function AuthSync() {
           .select("role")
           .eq("id", session.user.id)
           .single();
-        const role = profile?.role || "seller";
+        const role = profile?.role === "admin" ? "admin" : "seller";
         setUser(name, phone, role);
       } catch (err) {
-        console.error("AuthSync error fetching profile role", err);
         setUser(name, phone, "seller");
       }
     };
@@ -59,11 +107,23 @@ function AuthSync() {
 
     // Listen to changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      syncUser(session);
+      syncUser(session, event === "SIGNED_IN");
     });
+
+    let lastWrite = 0;
+    const noteActivity = () => {
+      if (!useStore.getState().user) return;
+      const now = Date.now();
+      if (now - lastWrite < 60 * 1000) return;
+      lastWrite = now;
+      writeActivityAt(now);
+    };
+    const activityEvents = ["pointerdown", "keydown", "touchstart", "focus"];
+    activityEvents.forEach((event) => window.addEventListener(event, noteActivity, { passive: true }));
 
     return () => {
       subscription.unsubscribe();
+      activityEvents.forEach((event) => window.removeEventListener(event, noteActivity));
     };
   }, [setUser, logout]);
 

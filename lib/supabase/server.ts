@@ -5,6 +5,7 @@
 import { createServerClient as createSSRClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { authCookieOptions } from '@/lib/authSession'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -12,6 +13,7 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 export const createServerClient = async () => {
   const cookieStore = await cookies()
   return createSSRClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    cookieOptions: authCookieOptions,
     cookies: {
       getAll() {
         return cookieStore.getAll()

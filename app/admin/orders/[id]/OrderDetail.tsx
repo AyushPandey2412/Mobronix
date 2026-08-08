@@ -8,6 +8,7 @@ import { useToast } from '@/components/ToastHost'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { cn } from '@/lib/utils'
 import { inr } from '@/lib/format'
+import { getCustomerContactHref } from '@/lib/contactLinks'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import {
   QK,
@@ -159,7 +160,7 @@ export default function OrderDetail({
           <dl className="space-y-2.5">
             {[
               { label: 'Name',    value: fullName || '—' },
-              { label: 'Phone',   value: phone ? <a href={`https://wa.me/91${phone}`} target="_blank" rel="noopener noreferrer" className="text-brand font-medium hover:underline">{phoneRaw}</a> : '—' },
+              { label: 'Phone',   value: phone ? <a href={getCustomerContactHref(phone, `Hi ${firstName}, this is Mobronix regarding your enquiry ${initial.display_id}.`)} target="_blank" rel="noopener noreferrer" className="text-brand font-medium hover:underline">{phoneRaw}</a> : '—' },
               { label: 'Payment', value: initial.payment_mode ?? '—' },
               { label: 'Slot',    value: initial.pickup_slot  ?? '—' },
               { label: 'Address', value: `${initial.address ?? ''}, ${initial.pincode ?? ''}` },
@@ -316,7 +317,7 @@ export default function OrderDetail({
         <div className="flex flex-wrap gap-2">
           {waMessages.map(m => (
             <a key={m.key}
-              href={phone ? `https://wa.me/91${phone}?text=${encodeURIComponent(m.text)}` : '#'}
+              href={phone ? getCustomerContactHref(phone, m.text) : '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-border text-caption font-medium text-text-secondary hover:text-success-700 hover:border-success-200 hover:bg-success-50 transition-colors">

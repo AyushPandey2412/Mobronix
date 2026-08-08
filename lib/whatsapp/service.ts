@@ -4,6 +4,7 @@ import { normalizePhoneNumber } from './utils'
 import { whatsappClient, WhatsAppClient } from './client'
 import type { Enquiry, EnquiryStatus } from '@/lib/types'
 import type { WhatsAppRecipientType, WhatsAppSendResult } from './types'
+import { isWhatsAppMailtoMode } from '@/lib/contactLinks'
 
 type NotificationStatus = 'sent' | 'failed' | 'skipped'
 
@@ -63,6 +64,10 @@ export class WhatsAppNotificationService {
   constructor(private readonly client: WhatsAppClient = whatsappClient) {}
 
   async notifyOwner(supabase: SupabaseClient, enquiry: Enquiry) {
+    if (isWhatsAppMailtoMode()) {
+      return { ok: true, skipped: true as const }
+    }
+
     const ownerPhone = normalizePhoneNumber(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '')
     if (!ownerPhone) {
       console.error('[whatsapp] owner notification skipped: NEXT_PUBLIC_WHATSAPP_NUMBER is missing')
@@ -81,6 +86,10 @@ export class WhatsAppNotificationService {
   }
 
   async notifyCustomer(supabase: SupabaseClient, enquiry: Enquiry, status: EnquiryStatus) {
+    if (isWhatsAppMailtoMode()) {
+      return { ok: true, skipped: true as const }
+    }
+
     const rawPhone = enquiry.profile?.phone || enquiry.guest_phone || ''
     const customerPhone = normalizePhoneNumber(rawPhone)
     if (!customerPhone) {

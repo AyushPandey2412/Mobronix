@@ -21,7 +21,7 @@ export function Footer() {
               <Phone className="h-4 w-4 shrink-0 text-brand" /> +91 7700902077
             </li>
             <li className="flex items-center gap-2">
-              <Mail className="h-4 w-4 shrink-0 text-brand" /> support@mobronix.com
+              <Mail className="h-4 w-4 shrink-0 text-brand" /> officialmobronix@gmail.com
             </li>
           </ul>
         </div>
@@ -32,7 +32,7 @@ export function Footer() {
           <ul className="mt-4 space-y-3 text-body-sm text-neutral-400">
             <li><Link href="/#about" className="hover:text-white transition-colors">About Us</Link></li>
             <li><Link href="/#about" className="hover:text-white transition-colors">Contact</Link></li>
-            <li><button onClick={() => toast("Contact support@mobronix.com to partner with us.")} className="hover:text-white transition-colors text-left">Partner With Us</button></li>
+            <li><button onClick={() => toast("Contact officialmobronix@gmail.com to partner with us.")} className="hover:text-white transition-colors text-left">Partner With Us</button></li>
           </ul>
         </div>
 
@@ -42,12 +42,7 @@ export function Footer() {
           <ul className="mt-4 space-y-2.5 text-body-sm text-neutral-400">
             <li><Link href="/sell/iphone" className="hover:text-white transition-colors">Sell Phone</Link></li>
             <li><button onClick={() => toast("Tablet valuation is coming soon.")} className="hover:text-white transition-colors text-left">Sell Tablet</button></li>
-            <li><button onClick={() => toast("Smartwatch valuation is coming soon.")} className="hover:text-white transition-colors text-left">Sell Smartwatch</button></li>
             <li><Link href="/sell/macbook" className="hover:text-white transition-colors">Sell Laptop</Link></li>
-            <li><button onClick={() => toast("Earbuds valuation is coming soon.")} className="hover:text-white transition-colors text-left">Sell Earbuds</button></li>
-            <li><button onClick={() => toast("TV valuation is coming soon.")} className="hover:text-white transition-colors text-left">Sell TV</button></li>
-            <li><button onClick={() => toast("Camera valuation is coming soon.")} className="hover:text-white transition-colors text-left">Sell Camera</button></li>
-            <li><button onClick={() => toast("Gaming Console valuation is coming soon.")} className="hover:text-white transition-colors text-left">Sell Gaming Console</button></li>
           </ul>
         </div>
 

@@ -80,7 +80,7 @@ export async function sendOtpSms(mobile: string, otp: string, message: string): 
     if (provider === 'fast2sms') return await sendFast2Sms(mobile, otp)
     // TERMINAL fallback (dev) — never use in production.
     console.log(`\n========================================`)
-    console.log(`📱  OTP for +${CC} ${mobile}:  ${otp}`)
+    console.log(`OTP preview code: ${otp}`)
     console.log(`    (no SMS provider configured — terminal only)`)
     console.log(`========================================\n`)
     return { ok: true, provider: 'terminal' }

@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { MessageCircle, User as UserIcon } from "lucide-react";
 import { Logo } from "./Logo";
+import { LoginModal } from "./LoginModal";
 import { Button } from "@/components/ui/Button";
 import { useStore } from "@/lib/store";
 import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
+import { openContact } from "@/lib/contactLinks";
 
 const NAV = [
   { href: "/", label: "Sell" },
@@ -21,6 +23,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const user = useStore((s) => s.user);
+  const [showLogin, setShowLogin] = useState(false);
 
   // Scroll-spy: on the home page, highlight the nav item whose section is in
   // view.
@@ -98,7 +101,7 @@ export function SiteHeader() {
             size="sm"
             className="hidden text-whatsapp hover:bg-success-50 sm:inline-flex"
             leftIcon={<MessageCircle className="h-[18px] w-[18px]" />}
-            onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919999999999"}`, "_blank")}
+            onClick={() => openContact()}
           >
             WhatsApp
           </Button>
@@ -112,12 +115,13 @@ export function SiteHeader() {
               {user.name.split(" ")[0]}
             </Button>
           ) : (
-            <Button variant="primary" size="sm" onClick={() => router.push("/login")}>
+            <Button variant="primary" size="sm" onClick={() => setShowLogin(true)}>
               Login
             </Button>
           )}
         </div>
       </div>
+      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
     </header>
   );
 }

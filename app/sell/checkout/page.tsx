@@ -2,20 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Info, MapPin, ShieldCheck, Wallet, Banknote } from "lucide-react";
+import { Check, MapPin, ShieldCheck, Wallet, Banknote } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { StickyBar } from "@/components/shared/StickyBar";
 import { Textarea, Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Sheet } from "@/components/ui/Sheet";
 import { SelectorRow } from "@/components/ui/Selectable";
-import { Phone, User as UserIcon } from "lucide-react";
 import { useStore, useActiveModel } from "@/lib/store";
 import { SLOTS } from "@/lib/data";
 import { fmt, cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import type { DeviceLine } from "@/lib/types";
-import { PhoneOtpLogin } from "@/components/shared/PhoneOtpLogin";
+import { LoginModal } from "@/components/shared/LoginModal";
 import { getResponses } from "@/lib/answers";
 
 export default function CheckoutPage() {
@@ -29,7 +28,6 @@ export default function CheckoutPage() {
   const editing            = useStore((s) => s.editingEnquiry);
   const checkout           = useStore((s) => s.checkout);
   const setCheckout        = useStore((s) => s.setCheckout);
-  const setContact          = useStore((s) => s.setContact);          // saves name + phone
   const submitEnquiry        = useStore((s) => s.submitEnquiry);       // builds local Enquiry object
   const patchCurrentEnquiry  = useStore((s) => s.patchCurrentEnquiry); // overwrites with real API values
   const updateEnquiryPickup = useStore((s) => s.updateEnquiryPickup);
@@ -42,6 +40,7 @@ export default function CheckoutPage() {
   // Login is NOT required to browse/quote — only to book the pickup here.
   const loggedIn =
     !!user && /^\d{10}$/.test(user.mobile ?? "") && !!user.name.trim() && user.name !== "Seller";
+  const loginRequired = !editing && !loggedIn;
 
   useEffect(() => {
     if (editing) { if (!enquiry) router.replace("/track"); }
@@ -83,7 +82,7 @@ export default function CheckoutPage() {
       setSubmitting(true);
       updateEnquiryPickup();
       toast("Pickup details updated", "success");
-      router.push("/track");
+      router.replace("/track");
       return;
     }
 
@@ -179,7 +178,7 @@ export default function CheckoutPage() {
         assigned_exec: assignedExec,
       });
 
-      router.push("/track");
+      router.replace("/track");
     } catch (e: any) {
       setSubmitting(false);
       setError(e.message || "Something went wrong. Please try again.");
@@ -188,6 +187,18 @@ export default function CheckoutPage() {
   };
 
   if ((editing && !enquiry) || (!editing && (!model || !quote))) return null;
+
+  if (loginRequired && model) {
+    return (
+      <LoginModal
+        open
+        onClose={() => router.back()}
+        model={model}
+        storage={selectedStorage}
+        closeOnSuccess={false}
+      />
+    );
+  }
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -235,29 +246,6 @@ export default function CheckoutPage() {
           )}
         </div>
       </div>
-
-      {/* LOGIN GATE — name + phone, then OTP, before the pickup form unlocks */}
-      {!editing && !loggedIn && (
-        <div
-          className="mt-6 rounded-xl border border-border bg-surface p-5 sm:p-6 animate-m-fade-up"
-        >
-          <h3 className="text-h4 font-bold text-text-primary">Log in to book your pickup</h3>
-          <p className="mt-1 mb-5 text-body-sm text-text-secondary">
-            {devices.some(d => d.category === 'android' || d.final === 0) ? (
-              <>
-                Your request is ready to submit. Verify your mobile number — we&apos;ll call you on it to confirm your device &amp; the pickup slot.
-              </>
-            ) : (
-              <>
-                Your offer of <b className="text-text-primary">{!editing && !loggedIn ? "₹XX,XXX" : fmt(total)}</b> is locked in. Verify your mobile
-                number — we&apos;ll call you on it to confirm your device, the final price &amp; the pickup slot.
-              </>
-            )}
-          </p>
-
-          <PhoneOtpLogin />
-        </div>
-      )}
 
       {/* Pickup form — only after login (or when editing an existing pickup) */}
       {(editing || loggedIn) && (

@@ -238,6 +238,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useStore } from "@/lib/store";
 import { TRACK_STEPS } from "@/lib/data";
 import { toast } from "@/lib/toast";
+import { openContact } from "@/lib/contactLinks";
 
 interface OrderLike {
   id: string;
@@ -422,7 +423,7 @@ function TrackInner() {
                 <MessageCircle className="h-5 w-5 text-whatsapp" />
                 <p className="flex-1 text-body-sm text-text-secondary">Need help with this enquiry?</p>
                 <button
-                  onClick={() => toast("This opens WhatsApp chat on the live site.")}
+                  onClick={() => openContact(`Hi Mobronix, I need help with my enquiry ${enquiry.display_id || enquiry.id}.`)}
                   className="text-body-sm font-bold text-brand"
                 >
                   Chat with us

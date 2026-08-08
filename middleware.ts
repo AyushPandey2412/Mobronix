@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { authCookieOptions } from './lib/authSession'
 
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next({ request: req })
@@ -10,6 +11,7 @@ export async function middleware(req: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      cookieOptions: authCookieOptions,
       cookies: {
         getAll() {
           return req.cookies.getAll()
@@ -30,7 +32,7 @@ export async function middleware(req: NextRequest) {
 
   // ── Server-side admin enforcement ────────────────────────────────────────
   // The client AdminAuthGate is only UX; real authorization happens here so the
-  // admin pages are never served to a non-admin (no JS-disable / localStorage
+  // admin pages are never served to a non-admin (no JS-disable / browser-storage
   // bypass). The login page itself stays public so admins can sign in.
   const path = req.nextUrl.pathname
   if (path.startsWith('/admin') && path !== '/admin/login') {

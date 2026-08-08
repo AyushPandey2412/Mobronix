@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import {
   MODELS,
   MACBOOK_MODELS,
@@ -51,6 +51,7 @@ interface AppState {
 
   // auth
   user: User | null;
+  authSessionTouchedAt: number | null;
 
   // active sell flow
   selectedModelId: string | null;
@@ -139,6 +140,7 @@ export const useStore = create<AppState>()(
       enquiries: SEED_ENQUIRIES,
 
       user: null,
+      authSessionTouchedAt: null,
 
       selectedModelId: null,
       selectedStorage: null,
@@ -167,7 +169,7 @@ export const useStore = create<AppState>()(
         const user: User = isPhone
           ? { name: "Seller", mobile: id, role: "seller" }
           : { name: id, mobile: id, role: "seller" };
-        set({ user });
+        set({ user, authSessionTouchedAt: Date.now() });
         return { ok: true, role: "seller" };
       },
 
@@ -178,14 +180,20 @@ export const useStore = create<AppState>()(
         if (!n) return { ok: false, error: "Please enter your name to create an account." };
         if (!/^\d{10}$/.test(m)) return { ok: false, error: "Please enter a valid 10-digit mobile number." };
         if (pwd.length < 4) return { ok: false, error: "Please choose a password of at least 4 characters." };
-        set({ user: { name: n, mobile: m, role: "seller" } });
+        if (get().user?.mobile && get().user?.mobile !== m) {
+          return { ok: false, error: "You are already logged in with another mobile number. Please log out before using a different account." };
+        }
+        set({ user: { name: n, mobile: m, role: "seller" }, authSessionTouchedAt: Date.now() });
         return { ok: true, role: "seller" };
       },
 
       phoneLogin: (mobile) => {
         const m = mobile.trim();
         if (!/^\d{10}$/.test(m)) return { ok: false, error: "Please enter a valid 10-digit mobile number." };
-        set((st) => ({ user: { name: st.user?.name ?? "Seller", mobile: m, role: "seller" } }));
+        if (get().user?.mobile && get().user?.mobile !== m) {
+          return { ok: false, error: "You are already logged in with another mobile number. Please log out before using a different account." };
+        }
+        set((st) => ({ user: { name: st.user?.name ?? "Seller", mobile: m, role: "seller" }, authSessionTouchedAt: Date.now() }));
         return { ok: true, role: "seller" };
       },
 
@@ -196,6 +204,7 @@ export const useStore = create<AppState>()(
             mobile: mobile.trim() || st.user?.mobile || "",
             role: (role || st.user?.role || "seller") as "seller" | "admin",
           },
+          authSessionTouchedAt: Date.now(),
         })),
 
       logout: () => {
@@ -207,6 +216,7 @@ export const useStore = create<AppState>()(
         }
         set({
           user: null,
+          authSessionTouchedAt: null,
           selectedModelId: null,
           selectedStorage: null,
           answers: {},
@@ -508,13 +518,14 @@ export const useStore = create<AppState>()(
     }),
     {
       name: "sellmyiphone",
+      storage: createJSONStorage(() => sessionStorage),
       partialize: (st) => ({
         // Only persist the fields actually needed across page reloads.
         // models, questions, enquiries are intentionally excluded:
         //   - models/questions come from Supabase via TanStack Query (live data)
-        //   - enquiries (all-time list) is not needed in localStorage; admin reads from Supabase
-        // Keeping these out cuts localStorage from ~100KB to ~2KB.
+        //   - enquiries (all-time list) is not needed in browser storage; admin reads from Supabase
         user:            st.user,
+        authSessionTouchedAt: st.authSessionTouchedAt,
         enquiry:         st.enquiry,          // current in-flight sell enquiry
         cart:            st.cart,             // multi-device cart
         selectedModelId: st.selectedModelId,  // resume sell flow after login

@@ -19,16 +19,16 @@ const jbMono = JetBrains_Mono({
   display: "swap",
 });
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.mobronix.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Mobronix — Sell your used device in Mumbai, get paid today",
+    default: "Mobronix - Sell Used Phones, iPhones & MacBooks in Mumbai",
     template: "%s | Mobronix",
   },
   description:
-    "Get an instant price for your used iPhone or MacBook, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai, Thane & Sangli.",
+    "Sell your used phone, iPhone or MacBook in Mumbai, Navi Mumbai, Thane and Sangli. Free doorstep pickup, quick inspection and same-day UPI or cash payout.",
   keywords: [
     "sell used iPhone Mumbai",
     "sell second hand iPhone",
@@ -49,23 +49,23 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: APP_URL,
     siteName: "Mobronix",
-    title: "Mobronix — Sell your used device in Mumbai, get paid today",
+    title: "Mobronix - Sell Used Phones, iPhones & MacBooks in Mumbai",
     description:
-      "Instant price for your iPhone or MacBook, free doorstep pickup, same-day UPI payment. Trusted by 12,400+ sellers across Mumbai, Navi Mumbai, Thane & Sangli.",
+      "Sell your used phone, iPhone or MacBook with free doorstep pickup and same-day payout across Mumbai, Navi Mumbai, Thane and Sangli.",
     images: [
       {
         url: "/og-default.png",
         width: 1200,
         height: 630,
-        alt: "Mobronix — Sell your device, get paid today",
+        alt: "Mobronix - Sell your device, get paid today",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mobronix — Sell your used device in Mumbai, get paid today",
+    title: "Mobronix - Sell Used Phones, iPhones & MacBooks in Mumbai",
     description:
-      "Instant price for your iPhone or MacBook, free doorstep pickup, same-day UPI payment across Mumbai, Navi Mumbai, Thane & Sangli.",
+      "Sell your used phone, iPhone or MacBook with free doorstep pickup and same-day payout across Mumbai, Navi Mumbai, Thane and Sangli.",
     images: ["/og-default.png"],
   },
   alternates: {
@@ -78,11 +78,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/icon.png", type: "image/png" }
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon-512.png", sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
     apple: "/apple-icon.png",
   },
+  manifest: "/manifest.webmanifest",
 };
 
 export const viewport: Viewport = {
@@ -122,3 +126,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { getModels } from '@/lib/data'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.mobronix.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const static_pages: MetadataRoute.Sitemap = [

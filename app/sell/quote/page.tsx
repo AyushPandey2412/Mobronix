@@ -25,7 +25,7 @@
 
 //   // Show the unlock modal automatically when an unauthenticated seller lands here —
 //   // but only AFTER the persisted store has rehydrated, otherwise a logged-in user
-//   // sees the modal flash open on reload before `user` is restored from localStorage.
+//   // sees the modal flash open on reload before `user` is restored from browser storage.
 //   const [showLogin, setShowLogin] = useState(false);
 //   const [hydrated, setHydrated] = useState(false);
 
@@ -238,7 +238,7 @@ export default function QuotePage() {
 
   // Show the unlock modal automatically when an unauthenticated seller lands here —
   // but only AFTER the persisted store has rehydrated, otherwise a logged-in user
-  // sees the modal flash open on reload before `user` is restored from localStorage.
+  // sees the modal flash open on reload before `user` is restored from browser storage.
   const [showLogin, setShowLogin] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 

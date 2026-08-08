@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useMemo, useState, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { Progress } from "@/components/ui/Progress";
@@ -11,7 +11,19 @@ import { QuestionBody, canProceed } from "@/components/sell/QuestionBody";
 import { useStore } from "@/lib/store";
 import { QUESTIONS } from "@/lib/data";
 import { toast } from "@/lib/toast";
-import type { Answer } from "@/lib/types";
+import type { Answer, Question } from "@/lib/types";
+
+const ANDROID_SKIP_QUESTION_INDEX = 6;
+
+const ANDROID_SKIP_QUESTION: Question = {
+  type: "single",
+  q: "Select the condition that best describes your phone.",
+  sub: "Select one option",
+  opts: [
+    { label: "My phone has functional issues or physical damage.", factor: 1 },
+    { label: "My phone has no issues. Skip to the next step.", factor: 1 },
+  ],
+};
 
 function ManualSellContent() {
   const searchParams = useSearchParams();
@@ -30,12 +42,50 @@ function ManualSellContent() {
   const [qIndex, setQIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, Answer>>({});
 
-  const questions = QUESTIONS; // 13 standard questions
+  const questions = useMemo(() => {
+    return [
+      ...QUESTIONS.slice(0, ANDROID_SKIP_QUESTION_INDEX),
+      ANDROID_SKIP_QUESTION,
+      ...QUESTIONS.slice(ANDROID_SKIP_QUESTION_INDEX),
+    ];
+  }, []);
+
   const currentQuestion = questions[qIndex];
   const currentAnswer = answers[qIndex];
   const canProceedQuestion = currentQuestion ? canProceed(currentQuestion, currentAnswer) : false;
 
   const totalQuestions = questions.length;
+
+  const shouldSkipRemaining = useMemo(() => {
+    if (!currentQuestion || currentQuestion.type !== "single" || currentAnswer === undefined || currentAnswer === null) return false;
+    const opts = currentQuestion.opts ?? currentQuestion.options ?? [];
+    const opt = opts[currentAnswer as number];
+    if (!opt) return false;
+    const label = opt.label.toLowerCase();
+    return label.includes("skip to the next step") || label.includes("no issues. skip") || label.includes("skip to next");
+  }, [currentQuestion, currentAnswer]);
+
+  const completeManualFlow = () => {
+    const manualModel = {
+      id: "manual-android",
+      name: `${brand} ${modelName}`,
+      category: "android" as const,
+      series: brand,
+      storages: { [storageName || "To be collected"]: 0 }
+    };
+
+    useStore.setState({
+      models: [manualModel, ...useStore.getState().models.filter(m => m.id !== "manual-android")],
+      selectedModelId: "manual-android",
+      selectedStorage: storageName || "To be collected",
+      answers: answers,
+      activeQuestions: questions,
+      quote: { base: 0, final: 0, breakdown: [] }
+    });
+
+    toast("Details saved. Please schedule your pickup.", "success");
+    router.push("/sell/checkout");
+  };
 
   const handleNextStep1 = () => {
     if (!modelName.trim()) {
@@ -46,31 +96,11 @@ function ManualSellContent() {
   };
 
   const handleNextQuestion = () => {
-    if (qIndex < totalQuestions - 1) {
+    if (shouldSkipRemaining || qIndex === totalQuestions - 1) {
+      completeManualFlow();
+    } else {
       setQIndex(qIndex + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      // Complete: sync with store and redirect to standard checkout
-      const manualModel = {
-        id: "manual-android",
-        name: `${brand} ${modelName}`,
-        category: "android" as const,
-        series: brand,
-        storages: { [storageName || "To be collected"]: 0 }
-      };
-
-      // Add to store and select it
-      useStore.setState({
-        models: [manualModel, ...useStore.getState().models.filter(m => m.id !== "manual-android")],
-        selectedModelId: "manual-android",
-        selectedStorage: storageName || "To be collected",
-        answers: answers,
-        activeQuestions: QUESTIONS,
-        quote: { base: 0, final: 0, breakdown: [] }
-      });
-
-      toast("Details saved. Please schedule your pickup.", "success");
-      router.push("/sell/checkout");
     }
   };
 
@@ -169,7 +199,7 @@ function ManualSellContent() {
                 disabled={!canProceedQuestion}
                 rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
               >
-                {qIndex === totalQuestions - 1 ? "Go to Checkout" : "Next"}
+                {qIndex === totalQuestions - 1 || shouldSkipRemaining ? "Go to Checkout" : "Next"}
               </Button>
             </div>
           </div>

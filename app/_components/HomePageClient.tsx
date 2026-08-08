@@ -23,6 +23,7 @@ import { useMemo } from "react";
 import { useStore } from "@/lib/store";
 import { REVIEWS, FAQS, STATS } from "@/lib/data";
 import type { Model } from "@/lib/types";
+import { openContact } from "@/lib/contactLinks";
 
 function maxPrice(model: Model): number {
   if (!model.storages) return 0;
@@ -92,21 +93,10 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
                 size="lg"
                 variant="outline"
                 leftIcon={<MessageCircle className="h-[18px] w-[18px] text-whatsapp" />}
-                onClick={() => window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919999999999"}`, "_blank")}
+                onClick={() => openContact()}
                 className="flex-1 sm:flex-initial justify-center text-[13px] sm:text-body-sm px-3 sm:px-5 bg-surface"
               >
                 WhatsApp us
-              </Button>
-            </div>
-
-            <div className="mt-4 md:hidden flex justify-center animate-m-fade-up" style={{ animationDelay: `${3.5 * 60}ms` }}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-[12px] font-semibold text-brand hover:underline"
-                onClick={() => document.getElementById("about")?.scrollIntoView({ behavior: "smooth" })}
-              >
-                Know more about us ↓
               </Button>
             </div>
 
@@ -177,33 +167,6 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
 
       {/* WHY US — bento grid */}
       <WhyUs />
-
-      {/* ABOUT US — smaller homepage overview */}
-      <section id="about" className="scroll-mt-24 py-12 md:py-20 bg-primary-50/50 border-t border-b border-primary-100/80">
-        <div className="container-app">
-          <div className="text-center max-w-3xl mx-auto">
-            <span className="text-[11px] sm:text-caption font-bold text-brand uppercase tracking-wider bg-primary-50 border border-primary-100 rounded-full px-3 py-1">
-              About Us
-            </span>
-            <h2 className="mt-4 text-body-xl md:text-[32px] font-extrabold tracking-tight text-text-primary leading-tight">
-              Your Trusted Partner for Selling Used Devices
-            </h2>
-            <p className="mt-4 text-body-md text-text-secondary leading-relaxed">
-              Welcome to <strong>Mobronix</strong>! We make it easy to sell your old mobile phones quickly, safely, and at a fair price. Our goal is to give every device a second life while helping reduce electronic waste.
-            </p>
-            <div className="mt-6 flex justify-center">
-              <Button
-                variant="outline"
-                onClick={() => router.push("/about")}
-                rightIcon={<ChevronRight className="h-4 w-4" />}
-                className="font-bold border-brand text-brand hover:bg-primary-50"
-              >
-                Know More
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* RESET & HAND OVER */}
       {/* <section className="bg-surface py-14 md:py-20">

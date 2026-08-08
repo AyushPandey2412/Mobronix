@@ -13,7 +13,7 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
     async function check() {
       // Authorization is enforced server-side in middleware.ts. This client gate
       // only trusts a REAL Supabase session with profiles.role = 'admin' — the
-      // old localStorage/demo-admin bypass was removed.
+      // old browser-storage/demo-admin bypass was removed.
       const { data: { user } } = await sb.auth.getUser()
       if (user) {
         const { data: profile } = await sb.from('profiles').select('role').eq('id', user.id).single()

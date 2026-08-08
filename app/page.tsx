@@ -8,12 +8,12 @@ import { HomePageClient } from "./_components/HomePageClient";
 import { MODELS, MACBOOK_MODELS } from "@/lib/data";
 import type { Model } from "@/lib/types";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.mobronix.com";
 
 export const metadata: Metadata = {
-  title: "Mobronix — Sell your used iPhone or MacBook in Mumbai, get paid today",
+  title: "Mobronix - Sell Used Phones, iPhones & MacBooks in Mumbai",
   description:
-    "Get an instant price for your used iPhone or MacBook, free doorstep pickup, and same-day payout via UPI or cash. Serving Mumbai, Navi Mumbai, Thane & Sangli.",
+    "Sell your used phone, iPhone or MacBook in Mumbai, Navi Mumbai, Thane and Sangli. Free doorstep pickup, quick inspection and same-day UPI or cash payout.",
 };
 
 // Revalidate the page every 5 minutes — model prices occasionally change.
@@ -45,11 +45,15 @@ export default async function HomePage() {
   // JSON-LD schema — generated server-side so it's in the HTML source
   const orgJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": ["Organization", "LocalBusiness"],
     name: "Mobronix",
+    alternateName: "Mobronix Official",
     url: APP_URL,
-    logo: `${APP_URL}/icon.png`,
-    description: "Trusted iPhone buyback service in Mumbai, Navi Mumbai, Thane and Sangli. Free doorstep pickup, instant UPI payment.",
+    logo: `${APP_URL}/favicon-512.png`,
+    image: `${APP_URL}/og-default.png`,
+    description: "Trusted used phone, iPhone and MacBook buyback service in Mumbai, Navi Mumbai, Thane and Sangli. Free doorstep pickup and same-day payout.",
+    telephone: "+917700902077",
+    email: "officialmobronix@gmail.com",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Mumbai",
@@ -59,9 +63,18 @@ export default async function HomePage() {
     areaServed: ["Mumbai", "Navi Mumbai", "Thane", "Sangli"],
     contactPoint: {
       "@type": "ContactPoint",
+      telephone: "+917700902077",
+      email: "officialmobronix@gmail.com",
       contactType: "customer service",
       availableLanguage: ["English", "Hindi", "Marathi"],
     },
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Mobronix",
+    url: APP_URL,
   };
 
   const faqJsonLd = {
@@ -89,6 +102,7 @@ export default async function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aggregateRatingJsonLd) }} />
       <HomePageClient initialModels={initialModels} />

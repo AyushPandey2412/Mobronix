@@ -172,10 +172,10 @@ export default function AboutPage() {
               <Phone className="h-4 w-4" /> Call: +91 7700902077
             </a>
             <a
-              href="mailto:support@mobronix.com"
+              href="mailto:officialmobronix@gmail.com"
               className="flex items-center justify-center gap-2.5 w-full sm:w-auto rounded-xl border border-border bg-surface px-6 py-3 text-body-sm font-bold text-text-primary hover:bg-neutral-50 active:scale-[0.98] transition-all shadow-xs"
             >
-              <Mail className="h-4 w-4" /> Email: support@mobronix.com
+              <Mail className="h-4 w-4" /> Email: officialmobronix@gmail.com
             </a>
           </div>
         </div>

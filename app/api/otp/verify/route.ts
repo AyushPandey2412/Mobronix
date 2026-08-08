@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { verifyOtp } from '@/lib/otp'
 import { rateLimit, clientIp } from '@/lib/ratelimit'
 import { createServiceClient, createRouteClient } from '@/lib/supabase/server'
+import { AUTH_ACTIVITY_COOKIE, authCookieOptions } from '@/lib/authSession'
 
 export const runtime = 'nodejs'
 
@@ -30,6 +31,23 @@ export async function POST(req: Request) {
 
   // 2. Real Auth integration — find or create genuine Supabase Auth user
   const serviceClient = createServiceClient()
+  const routeClient = await createRouteClient()
+  const { data: { user: currentUser } } = await routeClient.auth.getUser()
+
+  if (currentUser) {
+    const currentPhone =
+      currentUser.phone?.replace(/\D/g, '').slice(-10) ||
+      currentUser.user_metadata?.phone?.replace(/\D/g, '').slice(-10) ||
+      ''
+
+    if (currentPhone && currentPhone !== body.mobile) {
+      return NextResponse.json(
+        { error: 'You are already logged in with another mobile number. Please log out before using a different account.' },
+        { status: 409 }
+      )
+    }
+  }
+
   const password = Math.random().toString(36).slice(-16) + 'A1!'
   const email = `${body.mobile}@sellers.mobronix.internal`
   let userEmail = email
@@ -38,12 +56,12 @@ export async function POST(req: Request) {
     // Check if profile already exists for this phone number
     const { data: profile, error: profileErr } = await serviceClient
       .from('profiles')
-      .select('id, email')
+      .select('id, email, full_name')
       .eq('phone', body.mobile)
       .maybeSingle()
 
     if (profileErr) {
-      console.error('[otp/verify] profile lookup error', profileErr)
+      console.error('[otp/verify] profile lookup error')
     }
 
     if (profile) {
@@ -68,13 +86,26 @@ export async function POST(req: Request) {
         if (createErr.message.includes('already exists')) {
           // Find user to get ID and update password
           const { data: list, error: listErr } = await serviceClient.auth.admin.listUsers()
+          if (listErr) throw listErr
           const existing = list?.users?.find(u => u.email === email || u.phone === body.mobile)
           if (existing) {
+            userEmail = existing.email || email
             const { error: updateErr } = await serviceClient.auth.admin.updateUserById(existing.id, {
               password,
               user_metadata: { full_name: body.name || undefined }
             })
             if (updateErr) throw updateErr
+
+            const { error: profileCreateErr } = await serviceClient
+              .from('profiles')
+              .upsert({
+                id: existing.id,
+                full_name: body.name || existing.user_metadata?.full_name || 'Seller',
+                phone: body.mobile,
+                email: userEmail,
+                role: 'customer',
+              }, { onConflict: 'id' })
+            if (profileCreateErr) throw profileCreateErr
           } else {
             throw createErr
           }
@@ -85,7 +116,6 @@ export async function POST(req: Request) {
     }
 
     // 3. Adopt session on the client/route side (sets the cookies)
-    const routeClient = await createRouteClient()
     const { data: signInData, error: signInError } = await routeClient.auth.signInWithPassword({
       email: userEmail,
       password
@@ -99,23 +129,25 @@ export async function POST(req: Request) {
     // Fetch profile role to return the correct user role instantly
     const { data: profileRole } = await serviceClient
       .from('profiles')
-      .select('role')
+      .select('role, full_name')
       .eq('id', signInData.user.id)
       .single()
-    const role = profileRole?.role || 'seller'
+    const role = profileRole?.role === 'admin' ? 'admin' : 'seller'
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       session: signInData.session,
       user: {
-        name: signInData.user?.user_metadata?.full_name || 'Seller',
+        name: profileRole?.full_name || signInData.user?.user_metadata?.full_name || 'Seller',
         mobile: body.mobile,
         role
       }
     })
+    response.cookies.set(AUTH_ACTIVITY_COOKIE, String(Date.now()), authCookieOptions)
+    return response
 
   } catch (error: any) {
-    console.error('[otp/verify] user sync failed', error)
+    console.error('[otp/verify] user sync failed')
     return NextResponse.json({ error: error.message || 'Verification succeeded, but login synchronization failed.' }, { status: 500 })
   }
 }

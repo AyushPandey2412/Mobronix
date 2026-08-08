@@ -35,6 +35,10 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
       setError("Please enter a valid 10-digit mobile number.");
       return;
     }
+    if (user?.mobile && user.mobile !== phone) {
+      setError("You are already logged in with another mobile number. Please log out before using a different account.");
+      return;
+    }
     setOtpBusy(true);
     try {
       const res = await fetch("/api/otp/send", {
@@ -65,6 +69,10 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
     const code = otpCode.trim();
     if (!/^\d{4,6}$/.test(code)) {
       setError("Enter the 6-digit code we sent you.");
+      return;
+    }
+    if (user?.mobile && user.mobile !== phone) {
+      setError("You are already logged in with another mobile number. Please log out before using a different account.");
       return;
     }
     setOtpBusy(true);

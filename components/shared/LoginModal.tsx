@@ -15,10 +15,11 @@ import type { Model } from "@/lib/types";
 export interface LoginModalProps {
   open: boolean;
   onClose: () => void;
-  model: Model;
+  model?: Model;
   storage?: string | null;
   /** Called after a successful OTP-verified login. */
-  onSuccess?: () => void;
+  onSuccess?: (role: string) => void;
+  closeOnSuccess?: boolean;
 }
 
 /**
@@ -26,12 +27,13 @@ export interface LoginModalProps {
  * Shows the device with a masked price and runs the real name + OTP login
  * flow (same as Checkout) before revealing the price.
  */
-export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginModalProps) {
+export function LoginModal({ open, onClose, model, storage, onSuccess, closeOnSuccess = true }: LoginModalProps) {
+  const user = useStore((s) => s.user);
   const setContact = useStore((s) => s.setContact);
   const trapRef = useFocusTrap<HTMLDivElement>(open);
 
-  const [contactName, setContactName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
+  const [contactName, setContactName] = useState(user && user.name !== "Seller" ? user.name : "");
+  const [contactPhone, setContactPhone] = useState(user?.mobile ?? "");
   const [agree, setAgree] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +43,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
   const [devCode, setDevCode] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  const img = getDeviceImageSized(model, 160);
+  const img = model ? getDeviceImageSized(model, 160) : null;
 
   // Escape-to-close + scroll lock (compensates for scrollbar width so the
   // page doesn't shift and produce a stray horizontal scrollbar).
@@ -94,6 +96,9 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
     const phone = contactPhone.trim();
     if (!name) return setError("Please enter your name to continue.");
     if (!/^\d{10}$/.test(phone)) return setError("Please enter a valid 10-digit mobile number.");
+    if (user?.mobile && user.mobile !== phone) {
+      return setError("You are already logged in with another mobile number. Please log out before using a different account.");
+    }
     if (!agree) return setError("Please accept the Terms to continue.");
     setOtpBusy(true);
     try {
@@ -125,12 +130,15 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
     const phone = contactPhone.trim();
     const code = otpCode.trim();
     if (!/^\d{4,6}$/.test(code)) return setError("Enter the 6-digit code we sent you.");
+    if (user?.mobile && user.mobile !== phone) {
+      return setError("You are already logged in with another mobile number. Please log out before using a different account.");
+    }
     setOtpBusy(true);
     try {
       const res = await fetch("/api/otp/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile: phone, code }),
+        body: JSON.stringify({ mobile: phone, code, name: contactName.trim() }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -139,8 +147,8 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
       }
       setContact(contactName.trim(), phone, data.user?.role || "seller");
       toast("Login successful", "success");
-      onSuccess?.();
-      onClose();
+      onSuccess?.(data.user?.role || "seller");
+      if (closeOnSuccess) onClose();
     } catch {
       setError("Couldn't verify the code. Please try again.");
     } finally {
@@ -177,6 +185,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
             {/* Inner wrapper — this is what scrolls and what has rounded corners */}
             <div className="max-h-[92vh] overflow-y-auto rounded-t-3xl bg-surface p-5 pt-6 shadow-2xl sm:rounded-3xl">
               {/* Device card */}
+              {model && (
               <div className="flex items-center gap-4 rounded-2xl bg-gradient-to-br from-primary-50 to-secondary-50 p-4">
                 <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-xl bg-white/70 shadow-sm">
                   {img ? (
@@ -198,10 +207,11 @@ export function LoginModal({ open, onClose, model, storage, onSuccess }: LoginMo
                   </p>
                 </div>
               </div>
+              )}
 
               {/* Heading */}
               <h3 className="mt-6 flex items-center justify-center gap-2 text-center text-h4 font-extrabold tracking-tight text-text-primary">
-                <Lock className="h-5 w-5 text-warning-500" /> Login To Unlock The Best Price
+                <Lock className="h-5 w-5 text-warning-500" /> {model ? "Login To Unlock The Best Price" : "Login To Continue"}
               </h3>
 
               {!otpSent ? (
