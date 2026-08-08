@@ -24,7 +24,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.mobronix.com";
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Mobronix - Sell Used Phones, iPhones & MacBooks in Mumbai",
+    default: "Mobronix Sell Used Phones, iPhones & MacBooks in Mumbai",
     template: "%s | Mobronix",
   },
   description:
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: APP_URL,
     siteName: "Mobronix",
-    title: "Mobronix - Sell Used Phones, iPhones & MacBooks in Mumbai",
+    title: "Mobronix Sell Used Phones, iPhones & MacBooks in Mumbai",
     description:
       "Sell your used phone, iPhone or MacBook with free doorstep pickup and same-day payout across Mumbai, Navi Mumbai, Thane and Sangli.",
     images: [
@@ -57,13 +57,13 @@ export const metadata: Metadata = {
         url: "/og-default.png",
         width: 1200,
         height: 630,
-        alt: "Mobronix - Sell your device, get paid today",
+        alt: "Mobronix Sell your device, get paid today",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mobronix - Sell Used Phones, iPhones & MacBooks in Mumbai",
+    title: "Mobronix Sell Used Phones, iPhones & MacBooks in Mumbai",
     description:
       "Sell your used phone, iPhone or MacBook with free doorstep pickup and same-day payout across Mumbai, Navi Mumbai, Thane and Sangli.",
     images: ["/og-default.png"],

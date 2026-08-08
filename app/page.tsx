@@ -11,7 +11,7 @@ import type { Model } from "@/lib/types";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.mobronix.com";
 
 export const metadata: Metadata = {
-  title: "Mobronix - Sell Used Phones, iPhones & MacBooks in Mumbai",
+  title: "Mobronix Sell Used Phones, iPhones & MacBooks in Mumbai",
   description:
     "Sell your used phone, iPhone or MacBook in Mumbai, Navi Mumbai, Thane and Sangli. Free doorstep pickup, quick inspection and same-day UPI or cash payout.",
 };
