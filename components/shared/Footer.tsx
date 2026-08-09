@@ -8,7 +8,7 @@ import { toast } from "@/lib/toast";
 export function Footer() {
   return (
     <footer className="mt-12 border-t border-border bg-neutral-900 text-neutral-300">
-      <div className="container-app grid gap-10 pt-12 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="container-app grid gap-8 pt-10 pb-8 md:gap-10 md:py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         {/* Brand */}
         <div>
           <Logo light />
@@ -59,18 +59,20 @@ export function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/10 px-4 py-6">
-        <p className="text-center text-[11px] leading-relaxed text-neutral-600 max-w-3xl mx-auto">
+      <div className="border-t border-white/10 px-4 pt-5 pb-[calc(8rem+env(safe-area-inset-bottom))] md:py-6">
+        <p className="mx-auto max-w-3xl text-center text-[11px] leading-relaxed text-neutral-500">
           All trademarks, logos, and brand names belong to their respective owners. They are used only for identification purposes and do not imply any endorsement or affiliation with Mobronix.
         </p>
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-caption text-neutral-600">
+        <div className="mt-3 flex flex-col items-center justify-center gap-2 text-center text-[11px] leading-tight text-neutral-500 sm:flex-row sm:flex-wrap sm:gap-x-3 sm:text-caption">
           <span>© 2026 Mobronix. All rights reserved.</span>
           <span className="hidden sm:inline">·</span>
-          <Link href="/legal/privacy-policy" className="hover:text-neutral-400 transition-colors">Privacy Policy</Link>
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+          <Link href="/legal/privacy-policy" className="hover:text-neutral-300 transition-colors">Privacy Policy</Link>
           <span>·</span>
-          <Link href="/legal/terms-of-use" className="hover:text-neutral-400 transition-colors">Terms of Use</Link>
+          <Link href="/legal/terms-of-use" className="hover:text-neutral-300 transition-colors">Terms of Use</Link>
           <span>·</span>
-          <Link href="/legal/terms-and-conditions" className="hover:text-neutral-400 transition-colors">Terms &amp; Conditions</Link>
+          <Link href="/legal/terms-and-conditions" className="hover:text-neutral-300 transition-colors">Terms &amp; Conditions</Link>
+          </div>
         </div>
       </div>
     </footer>

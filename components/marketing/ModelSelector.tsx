@@ -22,6 +22,7 @@ export interface ModelSelectorProps {
   limit?: number;
   categoryFilter?: "iphone" | "macbook";
   hideTabs?: boolean;
+  hideSearch?: boolean;
 }
 
 type Category = "iphone" | "macbook";
@@ -31,6 +32,7 @@ export function ModelSelector({
   limit,
   categoryFilter,
   hideTabs = false,
+  hideSearch = false,
 }: ModelSelectorProps = {}) {
   const router      = useRouter();
   const selectModel = useStore((s) => s.selectModel);
@@ -143,18 +145,20 @@ export function ModelSelector({
       )}
 
       {/* Search */}
-      <div className="relative">
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-tertiary" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={category === "iphone" ? "Search e.g. iPhone 16 Pro" : "Search e.g. MacBook Air M3"}
-          className="h-[52px] w-full rounded-lg border border-border bg-surface py-3.5 pl-12 pr-4 text-body-md text-text-primary shadow-xs placeholder:text-text-tertiary focus:border-brand focus:shadow-focus focus:outline-none"
-        />
-      </div>
+      {!hideSearch && (
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-text-tertiary" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={category === "iphone" ? "Search e.g. iPhone 16 Pro" : "Search e.g. MacBook Air M3"}
+            className="h-[52px] w-full rounded-lg border border-border bg-surface py-3.5 pl-12 pr-4 text-body-md text-text-primary shadow-xs placeholder:text-text-tertiary focus:border-brand focus:shadow-focus focus:outline-none"
+          />
+        </div>
+      )}
 
       {/* Series pills */}
-      <div className="no-scrollbar -mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1">
+      <div className={cn("no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 pb-1", hideSearch ? "mt-0" : "mt-4")}>
         {seriesList.map((s) => (
           <Pill key={s} active={series === s} onClick={() => setSeries(s)}>
             {s}

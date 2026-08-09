@@ -155,10 +155,10 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
         <SectionHeading
           eyebrow="Get started"
           title="Choose your device"
-          subtitle="Search or pick your phone or MacBook to get an instant price estimate."
+          subtitle="Pick your phone or MacBook to get an instant price estimate."
         />
         <div className="mt-6">
-          <ModelSelector initialModels={initialModels} limit={10} />
+          <ModelSelector initialModels={initialModels} limit={10} hideSearch />
         </div>
       </section>
 

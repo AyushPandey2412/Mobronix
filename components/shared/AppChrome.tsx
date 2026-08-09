@@ -22,7 +22,7 @@ export function AppChrome({ children }: { children: React.ReactNode }) {
   const showFooter = !isFlow;
 
   return (
-    <div className="flex min-h-screen flex-col overflow-x-hidden">
+    <div className="flex min-h-screen flex-col overflow-x-clip">
       <SiteHeader />
       {/* No bottom-nav padding during the sell/cart flow — those screens use their
           own full-width StickyBar action bar instead of the global bottom nav. */}
