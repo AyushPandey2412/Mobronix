@@ -199,7 +199,7 @@ export function ModelSelector({
                   onClick={() => router.push(`/sell/${category}`)}
                   className="inline-flex items-center gap-2 rounded-xl bg-brand/5 border border-brand/10 hover:bg-brand/10 text-brand font-bold text-body-sm px-6 py-3 transition-all"
                 >
-                  View all {category === "iphone" ? "iPhone" : "MacBook"} →
+                  View all {category === "iphone" ? "iPhone" : "MacBook"}
                 </button>
               </div>
             )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Plus, ArrowRight, Trash2, ShoppingBag } from "lucide-react";
+import { Plus, Trash2, ShoppingBag } from "lucide-react";
 import { AuthGate } from "@/components/shared/AuthGate";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { StickyBar } from "@/components/shared/StickyBar";
@@ -83,7 +83,7 @@ function CartInner() {
           </div>
 
           <StickyBar label="Total offer" value={fmt(total)} className="mt-6">
-            <Button onClick={continueToVerification} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
+            <Button onClick={continueToVerification}>
               Continue to verification
             </Button>
           </StickyBar>

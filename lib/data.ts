@@ -149,7 +149,7 @@ export const QUESTIONS: Question[] = [
     { label: "Used / Replaced", factor: 0.9 },
     { label: "Battery Swollen", factor: 0.5 },
   ] },
-  { type: "single", q: "Battery health", sub: "Settings → Battery → Battery Health", opts: [
+  { type: "single", q: "Battery health", sub: "Settings > Battery > Battery Health", opts: [
     { label: "96%–100%", factor: 1.0 },
     { label: "91%–95%", factor: 0.97 },
     { label: "86%–90%", factor: 0.93 },
@@ -167,7 +167,7 @@ export const QUESTIONS: Question[] = [
 export const PHOTO_SLOTS: PhotoSlot[] = [
   { id: "front", label: "Front View", hint: "Clear photo of the front screen, switched on" },
   { id: "back", label: "Back View", hint: "Clear photo of the back panel" },
-  { id: "settings", label: "Settings → About", hint: "Screenshot showing model, storage & serial number" },
+  { id: "settings", label: "Settings > About", hint: "Screenshot showing model, storage & serial number" },
   { id: "left", label: "Left Side", hint: "Side with volume buttons & SIM tray" },
   { id: "right", label: "Right Side", hint: "Side with the power button" },
 ];
@@ -278,7 +278,7 @@ export const MAC_QUESTIONS: Question[] = [
     { label: "MagSafe charging", yesFactor: 1.0, noFactor: 0.88 },
     { label: "Touch ID", yesFactor: 1.0, noFactor: 0.90 },
   ] },
-  { type: "single", q: "Battery health", sub: "System Report → Power → Cycle Count", opts: [
+  { type: "single", q: "Battery health", sub: "System Report > Power > Cycle Count", opts: [
     { label: "Under 200 cycles (Excellent)", factor: 1.0 },
     { label: "200–400 cycles (Good)", factor: 0.95 },
     { label: "400–600 cycles (Fair)", factor: 0.88 },

@@ -2,7 +2,7 @@
 
 // import { useEffect, useState } from "react";
 // import { useRouter } from "next/navigation";
-// import { ArrowRight, Plus, CheckCircle2, Sparkles, ChevronLeft, Lock } from "lucide-react";
+// import { Plus, CheckCircle2, Sparkles, ChevronLeft, Lock } from "lucide-react";
 // import { FlowHeader } from "@/components/shared/FlowHeader";
 // import { StickyBar } from "@/components/shared/StickyBar";
 // import { PriceUnlockModal } from "@/components/shared/PriceUnlockModal";
@@ -168,7 +168,7 @@
 //           </div>
 
 //           <StickyBar label={cart.length ? "Total offer" : "Your offer"} value={fmt(grandTotal)} className="mt-6">
-//             <Button onClick={() => router.push("/sell/photos")} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
+//             <Button onClick={() => router.push("/sell/photos")}>
 //               Continue
 //             </Button>
 //           </StickyBar>
@@ -213,7 +213,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Plus, CheckCircle2, Sparkles, ChevronLeft, Lock } from "lucide-react";
+import { Plus, CheckCircle2, Sparkles, ChevronLeft, Lock } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { StickyBar } from "@/components/shared/StickyBar";
 // import { PriceUnlockModal } from "@/components/shared/PriceUnlockModal"
@@ -384,7 +384,7 @@ export default function QuotePage() {
           </div>
 
           <StickyBar label={cart.length ? "Total offer" : "Your offer"} value={fmt(grandTotal)} className="mt-6">
-            <Button onClick={() => router.push("/sell/checkout")} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
+            <Button onClick={() => router.push("/sell/checkout")}>
               Continue
             </Button>
           </StickyBar>

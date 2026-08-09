@@ -32,7 +32,7 @@ export function fmt(n: number) {
   return "₹" + Math.round(n).toLocaleString("en-IN");
 }
 
-/** Format a percentage delta from a multiplier, e.g. 0.85 -> "−15%". */
+/** Format a percentage delta from a multiplier, e.g. 0.85 gives "−15%". */
 export function factorLabel(factor: number) {
   const pct = Math.round((factor - 1) * 100);
   if (pct === 0) return "base";

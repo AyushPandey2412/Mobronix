@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ArrowRight, Home } from "lucide-react";
+import { Check, Home } from "lucide-react";
 import { OrderCard } from "@/components/track/OrderCard";
 import { Button } from "@/components/ui/Button";
 import { useStore } from "@/lib/store";
@@ -47,7 +47,7 @@ export default function ConfirmPage() {
         <div
           className="mt-6 flex flex-col gap-3 animate-m-fade"
         >
-          <Button size="lg" onClick={() => router.push("/track")} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
+          <Button size="lg" onClick={() => router.push("/track")}>
             View full tracking
           </Button>
           <Button size="lg" variant="outline" onClick={() => router.push("/")} leftIcon={<Home className="h-[18px] w-[18px]" />}>

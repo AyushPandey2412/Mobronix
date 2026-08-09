@@ -25,7 +25,7 @@ export default async function HomePage() {
   // in ModelSelector — the client never makes a cold Supabase fetch on first render.
   let initialModels: Model[] = [];
   try {
-    // Cookie-less client → this page can be statically rendered + ISR-cached
+    // Cookie-less client so this page can be statically rendered + ISR-cached
     // (revalidate 300) instead of doing a blocking Supabase fetch on EVERY request.
     const supabase = createPublicClient();
     const { data } = await supabase

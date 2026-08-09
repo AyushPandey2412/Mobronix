@@ -78,7 +78,7 @@ export function calcQuote(
   return { finalPrice, breakdown }
 }
 
-/** Format a factor as a human delta string, e.g. 0.88 -> "−12%", 1.03 -> "+3%". */
+/** Format a factor as a human delta string, e.g. 0.88 gives "−12%", 1.03 gives "+3%". */
 export function formatFactorDelta(factor: number): string {
   const pct = Math.round((factor - 1) * 100)
   if (pct === 0) return '0%'
@@ -96,7 +96,7 @@ export function getMaxPrice(model: Model): number {
   return values.length ? Math.max(...values) : 0
 }
 
-/** Format INR with grouping, no decimals, e.g. 89000 -> "₹89,000". */
+/** Format INR with grouping, no decimals, e.g. 89000 gives "₹89,000". */
 export function formatINR(n: number): string {
   return '₹' + n.toLocaleString('en-IN')
 }

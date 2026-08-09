@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, ShieldCheck, Truck, Wallet, Info } from "lucide-react";
+import { ShieldCheck, Truck, Wallet, Info } from "lucide-react";
 import Image from "next/image";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { DeviceVisual } from "@/components/shared/DeviceVisual";
@@ -218,7 +218,7 @@ export default function StoragePage() {
           </div>
 
           <div className="mt-8 hidden lg:block animate-m-fade-up">
-            <Button size="lg" fullWidth onClick={startCondition} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
+            <Button size="lg" fullWidth onClick={startCondition}>
               Continue to condition check
             </Button>
           </div>
@@ -227,7 +227,7 @@ export default function StoragePage() {
 
       <div className="lg:hidden">
         <StickyBar label="Estimated price" value={fmt(price)}>
-          <Button onClick={startCondition} rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}>
+          <Button onClick={startCondition}>
             Continue
           </Button>
         </StickyBar>

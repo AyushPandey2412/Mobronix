@@ -215,7 +215,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess, closeOnSu
               </h3>
 
               {!otpSent ? (
-                /* Step 1 — name + phone → send code */
+                /* Step 1: name + phone to send code */
                 <div className="mt-5 space-y-4">
                   <Input
                     label="Full name"
@@ -270,7 +270,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess, closeOnSu
                   </Button>
                 </div>
               ) : (
-                /* Step 2 — enter the OTP → verify & log in */
+                /* Step 2: enter the OTP to verify and log in */
                 <div className="mt-5 space-y-4">
                   <p className="text-body-sm text-text-secondary">
                     Enter the 6-digit code sent to <b className="text-text-primary">+91 {contactPhone}</b>.{" "}

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { Progress } from "@/components/ui/Progress";
 import { Button } from "@/components/ui/Button";
@@ -162,7 +161,6 @@ export default function ConditionPage() {
           className="ml-auto"
           onClick={next}
           disabled={!proceed}
-          rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
         >
           {isLast ? "Go to Checkout" : "Next"}
         </Button>

@@ -59,7 +59,7 @@ export async function sendAdminNotification(enquiry: Enquiry, adminBaseUrl: stri
     <b>Pickup:</b> ${enquiry.pickup_slot}<br/>
     <b>Address:</b> ${enquiry.address}, ${enquiry.pincode}<br/>
     <b>Payment:</b> ${enquiry.payment_mode}</p>
-    <a href="${link}" style="display:inline-block;margin-top:12px;background:${ACCENT};color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Open in Admin →</a>`
+    <a href="${link}" style="display:inline-block;margin-top:12px;background:${ACCENT};color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Open in Admin</a>`
   await resend.emails.send({
     from: FROM,
     to: process.env.ADMIN_EMAIL || CONTACT_EMAIL,
@@ -98,7 +98,7 @@ export async function sendStatusUpdateEmail(
   const inner = `
     <p style="color:#667085;font-size:14px">Your enquiry <b style="font-family:monospace">${enquiry.display_id}</b> has been updated.</p>
     <p style="font-size:15px"><b>Status:</b> ${newStatus}<br/><b>Stage:</b> ${stepLabels[newStep] ?? newStep}</p>
-    <a href="${process.env.NEXT_PUBLIC_APP_URL}/track" style="display:inline-block;margin-top:8px;background:${ACCENT};color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Track your order →</a>`
+    <a href="${process.env.NEXT_PUBLIC_APP_URL}/track" style="display:inline-block;margin-top:8px;background:${ACCENT};color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Track your order</a>`
   await resend.emails.send({
     from: FROM,
     to: customerEmail,

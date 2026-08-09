@@ -129,7 +129,7 @@ export default function Dashboard({
   const safePage  = Math.min(page, pageCount)
   const paged     = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
   // Keep page state in sync when the row count shrinks (e.g. after a delete),
-  // otherwise `page` and the displayed `safePage` diverge → a dead "Prev" click.
+  // otherwise `page` and the displayed `safePage` diverge, causing a dead "Prev" click.
   useEffect(() => { if (page !== safePage) setPage(safePage) }, [page, safePage])
 
   function toggle(id: string) {

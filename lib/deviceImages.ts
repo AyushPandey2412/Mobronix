@@ -11,11 +11,11 @@
  * Apple occasionally retires old product URLs — if a card shows the fallback
  * glyph instead of a photo, re-run the verifier and update the dead entry.
  * Models Apple no longer hosts a unique shot for are mapped to the closest
- * sibling image (e.g. iPhone 13 Pro → iPhone 13).
+ * sibling image (e.g. iPhone 13 Pro to iPhone 13).
  */
 
 const IPHONE_IMAGES: Record<string, string> = {
-  // iPhone 17 Series (Apple CDN has no 17 shots yet → reuse 16 imagery)
+  // iPhone 17 Series (Apple CDN has no 17 shots yet, so reuse 16 imagery)
   "17promax":   "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-naturaltitanium?wid=400&hei=400&fmt=png-alpha",
   "17pro":      "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=400&hei=400&fmt=png-alpha",
   "17":         "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=400&hei=400&fmt=png-alpha",
@@ -102,7 +102,7 @@ const MACBOOK_IMAGES: Record<string, string> = {
 
 // Supabase stores a UUID as `id` and a descriptive `slug` (e.g. "iphone-12-pro"),
 // while the image maps above are keyed by the short local ids ("12pro"). This
-// table bridges Supabase slugs (and slugified names) → image keys so product
+// table bridges Supabase slugs (and slugified names) to image keys so product
 // photos resolve no matter where the model data came from.
 const SLUG_TO_KEY: Record<string, string> = {
   "iphone-se-3rd-gen": "se2022",
@@ -178,7 +178,7 @@ export interface DeviceImageRef {
 /**
  * Returns the product image URL for a model. Accepts either a model-like object
  * ({ id, slug, name, category }) or a plain id string (back-compat).
- * Resolves via id → slug → slugified name. Returns null if nothing matches
+ * Resolves via id, slug, then slugified name. Returns null if nothing matches
  * (the component then falls back to an SVG glyph).
  */
 export function getDeviceImage(

@@ -13,7 +13,7 @@ export function calcQuote(
   let factor = 1;
   const breakdown: QuoteBreakdownItem[] = [];
 
-  // A bad/empty factor from the DB (null → NaN) would turn the whole quote into
+  // A bad/empty factor from the DB (null to NaN) would turn the whole quote into
   // ₹NaN. Treat any non-finite factor as a neutral 1.0.
   const safe = (n: unknown) => (typeof n === "number" && Number.isFinite(n) ? n : 1);
 

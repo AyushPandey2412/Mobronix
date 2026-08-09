@@ -18,7 +18,7 @@ export default function LoginPage() {
   const user           = useStore((s) => s.user);
   const selectedModel  = useStore((s) => s.selectedModelId);
 
-  // Already logged in → redirect
+  // Already logged in: redirect
   useEffect(() => {
     if (user) router.replace(user.role === "admin" ? "/admin" : "/");
   }, [user, router]);
@@ -77,10 +77,6 @@ No Pressure.
           </p>
 
           <PhoneOtpLogin onSuccess={onSellerSuccess} />
-
-          <p className="mt-6 text-caption text-text-tertiary text-center">
-            Admin accounts are automatically redirected to the dashboard after sign in.
-          </p>
         </div>
       </div>
     </div>

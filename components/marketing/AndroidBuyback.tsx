@@ -1,6 +1,6 @@
 "use client";
 
-import { Smartphone, HelpCircle, Truck, ArrowRight } from "lucide-react";
+import { Smartphone, HelpCircle, Truck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import { useReveal } from "@/lib/useReveal";
@@ -33,7 +33,6 @@ export function AndroidBuyback() {
             <Button
               size="lg"
               onClick={() => router.push("/sell/manual?brand=Other")}
-              rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
               className="bg-brand hover:bg-brand-hover text-white shadow-md shadow-brand/15"
             >
               Sell Android device

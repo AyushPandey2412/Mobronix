@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ShoppingBag, ArrowRight } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { fmt } from "@/lib/utils";
 
@@ -23,7 +23,7 @@ export function CartBar() {
             {cart.length} device{cart.length > 1 ? "s" : ""} · {fmt(total)}
           </span>
           <span className="flex items-center gap-1 text-body-sm font-bold text-primary-200">
-            View cart <ArrowRight className="h-4 w-4" />
+            View cart
           </span>
         </button>
       )}

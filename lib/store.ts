@@ -125,7 +125,7 @@ const emptyCheckout: CheckoutForm = { address: "", pincode: "", slot: null, pay:
 /** Resolve the active model from the live store list (which includes
  *  Supabase-synced models, keyed by UUID) first, then fall back to the local
  *  seed data. Using getModel() alone returns undefined for Supabase models
- *  (their id is a UUID, not a local short id) → base price of 0. */
+ *  (their id is a UUID, not a local short id) gives base price of 0. */
 function resolveActiveModel(models: Model[], id: string | null): Model | undefined {
   if (!id) return undefined;
   return models.find((m) => m.id === id) ?? getModel(id);
@@ -251,7 +251,7 @@ export const useStore = create<AppState>()(
         // MacBook: storages = { "M1": { "256GB": 62000, ... } }  (nested by chip)
         // `selectedStorage` is always a STORAGE size (e.g. "512GB"), so for the
         // nested shape we must find the chip tier that contains it — not just take
-        // the first price (the old code did Object.values(undefined) → crash).
+        // the first price (the old code did Object.values(undefined), which crashed).
         let base = 0;
         if (model && st.selectedStorage) {
           const storageVal = (model.storages as Record<string, unknown>)[st.selectedStorage];

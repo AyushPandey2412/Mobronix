@@ -1,4 +1,4 @@
-// POST /api/otp/send  { mobile }  → generates a code and sends it via SMS.
+// POST /api/otp/send  { mobile } generates a code and sends it via SMS.
 // In dev (no provider configured) the code is printed to the terminal and
 // returned as devCode. Rate-limited per IP + per number.
 import { NextResponse } from 'next/server'

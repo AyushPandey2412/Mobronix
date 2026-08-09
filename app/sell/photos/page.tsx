@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { StickyBar } from "@/components/shared/StickyBar";
 import { Progress } from "@/components/ui/Progress";
@@ -68,7 +68,6 @@ export default function PhotosPage() {
         <Button
           fullWidth
           onClick={() => router.push("/sell/checkout")}
-          rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
         >
           {allDone ? "Continue to schedule pickup" : "Skip photos & continue"}
         </Button>

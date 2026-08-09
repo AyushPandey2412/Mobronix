@@ -2,7 +2,6 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useMemo, useState, Suspense } from "react";
-import { ArrowRight } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { Progress } from "@/components/ui/Progress";
 import { Button } from "@/components/ui/Button";
@@ -159,7 +158,6 @@ function ManualSellContent() {
               fullWidth
               size="lg"
               onClick={handleNextStep1}
-              rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
             >
               Continue to Condition Check
             </Button>
@@ -194,11 +192,10 @@ function ManualSellContent() {
                 Back
               </Button>
               <Button
-                className="ml-auto"
-                onClick={handleNextQuestion}
-                disabled={!canProceedQuestion}
-                rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
-              >
+              className="ml-auto"
+              onClick={handleNextQuestion}
+              disabled={!canProceedQuestion}
+            >
                 {qIndex === totalQuestions - 1 || shouldSkipRemaining ? "Go to Checkout" : "Next"}
               </Button>
             </div>

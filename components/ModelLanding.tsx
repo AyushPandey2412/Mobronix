@@ -71,7 +71,7 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
     ]
   }
 
-  // Enter the MAIN sell flow (storage → condition → quote → checkout). The
+  // Enter the MAIN sell flow (storage to condition to quote to checkout). The
   // legacy in-page SellWizard has been retired; `/sell/storage?model=<id>`
   // selects this device and starts the real flow.
   const startUrl = `/sell/storage?model=${model.id}`
@@ -105,7 +105,7 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
           <p className="font-mono text-4xl font-extrabold tracking-tight text-accent">{inr(maxPrice)}</p>
           <p className="mt-4 text-sm leading-relaxed text-ink-soft">{describe(model)}</p>
           <Link href={startUrl} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-white hover:bg-accent-deep">
-            Start Selling →
+            Start Selling
           </Link>
         </div>
       </div>
@@ -141,7 +141,7 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
         <p className="font-semibold">Ready to sell your {model.name}?</p>
         <p className="text-sm text-ink-soft mt-1">Free doorstep pickup across Mumbai, Navi Mumbai, Thane &amp; Sangli.</p>
         <Link href={startUrl} className="mt-4 inline-flex rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-white hover:bg-accent-deep">
-          Get My Price →
+          Get My Price
         </Link>
       </div>
     </div>

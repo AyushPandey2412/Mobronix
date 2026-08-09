@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight, MessageCircle, ShieldCheck, Truck, Wallet,
+  MessageCircle, ShieldCheck, Truck, Wallet,
   BadgeIndianRupee, Sparkles, ChevronRight, CheckCircle2,
   Heart, Recycle, Zap, Phone, Mail, Globe, Compass,
 } from "lucide-react";
@@ -84,7 +84,6 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
               <Button
                 size="lg"
                 onClick={scrollToModels}
-                rightIcon={<ArrowRight className="h-[18px] w-[18px]" />}
                 className="flex-1 sm:flex-initial justify-center text-[13px] sm:text-body-sm px-3 sm:px-5"
               >
                 Get my price

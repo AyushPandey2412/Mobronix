@@ -19,10 +19,10 @@ export function useReveal<T extends HTMLElement>(rootMargin = "0px 0px -10% 0px"
     const el = ref.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
 
-    // Already in view → leave visible (it just keeps its mount animation).
+    // Already in view: leave visible (it just keeps its mount animation).
     if (el.getBoundingClientRect().top <= window.innerHeight) return;
 
-    // Below the fold → hide now, reveal on scroll.
+    // Below the fold: hide now, reveal on scroll.
     setShown(false);
     const io = new IntersectionObserver(
       ([entry]) => {
