@@ -31,6 +31,13 @@ export const MAC_SERIES = [
   "MacBook Pro 16\"",
 ];
 
+export const MOBILE_HERO_BRANDS = [
+  { id: "Apple", label: "Apple", mark: "Apple", href: "/sell/iphone" },
+  { id: "Xiaomi", label: "Xiaomi", mark: "MI", href: "/sell/manual?brand=Xiaomi" },
+  { id: "Samsung", label: "Samsung", mark: "Samsung", href: "/sell/manual?brand=Samsung" },
+  { id: "Vivo", label: "Vivo", mark: "vivo", href: "/sell/manual?brand=Vivo" },
+];
+
 export const MODELS: Model[] = [
   { id: "17promax", name: "iPhone 17 Pro Max", series: "17 Series", category: "iphone" as const, storages: { "128GB": 95000, "256GB": 105000, "512GB": 120000 } },
   { id: "17pro", name: "iPhone 17 Pro", series: "17 Series", category: "iphone" as const, storages: { "128GB": 85000, "256GB": 95000, "512GB": 108000 } },
