@@ -6,6 +6,7 @@ import Link from "next/link";
 import { X, Lock, Star, User as UserIcon, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { isOtpLoginEnabled } from "@/lib/authMode";
 import { getDeviceImageSized } from "@/lib/deviceImages";
 import { useStore } from "@/lib/store";
 import { useFocusTrap } from "@/lib/useFocusTrap";
@@ -31,6 +32,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess, closeOnSu
   const user = useStore((s) => s.user);
   const setContact = useStore((s) => s.setContact);
   const trapRef = useFocusTrap<HTMLDivElement>(open);
+  const otpLoginEnabled = isOtpLoginEnabled();
 
   const [contactName, setContactName] = useState(user && user.name !== "Seller" ? user.name : "");
   const [contactPhone, setContactPhone] = useState(user?.mobile ?? "");
@@ -90,6 +92,25 @@ export function LoginModal({ open, onClose, model, storage, onSuccess, closeOnSu
   }, [resendCooldown]);
 
   // Step 1 — request an OTP for the entered name + phone. Also used for resend.
+  const loginWithPhone = async (code?: string) => {
+    const phone = contactPhone.trim();
+    const res = await fetch("/api/otp/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile: phone, code, name: contactName.trim() }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(data.error || (otpLoginEnabled ? "Incorrect code." : "Couldn't log you in. Please try again."));
+      return false;
+    }
+    setContact(contactName.trim(), phone, data.user?.role || "seller");
+    toast("Login successful", "success");
+    onSuccess?.(data.user?.role || "seller");
+    if (closeOnSuccess) onClose();
+    return true;
+  };
+
   const requestOtp = async () => {
     setError(null);
     const name = contactName.trim();
@@ -100,6 +121,17 @@ export function LoginModal({ open, onClose, model, storage, onSuccess, closeOnSu
       return setError("You are already logged in with another mobile number. Please log out before using a different account.");
     }
     if (!agree) return setError("Please accept the Terms to continue.");
+    if (!otpLoginEnabled) {
+      setOtpBusy(true);
+      try {
+        await loginWithPhone();
+      } catch {
+        setError("Couldn't log you in. Please try again.");
+      } finally {
+        setOtpBusy(false);
+      }
+      return;
+    }
     setOtpBusy(true);
     try {
       const res = await fetch("/api/otp/send", {
@@ -135,20 +167,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess, closeOnSu
     }
     setOtpBusy(true);
     try {
-      const res = await fetch("/api/otp/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile: phone, code, name: contactName.trim() }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(data.error || "Incorrect code.");
-        return;
-      }
-      setContact(contactName.trim(), phone, data.user?.role || "seller");
-      toast("Login successful", "success");
-      onSuccess?.(data.user?.role || "seller");
-      if (closeOnSuccess) onClose();
+      await loginWithPhone(code);
     } catch {
       setError("Couldn't verify the code. Please try again.");
     } finally {
@@ -266,7 +285,7 @@ export function LoginModal({ open, onClose, model, storage, onSuccess, closeOnSu
                   {error && <p role="alert" className="text-body-sm font-medium text-error-600">{error}</p>}
 
                   <Button fullWidth size="lg" isLoading={otpBusy} onClick={requestOtp}>
-                    Continue
+                    {otpLoginEnabled ? "Continue" : "Login to continue"}
                   </Button>
                 </div>
               ) : (

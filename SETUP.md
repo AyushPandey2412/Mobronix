@@ -47,7 +47,9 @@ RESEND_API_KEY=re_xxxxxxxxxxxx
 
 # App
 NEXT_PUBLIC_APP_URL=https://your-domain.com
-NEXT_PUBLIC_WHATSAPP_NUMBER=919999999999
+NEXT_PUBLIC_WHATSAPP_NUMBER=917700902077
+# Use "otp" for SMS OTP login, or "no-otp" for name + mobile login without OTP.
+NEXT_PUBLIC_OTP_LOGIN_MODE=no-otp
 ADMIN_EMAIL=you@yourdomain.com
 ```
 

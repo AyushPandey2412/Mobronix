@@ -253,7 +253,7 @@ export function SiteHeader() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-header border-b border-border bg-surface shadow-xs">
+    <header className="sticky top-0 z-header border-b border-[rgba(20,40,80,0.08)] bg-[#F7F9FF] shadow-[0_2px_6px_rgba(20,40,80,0.06)] lg:border-border lg:bg-surface lg:shadow-xs">
       <div className="container-app flex min-h-16 items-center justify-between gap-3 py-3">
         <Link href="/" aria-label="Mobronix home">
           <Logo />

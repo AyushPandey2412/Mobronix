@@ -4,12 +4,13 @@ import { verifyOtp } from '@/lib/otp'
 import { rateLimit, clientIp } from '@/lib/ratelimit'
 import { createServiceClient, createRouteClient } from '@/lib/supabase/server'
 import { AUTH_ACTIVITY_COOKIE, authCookieOptions } from '@/lib/authSession'
+import { isOtpLoginEnabled } from '@/lib/authMode'
 
 export const runtime = 'nodejs'
 
 const schema = z.object({
   mobile: z.string().regex(/^\d{10}$/),
-  code:   z.string().regex(/^\d{4,6}$/),
+  code:   z.string().regex(/^\d{4,6}$/).optional(),
   name:   z.string().optional(),
 })
 
@@ -25,9 +26,13 @@ export async function POST(req: Request) {
   try { body = schema.parse(await req.json()) }
   catch { return NextResponse.json({ error: 'Enter the code we sent you.' }, { status: 400 }) }
 
-  // 1. Verify OTP check
-  const otpRes = await verifyOtp(body.mobile, body.code)
-  if (!otpRes.ok) return NextResponse.json({ error: otpRes.error }, { status: 400 })
+  // 1. Verify OTP check when OTP login is enabled. In no-OTP mode, the same
+  // phone/profile sync below is reused so one mobile number maps to one account.
+  if (isOtpLoginEnabled()) {
+    if (!body.code) return NextResponse.json({ error: 'Enter the code we sent you.' }, { status: 400 })
+    const otpRes = await verifyOtp(body.mobile, body.code)
+    if (!otpRes.ok) return NextResponse.json({ error: otpRes.error }, { status: 400 })
+  }
 
   // 2. Real Auth integration — find or create genuine Supabase Auth user
   const serviceClient = createServiceClient()

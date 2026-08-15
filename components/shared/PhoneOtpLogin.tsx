@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Phone, User as UserIcon } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { isOtpLoginEnabled } from "@/lib/authMode";
 import { useStore } from "@/lib/store";
 import { toast } from "@/lib/toast";
 
@@ -14,6 +15,7 @@ export interface PhoneOtpLoginProps {
 export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
   const user = useStore((s) => s.user);
   const setContact = useStore((s) => s.setContact);
+  const otpLoginEnabled = isOtpLoginEnabled();
 
   const [contactName, setContactName] = useState(user && user.name !== "Seller" ? user.name : "");
   const [contactPhone, setContactPhone] = useState(user?.mobile ?? "");
@@ -22,6 +24,25 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
   const [otpBusy, setOtpBusy] = useState(false);
   const [devCode, setDevCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const loginWithPhone = async (code?: string) => {
+    const name = contactName.trim();
+    const phone = contactPhone.trim();
+    const res = await fetch("/api/otp/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile: phone, code, name }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(data.error || (otpLoginEnabled ? "Incorrect code." : "Couldn't log you in. Please try again."));
+      return false;
+    }
+    setContact(name, phone, data.user?.role || "seller");
+    toast("Successfully logged in", "success");
+    onSuccess?.(data.user?.role || "seller");
+    return true;
+  };
 
   const requestOtp = async () => {
     setError(null);
@@ -37,6 +58,17 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
     }
     if (user?.mobile && user.mobile !== phone) {
       setError("You are already logged in with another mobile number. Please log out before using a different account.");
+      return;
+    }
+    if (!otpLoginEnabled) {
+      setOtpBusy(true);
+      try {
+        await loginWithPhone();
+      } catch {
+        setError("Couldn't log you in. Please try again.");
+      } finally {
+        setOtpBusy(false);
+      }
       return;
     }
     setOtpBusy(true);
@@ -77,19 +109,7 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
     }
     setOtpBusy(true);
     try {
-      const res = await fetch("/api/otp/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile: phone, code, name }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(data.error || "Incorrect code.");
-        return;
-      }
-      setContact(name, phone, data.user?.role || "seller");
-      toast("Successfully logged in", "success");
-      onSuccess?.(data.user?.role || "seller");
+      await loginWithPhone(code);
     } catch {
       setError("Couldn't verify the code. Please try again.");
     } finally {
@@ -129,7 +149,7 @@ export function PhoneOtpLogin({ onSuccess }: PhoneOtpLoginProps) {
           />
           {error && <p role="alert" className="text-body-sm font-medium text-error-600">{error}</p>}
           <Button fullWidth size="lg" isLoading={otpBusy} onClick={requestOtp}>
-            Send verification code
+            {otpLoginEnabled ? "Send verification code" : "Login to continue"}
           </Button>
         </div>
       ) : (

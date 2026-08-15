@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   MessageCircle, ShieldCheck, Truck, Wallet,
@@ -55,13 +56,94 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
   const scrollToModels = () =>
     document.getElementById("models")?.scrollIntoView({ behavior: "smooth" });
 
+  const mobileBrands = [
+    { label: "Apple", mark: "Apple", href: "/sell/iphone", className: "text-brand font-bold" },
+    { label: "Xiaomi", mark: "MI", href: "/sell/manual?brand=Xiaomi", className: "text-brand font-bold" },
+    { label: "Samsung", mark: "Samsung", href: "/sell/manual?brand=Samsung", className: "text-brand text-[10px] font-bold uppercase tracking-wide" },
+    { label: "Vivo", mark: "vivo", href: "/sell/manual?brand=Vivo", className: "text-brand text-[18px] font-bold italic tracking-wide" },
+  ];
+
+  const mobileTrust = [
+    { label: "Best Prices Guaranteed", icon: CheckCircle2 },
+    { label: "100% Safe & Secure", icon: ShieldCheck },
+    { label: "Doorstep Pickup", icon: Truck },
+  ];
+
 
 
   return (
     <div>
-      <section className="relative overflow-hidden bg-mesh">
-        <div className="container-app grid items-center gap-8 pt-10 pb-6 md:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:py-20">
-          <div>
+      <section className="relative overflow-hidden bg-mesh lg:hidden">
+        <div className="container-app px-5 pt-8 pb-8">
+          <div className="mx-auto max-w-[390px] px-5 pb-7">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-2 text-[12px] font-bold leading-tight text-primary-700">
+              <ShieldCheck className="h-5 w-5 fill-primary-500 text-primary-500" />
+              <span>
+                Instant
+                <span className="block font-semibold text-text-primary">Payment</span>
+              </span>
+            </span>
+
+            <h1 className="mt-7 text-[2.1rem] font-extrabold leading-[1.15] text-text-primary text-balance">
+              Sell Old Mobile Phone for{" "}
+              <span className="text-brand">Instant Cash</span>
+            </h1>
+
+            <p className="mt-4 text-[14px] leading-6 text-text-secondary">
+              Get the best price for your old phone in minutes.
+            </p>
+
+            <div className="relative mx-auto mt-8 grid h-[230px] place-items-center">
+              <div className="absolute bottom-5 h-[170px] w-[220px] rounded-full bg-primary-50 blur-2xl" />
+              <Image
+                src="/mobile-hero-device.png"
+                alt=""
+                width={853}
+                height={991}
+                priority
+                className="relative h-[220px] w-[190px] object-contain"
+              />
+            </div>
+
+            <div className="mt-8 flex items-center gap-4">
+              <span className="h-px flex-1 bg-border" />
+              <span className="text-[16px] font-bold text-text-secondary">Or choose a brand</span>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+
+            <div className="mt-6 grid grid-cols-4 gap-3">
+              {mobileBrands.map((brand) => (
+                <Link key={brand.label} href={brand.href} className="text-center">
+                  <span className="mx-auto grid h-[clamp(54px,17vw,72px)] w-[clamp(54px,17vw,72px)] place-items-center rounded-full border border-border bg-surface shadow-xs">
+                    <span className={brand.className}>{brand.mark}</span>
+                  </span>
+                  <span className="mt-2 block text-[12px] font-semibold text-text-secondary">
+                    {brand.label}
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-8 grid grid-cols-3 gap-3 rounded-2xl bg-primary-50/60 p-5">
+              {mobileTrust.map((item) => (
+                <div key={item.label} className="flex flex-col items-center text-center">
+                  <span className="grid h-12 w-12 place-items-center rounded-full bg-surface text-brand shadow-xs">
+                    <item.icon className="h-5 w-5" />
+                  </span>
+                  <span className="mt-3 min-h-[34px] text-[13px] font-bold leading-tight text-text-primary">
+                    {item.label}
+                  </span>
+                  <span className="mx-auto mt-2 h-[3px] w-6 rounded-full bg-brand" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative hidden min-h-[88vh] items-center overflow-hidden bg-mesh lg:flex lg:min-h-[85vh]">
+        <div className="container-app grid items-center gap-8 py-10 md:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:py-0">
+          <div className="text-center lg:text-left">
             <span
               className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-caption font-bold text-primary-700 animate-m-fade-up"
               style={{ animationDelay: `${0 * 60}ms` }}
@@ -76,15 +158,15 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
               Honest Deals. Trusted Buyback.
             </h1>
 
-            <p className="mt-4 max-w-md text-body-lg text-text-secondary animate-m-fade-up" style={{ animationDelay: `${2 * 60}ms` }}>
+            <p className="mx-auto mt-4 max-w-md text-body-lg text-text-secondary animate-m-fade-up lg:mx-0" style={{ animationDelay: `${2 * 60}ms` }}>
               Get a Quote, Free of Cost. Free Device Check. Free Pickup at Your Doorstep.
             </p>
 
-            <div className="mt-7 flex flex-row gap-3 animate-m-fade-up" style={{ animationDelay: `${3 * 60}ms` }}>
+            <div className="mt-7 flex flex-col gap-3 animate-m-fade-up sm:flex-row" style={{ animationDelay: `${3 * 60}ms` }}>
               <Button
                 size="lg"
                 onClick={scrollToModels}
-                className="flex-1 sm:flex-initial justify-center text-[13px] sm:text-body-sm px-3 sm:px-5"
+                className="w-full justify-center text-[13px] sm:w-auto sm:text-body-sm px-3 sm:px-5"
               >
                 Get my price
               </Button>
@@ -93,7 +175,7 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
                 variant="outline"
                 leftIcon={<MessageCircle className="h-[18px] w-[18px] text-whatsapp" />}
                 onClick={() => openContact()}
-                className="flex-1 sm:flex-initial justify-center text-[13px] sm:text-body-sm px-3 sm:px-5 bg-surface"
+                className="w-full justify-center text-[13px] sm:w-auto sm:text-body-sm px-3 sm:px-5 bg-surface"
               >
                 WhatsApp us
               </Button>
@@ -103,12 +185,12 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
           </div>
 
           <div
-            className="relative mx-auto hidden h-[420px] w-[230px] -rotate-6 lg:block animate-m-scale-in"
+            className="relative mx-auto hidden h-[420px] w-[230px] -rotate-6 animate-m-scale-in lg:block"
           >
             <div className="absolute inset-0 -z-10 rounded-[3rem] bg-gradient-to-br from-primary-100 to-secondary-100 blur-2xl" />
             <DeviceVisual tone="blue" className="h-full w-full" />
             <div
-              className="absolute -left-16 top-12 flex items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-md backdrop-blur animate-m-fade-up"
+              className="absolute -left-16 top-12 hidden items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-md backdrop-blur animate-m-fade-up lg:flex"
             >
               <span className="grid h-8 w-8 place-items-center rounded-lg bg-success-50 text-success-600">
                 <Wallet className="h-4 w-4" />
@@ -119,7 +201,7 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
               </div>
             </div>
             <div
-              className="absolute -right-12 bottom-16 flex items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-md backdrop-blur animate-m-fade-up"
+              className="absolute -right-12 bottom-16 hidden items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-md backdrop-blur animate-m-fade-up lg:flex"
             >
               <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-50 text-brand">
                 <ShieldCheck className="h-4 w-4" />
@@ -150,7 +232,7 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
       )}
 
       {/* MODEL SELECTION — passes server-prefetched models as initialData */}
-      <section id="models" className="container-app scroll-mt-24 pt-6 pb-12 md:py-16">
+      <section id="models" className="container-app scroll-mt-24 pt-6 pb-4 md:pt-16 md:pb-8">
         <SectionHeading
           eyebrow="Get started"
           title="Choose your device"

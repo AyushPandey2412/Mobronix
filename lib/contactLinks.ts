@@ -6,13 +6,8 @@ export function isWhatsAppMailtoMode() {
 }
 
 export function getContactHref(message = "Hi Mobronix, I need help with selling my device.") {
-  if (isWhatsAppMailtoMode()) {
-    const subject = encodeURIComponent("Mobronix enquiry");
-    const body = encodeURIComponent(message);
-    return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-  }
-
-  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919999999999";
+  const configuredNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
+  const number = /^\d{10,15}$/.test(configuredNumber) ? configuredNumber : "917700902077";
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 

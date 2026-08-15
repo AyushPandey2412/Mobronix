@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { sendOtp } from '@/lib/otp'
 import { rateLimit, clientIp } from '@/lib/ratelimit'
+import { isOtpLoginEnabled } from '@/lib/authMode'
 
 export const runtime = 'nodejs'
 
@@ -21,6 +22,10 @@ export async function POST(req: Request) {
   let body
   try { body = schema.parse(await req.json()) }
   catch { return NextResponse.json({ error: 'Enter a valid 10-digit mobile number.' }, { status: 400 }) }
+
+  if (!isOtpLoginEnabled()) {
+    return NextResponse.json({ ok: true, otpRequired: false, devCode: null })
+  }
 
   const res = await sendOtp(body.mobile)
   if (!res.ok) {

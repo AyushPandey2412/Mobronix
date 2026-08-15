@@ -38,7 +38,7 @@ Variables). Add each for the **Production** (and Preview) environment:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | public | Supabase → Settings → API → anon/publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | **secret** | Supabase → Settings → API → service_role/secret key. **Server-only — never expose.** |
 | `NEXT_PUBLIC_APP_URL` | public | Your live URL, e.g. `https://your-app.vercel.app` (set after first deploy, see Step 6) |
-| `NEXT_PUBLIC_WHATSAPP_NUMBER` | public | Your WhatsApp number with country code, e.g. `919999999999` |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | public | Your WhatsApp number with country code, e.g. `917700902077` |
 | `ADMIN_EMAIL` | secret | Email that receives enquiry notifications |
 | `RESEND_API_KEY` | secret | Optional. Resend → API Keys (`re_...`). If blank, emails are silently skipped. |
 | `GOOGLE_CLIENT_ID` | secret | Optional — only if you enable Google login (configured in Supabase, not here) |
@@ -138,7 +138,13 @@ Then add env vars in the dashboard and redeploy.
 
 ## 6b. ⚠️ OTP login + rate limiting (REQUIRED for a real deploy)
 
-Checkout login uses a phone **OTP**. The OTP store and the rate limiters need a
+Checkout login can run with or without phone **OTP**.
+
+Set `NEXT_PUBLIC_OTP_LOGIN_MODE=no-otp` to skip OTP completely and let customers
+continue with only their name and 10-digit mobile number. Set it back to `otp`
+when your SMS/MSG91 OTP setup is approved.
+
+When OTP mode is enabled, the OTP store and the rate limiters need a
 **shared store** because Vercel runs many serverless instances (in-memory state
 isn't shared). Without it, OTP verify and rate limits are unreliable in production.
 
