@@ -1,3 +1,5 @@
+import { LOCAL_DEVICE_IMAGES } from "./generated/deviceImageManifest"
+
 /**
  * deviceImages.ts
  *
@@ -151,6 +153,14 @@ function slugify(s: string): string {
     .replace(/(^-|-$)/g, "")
 }
 
+function getLocalDeviceImage(candidates: string[]): string | null {
+  for (const c of candidates) {
+    const local = LOCAL_DEVICE_IMAGES[c]
+    if (local) return local
+  }
+  return null
+}
+
 /** Pick a representative MacBook image when the exact model has no mapping
  *  (e.g. Supabase's year-based slugs like "macbook-pro-2023"). */
 function macbookFallback(text: string): string {
@@ -195,6 +205,9 @@ export function getDeviceImage(
     candidates.push(String(v).toLowerCase())
     candidates.push(slugify(String(v)))
   }
+
+  const localImage = getLocalDeviceImage(candidates)
+  if (localImage) return localImage
 
   const isMac =
     cat === "macbook" ||

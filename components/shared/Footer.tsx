@@ -30,8 +30,8 @@ export function Footer() {
         <div>
           <h4 className="text-label font-semibold text-white">About</h4>
           <ul className="mt-4 space-y-3 text-body-sm text-neutral-400">
-            <li><Link href="/#about" className="hover:text-white transition-colors">About Us</Link></li>
-            <li><Link href="/#about" className="hover:text-white transition-colors">Contact</Link></li>
+            <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
+            <li><Link href="/about#contact" className="hover:text-white transition-colors">Contact</Link></li>
             <li><button onClick={() => toast("Contact officialmobronix@gmail.com to partner with us.")} className="hover:text-white transition-colors text-left">Partner With Us</button></li>
           </ul>
         </div>

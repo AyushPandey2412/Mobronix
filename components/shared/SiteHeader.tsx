@@ -253,8 +253,8 @@ export function SiteHeader() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-header border-b border-[rgba(20,40,80,0.08)] bg-[#F7F9FF] shadow-[0_2px_6px_rgba(20,40,80,0.06)] lg:border-border lg:bg-surface lg:shadow-xs">
-      <div className="container-app flex min-h-16 items-center justify-between gap-3 py-3">
+    <header className="sticky top-0 z-header border-b border-[rgba(20,40,80,0.05)] bg-[#F7F9FF] shadow-[0_1px_2px_rgba(20,40,80,0.03)] lg:border-border lg:bg-surface lg:shadow-xs">
+      <div className="container-app flex min-h-16 items-center justify-between gap-2 py-3 lg:gap-3">
         <Link href="/" aria-label="Mobronix home">
           <Logo />
         </Link>
@@ -300,18 +300,18 @@ export function SiteHeader() {
             type="button"
             onClick={() => setShowMobileSearch(true)}
             aria-label="Search devices"
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-text-primary shadow-xs lg:hidden"
+            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-text-primary shadow-xs max-[359px]:h-9 max-[359px]:w-9 lg:hidden"
           >
             <Search className="h-5 w-5" />
           </button>
           <Button
             variant="ghost"
             size="sm"
-            className="hidden text-whatsapp hover:bg-success-50 sm:inline-flex"
+            className="px-2 text-whatsapp hover:bg-success-50 max-[359px]:gap-0 max-[359px]:px-2 min-[360px]:px-2.5 sm:px-3.5"
             leftIcon={<MessageCircle className="h-[18px] w-[18px]" />}
             onClick={() => openContact()}
           >
-            WhatsApp
+            <span className="hidden text-xs min-[360px]:inline sm:text-body-sm">WhatsApp</span>
           </Button>
           {user ? (
             <Button

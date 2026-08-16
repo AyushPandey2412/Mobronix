@@ -1,8 +1,10 @@
 // Shared, server-rendered, indexable landing page for a single model.
 // Distinct from the stateful wizard (which is noindex). This is the SEO surface.
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getModelBySlug, getModels } from '@/lib/data'
+import { getDeviceImageSized } from '@/lib/deviceImages'
 import { getMaxPrice } from '@/lib/pricing'
 import { inr } from '@/lib/format'
 import type { Model, ModelCategory } from '@/lib/types'
@@ -43,12 +45,13 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
   const related = allModels.filter((m) => m.series === model.series && m.slug !== model.slug).slice(0, 3)
   const rows = priceRows(model)
   const maxPrice = getMaxPrice(model)
+  const imageUrl = getDeviceImageSized(model, 640)
 
   const productLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: model.name,
-    image: `${APP_URL}/og-default.png`,
+    image: imageUrl?.startsWith('/') ? `${APP_URL}${imageUrl}` : imageUrl || `${APP_URL}/og-default.png`,
     description: describe(model),
     brand: { '@type': 'Brand', name: 'Apple' },
     offers: {
@@ -91,12 +94,26 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
 
       <div className="grid md:grid-cols-2 gap-6 items-start">
         <div className="rounded-card border border-line bg-white p-8 flex items-center justify-center aspect-square">
-          <div className="flex items-center justify-center h-24 w-24 rounded-3xl bg-gradient-to-br from-neutral-100 to-neutral-200">
-        {category === 'iphone'
-          ? <svg width="32" height="44" viewBox="0 0 22 30" fill="none" className="text-neutral-500"><rect x="1" y="1" width="20" height="28" rx="5" stroke="currentColor" strokeWidth="1.6"/><rect x="8" y="4" width="6" height="1.6" rx="0.8" fill="currentColor"/></svg>
-          : <svg width="44" height="34" viewBox="0 0 28 22" fill="none" className="text-neutral-500"><rect x="3" y="1" width="22" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/><path d="M1 15h26l1.5 5H0.5L2 15z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/><rect x="11" y="17" width="6" height="1" rx="0.5" fill="currentColor"/></svg>
-        }
-      </div>
+          {imageUrl ? (
+            <div className="relative h-full min-h-64 w-full">
+              <Image
+                src={imageUrl}
+                alt={model.name}
+                fill
+                sizes="(min-width: 768px) 360px, 90vw"
+                className="object-contain drop-shadow-xl"
+                unoptimized
+                priority
+              />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-24 w-24 rounded-3xl bg-gradient-to-br from-neutral-100 to-neutral-200">
+              {category === 'iphone'
+                ? <svg width="32" height="44" viewBox="0 0 22 30" fill="none" className="text-neutral-500"><rect x="1" y="1" width="20" height="28" rx="5" stroke="currentColor" strokeWidth="1.6"/><rect x="8" y="4" width="6" height="1.6" rx="0.8" fill="currentColor"/></svg>
+                : <svg width="44" height="34" viewBox="0 0 28 22" fill="none" className="text-neutral-500"><rect x="3" y="1" width="22" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/><path d="M1 15h26l1.5 5H0.5L2 15z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/><rect x="11" y="17" width="6" height="1" rx="0.5" fill="currentColor"/></svg>
+              }
+            </div>
+          )}
         </div>
         <div>
           <p className="text-xs font-semibold text-accent-deep uppercase tracking-wide">{model.series}</p>

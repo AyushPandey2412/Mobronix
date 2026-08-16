@@ -157,7 +157,7 @@ export default function AboutPage() {
         </div>
 
         {/* Contact Us Card */}
-        <div className="mt-16 md:mt-24 rounded-3xl border border-primary-100 bg-gradient-to-br from-primary-50/40 via-surface to-primary-50/20 p-6 md:p-10 max-w-4xl mx-auto shadow-xs text-center">
+        <div id="contact" className="mt-16 scroll-mt-24 md:mt-24 rounded-3xl border border-primary-100 bg-gradient-to-br from-primary-50/40 via-surface to-primary-50/20 p-6 md:p-10 max-w-4xl mx-auto shadow-xs text-center">
           <h2 className="text-body-lg font-extrabold text-text-primary">
             Contact Us
           </h2>
