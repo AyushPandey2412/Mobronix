@@ -20,15 +20,11 @@ export default function LoginPage() {
 
   // Already logged in: redirect
   useEffect(() => {
-    if (user) router.replace(user.role === "admin" ? "/admin" : "/");
+    if (user) router.replace("/");
   }, [user, router]);
 
-  const onSellerSuccess = (role: string) => {
-    if (role === "admin") {
-      router.replace("/admin");
-    } else {
-      router.replace(selectedModel ? "/sell/storage" : "/");
-    }
+  const onSellerSuccess = () => {
+    router.replace(selectedModel ? "/sell/storage" : "/");
   };
 
   return (
@@ -57,9 +53,9 @@ No Pressure.
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-2 text-body-sm text-white/80">
+        {/* <div className="flex items-center gap-2 text-body-sm text-white/80">
           <Sparkles className="h-4 w-4" /> 12,400+ devices bought across Mumbai, Navi Mumbai, Thane &amp; Sangli
-        </div>
+        </div> */}
         <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-2xl" />
         <div className="pointer-events-none absolute -bottom-24 right-12 h-60 w-60 rounded-full bg-secondary-400/20 blur-3xl" />
       </div>

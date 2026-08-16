@@ -20,12 +20,10 @@ export function AuthGate({
       router.replace("/login");
     } else if (admin && user.role !== "admin") {
       router.replace("/");
-    } else if (!admin && user.role === "admin") {
-      router.replace("/admin");
     }
   }, [user, admin, router]);
 
-  if (!user || (admin && user.role !== "admin") || (!admin && user.role === "admin")) {
+  if (!user || (admin && user.role !== "admin")) {
     return null;
   }
   return <>{children}</>;
