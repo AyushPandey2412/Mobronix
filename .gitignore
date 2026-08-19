@@ -3,6 +3,7 @@ node_modules
 out
 .env*.local
 .DS_Store
+.cache
 *.tsbuildinfo
 next-env.d.ts
 .claude/settings.local.json

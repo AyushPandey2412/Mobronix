@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, MapPin, ShieldCheck, Wallet, Banknote } from "lucide-react";
+import { Check, MapPin, ShieldCheck, Wallet, Banknote, X } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { StickyBar } from "@/components/shared/StickyBar";
 import { Textarea, Input } from "@/components/ui/Input";
@@ -36,6 +36,13 @@ export default function CheckoutPage() {
   const [error,        setError]        = useState<string | null>(null);
   const [pincodeError, setPincodeError] = useState(false);
   const [submitting,   setSubmitting]   = useState(false);
+  const [submitted,    setSubmitted]    = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
+
+  const closeThankYou = () => {
+    setShowThankYou(false);
+    router.replace("/");
+  };
 
   // Login is NOT required to browse/quote — only to book the pickup here.
   const loggedIn =
@@ -44,11 +51,11 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (editing) { if (!enquiry) router.replace("/track"); }
-    else if (!model || !quote) { router.replace("/"); }
-  }, [editing, enquiry, model, quote, router]);
+    else if (!submitted && (!model || !quote)) { router.replace("/"); }
+  }, [editing, enquiry, model, quote, router, submitted]);
 
   const { devices, total } = useMemo(() => {
-    if (editing && enquiry) {
+    if ((editing || submitted) && enquiry) {
       const d = (enquiry.devices?.length
         ? enquiry.devices
         : [{ model: enquiry.model, storage: enquiry.storage, final: enquiry.amount }]) as (DeviceLine & { category?: string })[];
@@ -66,7 +73,7 @@ export default function CheckoutPage() {
       ...cur
     ];
     return { devices: d, total: d.reduce((s, x) => s + x.final, 0) };
-  }, [editing, enquiry, model, selectedStorage, quote, cart]);
+  }, [editing, submitted, enquiry, model, selectedStorage, quote, cart]);
 
   const submit = async () => {
     setError(null);
@@ -166,6 +173,9 @@ export default function CheckoutPage() {
 
       const { enquiryId, displayId, assignedExec } = await res.json();
 
+      setSubmitted(true);
+      setShowThankYou(true);
+
       // 1. Build local Enquiry object in Zustand (for confirm + track pages)
       submitEnquiry();
 
@@ -178,7 +188,7 @@ export default function CheckoutPage() {
         assigned_exec: assignedExec,
       });
 
-      router.replace("/track");
+      setSubmitting(false);
     } catch (e: any) {
       setSubmitting(false);
       setError(e.message || "Something went wrong. Please try again.");
@@ -186,7 +196,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if ((editing && !enquiry) || (!editing && (!model || !quote))) return null;
+  if ((editing && !enquiry) || (!editing && !submitted && (!model || !quote))) return null;
 
   if (loginRequired && model) {
     return (
@@ -290,10 +300,36 @@ export default function CheckoutPage() {
       </div>
 
       <StickyBar className="mt-6">
-        <Button fullWidth isLoading={submitting} onClick={submit}>
-          {editing ? "Save changes" : "Submit request"}
+        <Button fullWidth isLoading={submitting} disabled={submitted} onClick={submit}>
+          {submitted ? "Request submitted" : editing ? "Save changes" : "Submit request"}
         </Button>
       </StickyBar>
+
+      {showThankYou && (
+        <div
+          className="fixed inset-0 z-modal flex items-center justify-center overflow-y-auto bg-neutral-950/40 px-4 py-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="thank-you-title"
+        >
+          <div className="relative w-full max-w-xl rounded-2xl bg-white px-5 py-10 text-center shadow-2xl ring-1 ring-border sm:px-10 sm:py-12">
+            <button
+              type="button"
+              onClick={closeThankYou}
+              aria-label="Close thank you message"
+              className="absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-full text-text-secondary transition-colors hover:bg-neutral-100 hover:text-text-primary sm:right-3 sm:top-3"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <h2 id="thank-you-title" className="text-[2.25rem] font-light leading-tight text-text-primary sm:text-[3.5rem]">
+              Thank you!
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-body-sm leading-relaxed text-text-secondary sm:mt-4 sm:text-body-lg">
+              Your message has been submitted. Someone from our team will contact you shortly.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Slot sheet removed */}
 

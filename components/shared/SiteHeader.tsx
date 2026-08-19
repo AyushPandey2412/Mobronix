@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Laptop, MessageCircle, Search, Smartphone, User as UserIcon, X } from "lucide-react";
+import { Laptop, Search, Smartphone, User as UserIcon, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Logo } from "./Logo";
 import { LoginModal } from "./LoginModal";
@@ -24,6 +24,14 @@ const NAV = [
   { href: "/about", label: "About Us" },
   { href: "/track", label: "Track Order" },
 ];
+
+function WhatsAppLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M16.01 3.2A12.67 12.67 0 0 0 5.06 22.22L3.2 29l6.94-1.82a12.6 12.6 0 0 0 5.87 1.5h.01A12.74 12.74 0 0 0 28.8 15.98 12.7 12.7 0 0 0 16.01 3.2Zm0 23.3h-.01a10.5 10.5 0 0 1-5.36-1.47l-.38-.23-4.12 1.08 1.1-4.01-.25-.41a10.48 10.48 0 1 1 9.02 5.04Zm5.76-7.84c-.31-.16-1.86-.92-2.15-1.02-.29-.11-.5-.16-.7.16-.21.31-.81 1.02-.99 1.23-.18.21-.36.23-.67.08-.31-.16-1.32-.49-2.52-1.55-.93-.83-1.56-1.85-1.74-2.16-.18-.31-.02-.48.14-.64.14-.14.31-.36.47-.54.16-.18.21-.31.31-.52.1-.21.05-.39-.03-.54-.08-.16-.7-1.7-.96-2.33-.25-.61-.51-.53-.7-.54h-.6c-.21 0-.54.08-.83.39-.29.31-1.09 1.07-1.09 2.6 0 1.53 1.12 3.01 1.27 3.22.16.21 2.2 3.36 5.33 4.71.74.32 1.32.51 1.77.65.74.24 1.42.2 1.95.12.6-.09 1.86-.76 2.12-1.49.26-.73.26-1.36.18-1.49-.08-.13-.29-.21-.6-.37Z" />
+    </svg>
+  );
+}
 
 function DeviceResultImage({ model }: { model: Model }) {
   const [failed, setFailed] = useState(false);
@@ -300,18 +308,18 @@ export function SiteHeader() {
             type="button"
             onClick={() => setShowMobileSearch(true)}
             aria-label="Search devices"
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-text-primary shadow-xs max-[359px]:h-9 max-[359px]:w-9 lg:hidden"
+            className="grid h-9 w-9 place-items-center rounded-full border border-border bg-background text-text-primary shadow-xs lg:hidden"
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-[18px] w-[18px]" />
           </button>
           <Button
             variant="ghost"
             size="sm"
-            className="px-2 text-whatsapp hover:bg-success-50 max-[359px]:gap-0 max-[359px]:px-2 min-[360px]:px-2.5 sm:px-3.5"
-            leftIcon={<MessageCircle className="h-[18px] w-[18px]" />}
+            className="px-2 text-whatsapp hover:bg-success-50 max-[639px]:gap-0 max-[639px]:px-2 sm:px-3.5"
+            leftIcon={<WhatsAppLogo className="h-[20px] w-[20px]" />}
             onClick={() => openContact()}
           >
-            <span className="hidden text-xs min-[360px]:inline sm:text-body-sm">WhatsApp</span>
+            <span className="hidden sm:inline sm:text-body-sm">WhatsApp</span>
           </Button>
           {user ? (
             <Button

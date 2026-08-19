@@ -20,11 +20,11 @@ export default function LoginPage() {
 
   // Already logged in: redirect
   useEffect(() => {
-    if (user) router.replace("/");
+    if (user) router.replace(user.role === "admin" ? "/admin" : "/");
   }, [user, router]);
 
-  const onSellerSuccess = () => {
-    router.replace(selectedModel ? "/sell/storage" : "/");
+  const onSellerSuccess = (role: string) => {
+    router.replace(role === "admin" ? "/admin" : selectedModel ? "/sell/storage" : "/");
   };
 
   return (

@@ -4,9 +4,17 @@ import path from "node:path"
 const root = process.cwd()
 const publicDir = path.join(root, "public", "devices")
 const manifestPath = path.join(root, "lib", "generated", "deviceImageManifest.ts")
+const sourceCachePath = path.join(root, ".cache", "mobileapi-image-sources.json")
 const dataPath = path.join(root, "lib", "data.ts")
 const apiBase = "https://api.mobileapi.dev"
 let lastApiRequestAt = 0
+
+class RateLimitError extends Error {
+  constructor(message) {
+    super(message)
+    this.name = "RateLimitError"
+  }
+}
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -63,9 +71,31 @@ async function existingManifest() {
   return map
 }
 
+async function readJsonFile(file, fallback) {
+  try {
+    return JSON.parse(await readFile(file, "utf8"))
+  } catch {
+    return fallback
+  }
+}
+
+async function writeJsonFile(file, value) {
+  await mkdir(path.dirname(file), { recursive: true })
+  await writeFile(file, `${JSON.stringify(value, null, 2)}\n`)
+}
+
 function attachManifestEntry(map, model, url) {
   map[model.slug] = url
   map[model.id] = url
+}
+
+function attachFilenameAliases(map) {
+  for (const [key, url] of Object.entries({ ...map })) {
+    const match = key.match(/^iphone(\d+[a-z]*)$/)
+    if (!match) continue
+    map[`iphone-${match[1]}`] = url
+    map[match[1]] = url
+  }
 }
 
 function pickArray(payload) {
@@ -118,6 +148,7 @@ async function mobileApi(pathname, params, attempt = 0) {
   const apiDelayMs = Number(process.env.MOBILEAPI_DELAY_MS || 3500)
   const maxRateLimitRetries = Number(process.env.MOBILEAPI_MAX_429_RETRIES || 12)
   const fallbackRetryAfterSeconds = Number(process.env.MOBILEAPI_RETRY_AFTER_SECONDS || 60)
+  const waitOnRateLimit = process.env.MOBILEAPI_WAIT_ON_429 === "1"
   const waitMs = Math.max(0, apiDelayMs - (Date.now() - lastApiRequestAt))
   if (waitMs > 0) await sleep(waitMs)
   lastApiRequestAt = Date.now()
@@ -130,6 +161,9 @@ async function mobileApi(pathname, params, attempt = 0) {
     },
   })
   if (res.status === 429) {
+    if (!waitOnRateLimit) {
+      throw new RateLimitError(`MobileAPI rate limit hit on ${pathname}. Stopping to avoid spending more requests.`)
+    }
     if (attempt >= maxRateLimitRetries) throw new Error(`${res.status} ${res.statusText}`)
     const retryAfter = Number(res.headers.get("retry-after") || fallbackRetryAfterSeconds)
     console.warn(
@@ -178,6 +212,32 @@ async function getImageSource(model) {
   return direct
 }
 
+async function fetchImageWithRetry(source, attempt = 0) {
+  const maxRateLimitRetries = Number(process.env.MOBILEAPI_MAX_429_RETRIES || 12)
+  const fallbackRetryAfterSeconds = Number(process.env.MOBILEAPI_RETRY_AFTER_SECONDS || 60)
+  const waitOnRateLimit = process.env.MOBILEAPI_WAIT_ON_429 === "1"
+  const imageHeaders = new URL(source).hostname === new URL(apiBase).hostname
+    ? { Authorization: `Token ${key}` }
+    : undefined
+  const res = await fetch(source, imageHeaders ? { headers: imageHeaders } : undefined)
+
+  if (res.status === 429) {
+    if (!waitOnRateLimit) {
+      throw new RateLimitError("MobileAPI image rate limit hit. Stopping to avoid spending more requests.")
+    }
+    if (attempt >= maxRateLimitRetries) throw new Error(`image ${res.status} ${res.statusText}`)
+    const retryAfter = Number(res.headers.get("retry-after") || fallbackRetryAfterSeconds)
+    console.warn(
+      `MobileAPI image rate limit hit. Waiting ${retryAfter}s before retry ${attempt + 1}/${maxRateLimitRetries}.`
+    )
+    await sleep(retryAfter * 1000)
+    return fetchImageWithRetry(source, attempt + 1)
+  }
+
+  if (!res.ok) throw new Error(`image ${res.status} ${res.statusText}`)
+  return res
+}
+
 async function saveImage(model, source) {
   await mkdir(publicDir, { recursive: true })
   if (typeof source === "object" && source.base64) {
@@ -187,8 +247,7 @@ async function saveImage(model, source) {
     await writeFile(target, Buffer.from(base64, "base64"))
     return `/devices/${file}`
   }
-  const res = await fetch(source)
-  if (!res.ok) throw new Error(`image ${res.status} ${res.statusText}`)
+  const res = await fetchImageWithRetry(source)
   const contentType = res.headers.get("content-type") || ""
   const ext = contentType.includes("webp")
     ? "webp"
@@ -229,11 +288,17 @@ async function shouldRefreshCached(model, manifest) {
   return (meta.width || 0) < 300 || (meta.height || 0) < 300
 }
 
-async function cacheModelImage(model, manifest) {
-  const image = await getImageSource(model)
+async function cacheModelImage(model, manifest, sourceCache) {
+  const cachedSource = sourceCache[model.slug] || sourceCache[model.id]
+  const image = cachedSource || await getImageSource(model)
   if (!image) {
     console.warn(`No image found: ${model.name}`)
     return false
+  }
+  if (!cachedSource && typeof image === "string") {
+    sourceCache[model.slug] = image
+    sourceCache[model.id] = image
+    await writeJsonFile(sourceCachePath, sourceCache)
   }
   attachManifestEntry(manifest, model, await saveImage(model, image))
   await writeManifest(manifest)
@@ -256,6 +321,8 @@ const models = extractModels(source).filter((model) => {
   return true
 })
 const manifest = await existingManifest()
+attachFilenameAliases(manifest)
+const sourceCache = await readJsonFile(sourceCachePath, {})
 
 for (const model of models) {
   const existing = manifest[model.slug] || manifest[model.id]
@@ -280,8 +347,13 @@ for (const model of models) {
     if (manifest[model.slug] || manifest[model.id]) {
       if (!(await shouldRefreshCached(model, manifest))) continue
     }
-    if (await cacheModelImage(model, manifest)) downloaded += 1
+    if (await cacheModelImage(model, manifest, sourceCache)) downloaded += 1
   } catch (error) {
+    if (error instanceof RateLimitError) {
+      console.warn(error.message)
+      console.warn("Run the same command later; cached image sources/local images are preserved.")
+      break
+    }
     console.warn(`Skipped ${model.name}: ${error.message}`)
   }
 }
