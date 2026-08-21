@@ -321,7 +321,6 @@ function TrackInner() {
       if (!res.ok) { toast("Couldn't refresh status right now"); return; }
       const data = await res.json();
       patchCurrentEnquiry({ status: data.status, step: data.step });
-      toast(`Status: ${TRACK_STEPS[data.step] ?? "updated"}`);
     } catch {
       toast("Couldn't refresh status right now");
     } finally {
@@ -386,7 +385,7 @@ function TrackInner() {
                 {enquiry.status === "new" ? (
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" onClick={onEdit} leftIcon={<Pencil className="h-4 w-4" />}>
-                      Edit pickup
+                      Edit address
                     </Button>
                     <Button size="sm" variant="danger" onClick={onCancel} leftIcon={<X className="h-4 w-4" />}>
                       Cancel

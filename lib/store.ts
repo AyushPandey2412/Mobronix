@@ -384,11 +384,13 @@ export const useStore = create<AppState>()(
       startEditPickup: () => {
         const st = get();
         if (!st.enquiry) return;
+        const isPhoneFallback = (value: string) => value === "To be collected by phone";
+        const isPincodeFallback = (value: string) => value === "000000";
         set({
           editingEnquiry: true,
           checkout: {
-            address: st.enquiry.address,
-            pincode: st.enquiry.pincode,
+            address: isPhoneFallback(st.enquiry.address) ? "" : st.enquiry.address,
+            pincode: isPincodeFallback(st.enquiry.pincode) ? "" : st.enquiry.pincode,
             slot: st.enquiry.slot,
             pay: st.enquiry.pay,
           },
@@ -401,8 +403,8 @@ export const useStore = create<AppState>()(
         const c = st.checkout;
         const updated: Enquiry = {
           ...st.enquiry,
-          address: c.address,
-          pincode: c.pincode,
+          address: c.address.trim() || "To be collected by phone",
+          pincode: c.pincode.trim() || "000000",
           slot: c.slot ?? st.enquiry.slot,
           pay: c.pay ?? st.enquiry.pay,
           history: [{ ts: new Date().toISOString(), action: "Customer updated pickup details" }, ...st.enquiry.history],

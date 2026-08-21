@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, MapPin, ShieldCheck, Wallet, Banknote, X } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
@@ -39,10 +39,16 @@ export default function CheckoutPage() {
   const [submitted,    setSubmitted]    = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
 
-  const closeThankYou = () => {
+  const closeThankYou = useCallback(() => {
     setShowThankYou(false);
     router.replace("/");
-  };
+  }, [router]);
+
+  useEffect(() => {
+    if (!showThankYou) return;
+    const timer = window.setTimeout(closeThankYou, 30000);
+    return () => window.clearTimeout(timer);
+  }, [closeThankYou, showThankYou]);
 
   // Login is NOT required to browse/quote — only to book the pickup here.
   const loggedIn =
@@ -75,21 +81,52 @@ export default function CheckoutPage() {
     return { devices: d, total: d.reduce((s, x) => s + x.final, 0) };
   }, [editing, submitted, enquiry, model, selectedStorage, quote, cart]);
 
+  const hasPickupDetails =
+    checkout.address.trim().length > 0 ||
+    checkout.pincode.trim().length > 0 ||
+    !!checkout.pay;
+  const submitLabel = submitted
+    ? "Request submitted"
+    : editing
+      ? "Save changes"
+      : hasPickupDetails
+        ? "Submit request"
+        : "Skip for now";
+
   const submit = async () => {
     setError(null);
     setPincodeError(false);
 
     // ── Editing existing enquiry — local update only (no contact needed) ───
     if (editing) {
-      if (!checkout.address || !checkout.pincode || !checkout.pay) {
-        setError("Please fill the address and pincode, then select a payment mode.");
-        return;
-      }
-      if (!/^\d{6}$/.test(checkout.pincode.trim())) { setPincodeError(true); return; }
+      if (checkout.pincode.trim() && !/^\d{6}$/.test(checkout.pincode.trim())) { setPincodeError(true); return; }
       setSubmitting(true);
-      updateEnquiryPickup();
-      toast("Pickup details updated", "success");
-      router.replace("/track");
+      try {
+        if (enquiry?.id) {
+          const res = await fetch("/api/enquiry", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: enquiry.id,
+              address: checkout.address.trim() || undefined,
+              pincode: checkout.pincode.trim() || undefined,
+              pickup_slot: checkout.slot || undefined,
+              payment_mode: checkout.pay || undefined,
+            }),
+          });
+          if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || `Server error ${res.status}`);
+          }
+        }
+        updateEnquiryPickup();
+        toast("Pickup details updated", "success");
+        router.replace("/track");
+      } catch (e: any) {
+        setSubmitting(false);
+        setError(e.message || "Could not update pickup details. Please try again.");
+        toast(e.message || "Update failed", "error");
+      }
       return;
     }
 
@@ -101,11 +138,7 @@ export default function CheckoutPage() {
     const name  = user.name;
     const phone = user.mobile;
 
-    if (!checkout.address || !checkout.pincode || !checkout.pay) {
-      setError("Please fill the address and pincode, then select a payment mode.");
-      return;
-    }
-    if (!/^\d{6}$/.test(checkout.pincode.trim())) {
+    if (checkout.pincode.trim() && !/^\d{6}$/.test(checkout.pincode.trim())) {
       setPincodeError(true);
       return;
     }
@@ -151,10 +184,10 @@ export default function CheckoutPage() {
 
       const body = {
         devices:      bodyDevices,
-        address:      checkout.address,
-        pincode:      checkout.pincode,
+        address:      checkout.address.trim() || undefined,
+        pincode:      checkout.pincode.trim() || undefined,
         pickup_slot:  checkout.slot || "To be collected by phone",
-        payment_mode: checkout.pay! as "UPI" | "Cash",
+        payment_mode: (checkout.pay || undefined) as "UPI" | "Cash" | undefined,
         photos:       uploadedPhotos,  // real Supabase Storage paths
         name,                          // seller contact — now stored on the enquiry
         mobile:       phone,
@@ -258,17 +291,25 @@ export default function CheckoutPage() {
       </div>
 
       {/* Pickup form — only after login (or when editing an existing pickup) */}
+      {!editing && loggedIn && (
+        <div className="mt-5 rounded-xl border border-primary-100 bg-primary-50/70 px-4 py-3 animate-m-fade-up">
+          <p className="text-body-sm font-medium text-text-secondary">
+            Pickup address, pincode and payment mode are optional. You can add or edit them later from Track Order.
+          </p>
+        </div>
+      )}
+
       {(editing || loggedIn) && (
       <>
       <div className="mt-6 space-y-5">
         <Textarea
-          label="Pickup address"
-          placeholder="Flat / House no, Street, Area"
+          label="Pickup address (optional)"
+          placeholder="Flat / House no, Street, Area - you can add this later"
           value={checkout.address}
           onChange={(e) => setCheckout({ address: e.target.value })}
         />
         <Input
-          label="Pincode"
+          label="Pincode (optional)"
           inputMode="numeric"
           maxLength={6}
           placeholder="e.g. 400001"
@@ -285,7 +326,7 @@ export default function CheckoutPage() {
         {/* Preferred slot section removed */}
 
         <div>
-          <label className="mb-2 block text-label text-text-primary">Payment mode</label>
+          <label className="mb-2 block text-label text-text-primary">Payment mode (optional)</label>
           <SelectorRow value={checkout.pay} placeholder="Select payment mode" onClick={() => setSheet("pay")} />
         </div>
 
@@ -301,7 +342,7 @@ export default function CheckoutPage() {
 
       <StickyBar className="mt-6">
         <Button fullWidth isLoading={submitting} disabled={submitted} onClick={submit}>
-          {submitted ? "Request submitted" : editing ? "Save changes" : "Submit request"}
+          {submitLabel}
         </Button>
       </StickyBar>
 

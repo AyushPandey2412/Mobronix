@@ -87,7 +87,6 @@ import { CheckCircle2, Clock, BadgeCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { MiniStepper } from "@/components/ui/Stepper";
 import { TRACK_STEPS, TRACK_SHORT } from "@/lib/data";
-import { fmt } from "@/lib/utils";
 
 interface OrderLike {
   id:           string;
@@ -146,7 +145,7 @@ export function OrderCard({ order }: { order: OrderLike }) {
           </div>
         </div>
         {order.amount != null && (
-          <span className="font-mono text-body-md font-extrabold text-text-primary">{fmt(order.amount)}</span>
+          <span className="font-mono text-body-md font-extrabold text-text-primary">₹XX,XXX</span>
         )}
       </div>
       <div className="px-3 pb-4">
