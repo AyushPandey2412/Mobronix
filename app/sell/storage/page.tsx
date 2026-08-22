@@ -116,6 +116,7 @@ export default function StoragePage() {
         >
           {(() => {
             const imgSrc = getDeviceImageSized(model, 480);   // ~224px display @2x, direct from Apple
+            const isLocalImage = imgSrc?.startsWith("/");
             return imgSrc && !imgErr ? (
               <div className="relative h-72 w-44 lg:h-96 lg:w-56">
                 <Image
@@ -124,7 +125,7 @@ export default function StoragePage() {
                   fill
                   sizes="(min-width: 1024px) 224px, 176px"
                   className="object-contain drop-shadow-xl"
-                  unoptimized
+                  unoptimized={!isLocalImage}
                   priority
                   placeholder="blur"
                   blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiIGZpbGw9IiNFRUYyRkYiLz48L3N2Zz4="

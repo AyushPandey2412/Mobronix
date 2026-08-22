@@ -173,3 +173,48 @@
 .animate-fill-bar {
   animation: fill-bar linear forwards;
 }
+
+@keyframes heroBadgeInLeft {
+  0%, 8% { opacity: 0; transform: translate3d(-24px, 8px, 0) scale(0.94); }
+  18% { opacity: 1; transform: translate3d(0, 0, 0) scale(1.03); }
+  24%, 78% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(12px, -4px, 0) scale(0.98); }
+}
+@keyframes heroBadgeInRight {
+  0%, 8% { opacity: 0; transform: translate3d(24px, 8px, 0) scale(0.94); }
+  18% { opacity: 1; transform: translate3d(0, 0, 0) scale(1.03); }
+  24%, 78% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(-12px, -4px, 0) scale(0.98); }
+}
+@keyframes heroType {
+  0%, 12% { opacity: 0; transform: translateY(4px) scale(0.92); }
+  22% { opacity: 1; transform: translateY(0) scale(1.06); }
+  30%, 78% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-2px) scale(0.98); }
+}
+@keyframes heroIconPop {
+  0% { transform: scale(0.75); opacity: 0; }
+  65% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.hero-badge-in-left { animation: heroBadgeInLeft 5.8s cubic-bezier(0.16,1,0.3,1) 0.35s infinite both; }
+.hero-badge-in-right { animation: heroBadgeInRight 5.8s cubic-bezier(0.16,1,0.3,1) 1s infinite both; }
+.hero-type {
+  display: inline-block;
+  max-width: none;
+  white-space: nowrap;
+  transform-origin: left center;
+}
+.hero-type-late { animation-delay: 0s; }
+.hero-icon-pop { animation: heroIconPop 0.45s cubic-bezier(0.16,1,0.3,1) 1.35s both; }
+.hero-icon-pop-late { animation-delay: 1.9s; }
+@media (prefers-reduced-motion: reduce) {
+  .hero-badge-in-left,
+  .hero-badge-in-right,
+  .hero-type,
+  .hero-icon-pop,
+  .hero-icon-pop-late {
+    animation: none;
+  }
+  .hero-type { max-width: none; }
+}

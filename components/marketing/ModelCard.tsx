@@ -25,13 +25,16 @@ export function ModelCard({ model, onSelect, index = 0 }: { model: Model; onSele
   const max     = getMaxPrice(model);
   const isMac   = model.category === "macbook";
   const imgSrc  = getDeviceImageSized(model, 400);
+  const isLocalImage = imgSrc?.startsWith("/");
   const [imgErr, setImgErr] = useState(false);
 
   const isSelectImage = imgSrc ? (imgSrc.includes("finish-select") || imgSrc.includes("-select")) : false;
   const imgScaleClass = isMac
     ? "scale-100 group-hover:scale-[1.05]"
-    : isSelectImage
-      ? "scale-[1.38] group-hover:scale-[1.45]"
+    : isLocalImage
+      ? "scale-100 group-hover:scale-[1.06]"
+      : isSelectImage
+      ? "scale-[1.5] group-hover:scale-[1.56]"
       : "scale-[1.05] group-hover:scale-[1.12]";
 
   return (
@@ -50,7 +53,7 @@ export function ModelCard({ model, onSelect, index = 0 }: { model: Model; onSele
             fill
             sizes="(max-width: 768px) 150px, 200px"
             className={cn("object-contain transition-transform duration-300", imgScaleClass)}
-            unoptimized
+            unoptimized={!isLocalImage}
             loading="lazy"
             placeholder="blur"
             blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCA1NiA1NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNTYiIGhlaWdodD0iNTYiIGZpbGw9IiNGM0Y0RjYiLz48L3N2Zz4="

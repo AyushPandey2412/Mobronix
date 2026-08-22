@@ -46,6 +46,7 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
   const rows = priceRows(model)
   const maxPrice = getMaxPrice(model)
   const imageUrl = getDeviceImageSized(model, 640)
+  const isLocalImage = imageUrl?.startsWith('/')
 
   const productLd = {
     '@context': 'https://schema.org',
@@ -102,7 +103,7 @@ export async function ModelLanding({ category, slug }: { category: ModelCategory
                 fill
                 sizes="(min-width: 768px) 360px, 90vw"
                 className="object-contain drop-shadow-xl"
-                unoptimized
+                unoptimized={!isLocalImage}
                 priority
               />
             </div>

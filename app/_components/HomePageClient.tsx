@@ -190,23 +190,27 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
             <div className="absolute inset-0 -z-10 rounded-[3rem] bg-gradient-to-br from-primary-100 to-secondary-100 blur-2xl" />
             <DeviceVisual tone="blue" className="h-full w-full" />
             <div
-              className="absolute -left-16 top-12 hidden items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-md backdrop-blur animate-m-fade-up lg:flex"
+              className="hero-badge-in-left absolute -left-16 top-12 hidden items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-md backdrop-blur lg:flex"
             >
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-success-50 text-success-600">
+              <span className="hero-icon-pop grid h-8 w-8 place-items-center rounded-lg bg-success-50 text-success-600">
                 <Wallet className="h-4 w-4" />
               </span>
               <div>
-                <div className="text-caption font-bold text-text-primary">Paid in 24 min</div>
-                <div className="text-[10px] text-text-tertiary">via UPI</div>
+                <div className="text-caption font-bold text-text-primary">
+                  <span className="hero-type [--hero-type-width:14ch]">Paid in 24 min</span>
+                </div>
+                <div className="animate-m-fade text-[10px] text-text-tertiary" style={{ animationDelay: "2.15s" }}>via UPI</div>
               </div>
             </div>
             <div
-              className="absolute -right-12 bottom-16 hidden items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-md backdrop-blur animate-m-fade-up lg:flex"
+              className="hero-badge-in-right absolute -right-12 bottom-16 hidden items-center gap-2 rounded-xl border border-border bg-surface/95 px-3 py-2 shadow-md backdrop-blur lg:flex"
             >
-              <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary-50 text-brand">
+              <span className="hero-icon-pop hero-icon-pop-late grid h-8 w-8 place-items-center rounded-lg bg-primary-50 text-brand">
                 <ShieldCheck className="h-4 w-4" />
               </span>
-              <div className="text-caption font-bold text-text-primary">IMEI verified</div>
+              <div className="text-caption font-bold text-text-primary">
+                <span className="hero-type hero-type-late [--hero-type-width:13ch]">IMEI verified</span>
+              </div>
             </div>
           </div>
         </div>
