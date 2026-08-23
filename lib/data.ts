@@ -183,16 +183,15 @@ export const PHOTO_SLOTS: PhotoSlot[] = [
 // always render the same stage for a given tracking_step.
 export const TRACK_STEPS: string[] = [...TRACKING_STEPS];
 
-export const TRACK_SHORT = ["New", "Contacted", "Pickup", "Inspect", "Price", "Paid", "Done", "Cancelled"];
+export const TRACK_SHORT = ["New", "Contacted", "Price", "Pickup", "Paid", "Done", "Cancelled"];
 
 export const TRACK_DESC: Record<string, string> = {
   "New": "Your enquiry has been received and is in our queue.",
   "Contacted": "Our spokesperson has contacted you or will call shortly to verify device details.",
-  "Pickup Scheduled": "Our executive will visit your home or office during the confirmed slot.",
-  "Inspection": "Your device is being inspected in person before final confirmation.",
-  "Price Confirmed": "Final price confirmed with you based on inspection and condition.",
-  "Payment Completed": "Payment has been completed.",
-  "Completed": "The sale is complete.",
+  "Price Confirmed": "Final price confirmed with you based on your device details.",
+  "Pickup": "Our executive will visit your home or office during the confirmed slot.",
+  "Paid": "Payment has been completed.",
+  "Done": "The sale is complete.",
   "Cancelled": "This enquiry has been cancelled.",
 };
 
@@ -338,7 +337,6 @@ const STATUS_CLASS: Record<EnquiryStatus, string> = {
   new: "warning",
   contacted: "info",
   pickup_scheduled: "info",
-  inspection: "warning",
   price_confirmed: "warning",
   payment_completed: "success",
   completed: "success",

@@ -1,5 +1,6 @@
 import { inr } from '@/lib/format'
 import { statusLabel } from '@/lib/enquiryStatus'
+import { enquiryAmount } from '@/lib/enquiryPricing'
 import type { Enquiry, EnquiryStatus } from '@/lib/types'
 import type { WhatsAppTemplatePayload } from './types'
 
@@ -33,7 +34,7 @@ export function ownerNewEnquiryTemplate(enquiry: Enquiry, ownerPhone: string): W
           { type: 'text', text: customerName(enquiry) },
           { type: 'text', text: enquiry.guest_phone || enquiry.profile?.phone || 'Not provided' },
           { type: 'text', text: firstDeviceLabel(enquiry) },
-          { type: 'text', text: inr(enquiry.total_amount ?? 0) },
+          { type: 'text', text: inr(enquiryAmount(enquiry)) },
           { type: 'text', text: enquiry.pickup_slot ?? 'Not selected' },
         ],
       }],
@@ -61,7 +62,7 @@ export function customerStatusTemplate(
           { type: 'text', text: enquiry.display_id ?? enquiry.id },
           { type: 'text', text: statusLabel(status) },
           { type: 'text', text: firstDeviceLabel(enquiry) },
-          { type: 'text', text: inr(enquiry.total_amount ?? 0) },
+          { type: 'text', text: inr(enquiryAmount(enquiry)) },
         ],
       }],
     },

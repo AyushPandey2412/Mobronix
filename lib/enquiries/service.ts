@@ -37,9 +37,8 @@ export const updateStatusSchema = z.object({
   status: z.enum([
     'new',
     'contacted',
-    'pickup_scheduled',
-    'inspection',
     'price_confirmed',
+    'pickup_scheduled',
     'payment_completed',
     'completed',
     'cancelled',

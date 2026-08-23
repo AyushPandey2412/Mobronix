@@ -2,6 +2,8 @@
 // All templates use INLINE styles only (no Tailwind / external CSS in email HTML).
 import { Resend } from 'resend'
 import type { Enquiry } from './types'
+import { enquiryAmount, enquiryDeviceAmount } from './enquiryPricing'
+import { TRACKING_STEPS } from './enquiryStatus'
 
 const ACCENT = '#16A34A'
 const INK = '#171A21'
@@ -28,7 +30,7 @@ function deviceLines(enquiry: Enquiry): string {
       const sub = extra ? `${extra} · ${d.storage}` : d.storage
       return `<tr>
         <td style="padding:8px 0;color:${INK};font-size:14px">${d.model} <span style="color:#667085">(${sub})</span></td>
-        <td style="padding:8px 0;text-align:right;font-weight:700;color:${INK};font-family:monospace">${inr(d.final)}</td>
+        <td style="padding:8px 0;text-align:right;font-weight:700;color:${INK};font-family:monospace">${inr(enquiryDeviceAmount(d))}</td>
       </tr>`
     })
     .join('')
@@ -53,7 +55,7 @@ export async function sendAdminNotification(enquiry: Enquiry, adminBaseUrl: stri
     <p style="color:#667085;font-size:14px">A new enquiry was submitted.</p>
     <table style="width:100%;border-collapse:collapse;margin:12px 0">${deviceLines(enquiry)}
       <tr><td style="padding:12px 0;border-top:1px solid #E4E7EB;font-weight:700">Total estimate</td>
-      <td style="padding:12px 0;border-top:1px solid #E4E7EB;text-align:right;font-weight:800;font-family:monospace">${inr(enquiry.total_amount ?? 0)}</td></tr>
+      <td style="padding:12px 0;border-top:1px solid #E4E7EB;text-align:right;font-weight:800;font-family:monospace">${inr(enquiryAmount(enquiry))}</td></tr>
     </table>
     <p style="color:#667085;font-size:14px"><b>Customer:</b> ${enquiry.profile?.full_name ?? '—'} · ${enquiry.profile?.phone ?? '—'}<br/>
     <b>Pickup:</b> ${enquiry.pickup_slot}<br/>
@@ -75,7 +77,7 @@ export async function sendCustomerConfirmation(enquiry: Enquiry, customerEmail: 
     <p style="color:#667085;font-size:14px">We've received your request. Our spokesperson will call within 2 hours to confirm your pickup slot.</p>
     <table style="width:100%;border-collapse:collapse;margin:12px 0">${deviceLines(enquiry)}
       <tr><td style="padding:12px 0;border-top:1px solid #E4E7EB;font-weight:700">Total estimate</td>
-      <td style="padding:12px 0;border-top:1px solid #E4E7EB;text-align:right;font-weight:800;font-family:monospace">${inr(enquiry.total_amount ?? 0)}</td></tr>
+      <td style="padding:12px 0;border-top:1px solid #E4E7EB;text-align:right;font-weight:800;font-family:monospace">${inr(enquiryAmount(enquiry))}</td></tr>
     </table>
     <p style="color:#667085;font-size:13px">Your enquiry ID is <b style="color:${INK};font-family:monospace">${enquiry.display_id}</b>. Price is valid for 24 hours. At pickup, if the device condition differs from what you described, our executive may re-quote — you can accept or cancel, no obligation.</p>`
   await resend.emails.send({
@@ -94,10 +96,9 @@ export async function sendStatusUpdateEmail(
 ): Promise<void> {
   const resend = getResend()
   if (!resend || !customerEmail) return
-  const stepLabels = ['Request Submitted', 'Enquiry Accepted', 'Pickup Scheduled', 'Device Inspected', 'Payment Completed']
   const inner = `
     <p style="color:#667085;font-size:14px">Your enquiry <b style="font-family:monospace">${enquiry.display_id}</b> has been updated.</p>
-    <p style="font-size:15px"><b>Status:</b> ${newStatus}<br/><b>Stage:</b> ${stepLabels[newStep] ?? newStep}</p>
+    <p style="font-size:15px"><b>Status:</b> ${newStatus}<br/><b>Stage:</b> ${TRACKING_STEPS[newStep] ?? newStep}</p>
     <a href="${process.env.NEXT_PUBLIC_APP_URL}/track" style="display:inline-block;margin-top:8px;background:${ACCENT};color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Track your order</a>`
   await resend.emails.send({
     from: FROM,

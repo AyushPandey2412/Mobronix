@@ -87,6 +87,7 @@ import { CheckCircle2, Clock, BadgeCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { MiniStepper } from "@/components/ui/Stepper";
 import { TRACK_STEPS, TRACK_SHORT } from "@/lib/data";
+import { inr } from "@/lib/format";
 
 interface OrderLike {
   id:           string;
@@ -99,10 +100,10 @@ interface OrderLike {
 }
 
 function StatusChip({ step }: { step: number }) {
-  if (TRACK_STEPS[step] === "Completed") {
+  if (TRACK_STEPS[step] === "Done") {
     return (
       <Badge intent="success" icon={<CheckCircle2 className="h-3.5 w-3.5" />}>
-        Completed
+        Done
       </Badge>
     );
   }
@@ -129,6 +130,8 @@ function StatusChip({ step }: { step: number }) {
 
 export function OrderCard({ order }: { order: OrderLike }) {
   const displayRef = order.display_id ?? order.id;
+  const priceConfirmedStep = TRACK_STEPS.indexOf("Price Confirmed");
+  const canShowPrice = order.amount != null && priceConfirmedStep >= 0 && order.step >= priceConfirmedStep;
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-xs">
       <div className="flex items-center gap-3 border-b border-border p-4">
@@ -145,7 +148,9 @@ export function OrderCard({ order }: { order: OrderLike }) {
           </div>
         </div>
         {order.amount != null && (
-          <span className="font-mono text-body-md font-extrabold text-text-primary">₹XX,XXX</span>
+          <span className="font-mono text-body-md font-extrabold text-text-primary">
+            {canShowPrice ? inr(order.amount) : "₹XX,XXX"}
+          </span>
         )}
       </div>
       <div className="px-3 pb-4">

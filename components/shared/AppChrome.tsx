@@ -1,18 +1,29 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { SiteHeader } from "./SiteHeader";
 import { BottomNav } from "./BottomNav";
 import { Footer } from "./Footer";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/lib/store";
 
 /** Decides which global chrome (header / bottom nav / footer) to show per route. */
 export function AppChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const user = useStore((s) => s.user);
 
   const isLogin = pathname === "/login";
   const isAdmin = pathname.startsWith("/admin");
   const isFlow = pathname.startsWith("/sell") || pathname === "/cart";
+
+  useEffect(() => {
+    if (user?.role === "admin" && !isAdmin) {
+      router.replace("/admin");
+    }
+  }, [user?.role, isAdmin, router]);
 
   // Admin & login render their own full-bleed chrome.
   if (isLogin || isAdmin) {

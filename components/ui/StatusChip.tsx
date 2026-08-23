@@ -7,6 +7,6 @@ export default function StatusChip({ status, trackingStep }: { status: EnquirySt
   let cls = 'bg-info-soft text-info'
   if (normalized === 'completed' || normalized === 'payment_completed') cls = 'bg-accent-soft text-accent-deep'
   else if (normalized === 'cancelled') cls = 'bg-line text-ink-soft'
-  else if (normalized === 'inspection' || normalized === 'price_confirmed' || trackingStep === 4) cls = 'bg-amber-50 text-gold'
+  else if (normalized === 'price_confirmed' || trackingStep === 2) cls = 'bg-amber-50 text-gold'
   return <span className={clsx('inline-block rounded-full px-3 py-1 text-xs font-semibold', cls)}>{label}</span>
 }

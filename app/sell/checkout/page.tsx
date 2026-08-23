@@ -11,7 +11,7 @@ import { Sheet } from "@/components/ui/Sheet";
 import { SelectorRow } from "@/components/ui/Selectable";
 import { useStore, useActiveModel } from "@/lib/store";
 import { SLOTS } from "@/lib/data";
-import { fmt, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import type { DeviceLine } from "@/lib/types";
 import { LoginModal } from "@/components/shared/LoginModal";
@@ -262,7 +262,7 @@ export default function CheckoutPage() {
                 </span>
               ) : (
                 <span className="font-mono font-semibold text-text-primary">
-                  {!editing && !loggedIn ? "₹XX,XXX" : fmt(d.final)}
+                  ₹XX,XXX
                 </span>
               )}
             </div>
@@ -275,7 +275,7 @@ export default function CheckoutPage() {
                   Awaiting Call
                 </span>
               ) : (
-                !editing && !loggedIn ? "₹XX,XXX" : fmt(total)
+                "₹XX,XXX"
               )}
             </span>
           </div>

@@ -13,7 +13,6 @@ export type EnquiryStatus =
   | 'new'
   | 'contacted'
   | 'pickup_scheduled'
-  | 'inspection'
   | 'price_confirmed'
   | 'payment_completed'
   | 'completed'
@@ -183,6 +182,7 @@ export interface Enquiry {
   internal_note?: string | null
   pickup_slot?:   string
   payment_mode?:  PaymentMode
+  payment_date?:  string | null
   created_at?:    string
   updated_at?:    string
   /** Guest contact (captured at checkout when there is no authenticated profile). */

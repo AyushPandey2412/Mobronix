@@ -6,12 +6,13 @@ import { createBrowserClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/ToastHost'
 import { cn } from '@/lib/utils'
 import { inr } from '@/lib/format'
+import { enquiryAmount } from '@/lib/enquiryPricing'
 import {
   QK,
   bulkUpdateEnquiryStatus,
   bulkDeleteEnquiries,
 } from '@/lib/adminQueries'
-import { ACTIVE_ENQUIRY_STATUSES, ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS } from '@/lib/enquiryStatus'
+import { ACTIVE_ENQUIRY_STATUSES, ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, normalizeLegacyStatus } from '@/lib/enquiryStatus'
 import type { Enquiry, EnquiryStatus } from '@/lib/types'
 
 type Filter = 'all' | EnquiryStatus
@@ -20,16 +21,16 @@ type Sort   = 'newest' | 'oldest' | 'amount_asc' | 'amount_desc'
 const STATUS: Record<string, { label: string; cls: string }> = {
   new:               { label: 'New',               cls: 'bg-warning-50 text-warning-700 ring-warning-200'   },
   contacted:         { label: 'Contacted',         cls: 'bg-primary-50 text-primary-700 ring-primary-200'   },
-  pickup_scheduled:  { label: 'Pickup Scheduled',  cls: 'bg-primary-50 text-primary-700 ring-primary-200'   },
-  inspection:        { label: 'Inspection',        cls: 'bg-warning-50 text-warning-700 ring-warning-200'   },
+  pickup_scheduled:  { label: 'Pickup',            cls: 'bg-primary-50 text-primary-700 ring-primary-200'   },
   price_confirmed:   { label: 'Price Confirmed',   cls: 'bg-warning-50 text-warning-700 ring-warning-200'   },
-  payment_completed: { label: 'Payment Completed', cls: 'bg-success-50 text-success-700 ring-success-200'   },
-  completed:         { label: 'Completed',         cls: 'bg-success-50 text-success-700 ring-success-200'   },
+  payment_completed: { label: 'Paid',              cls: 'bg-success-50 text-success-700 ring-success-200'   },
+  completed:         { label: 'Done',              cls: 'bg-success-50 text-success-700 ring-success-200'   },
   cancelled:         { label: 'Cancelled',         cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200'  },
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const s = STATUS[status] ?? { label: status, cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' }
+  const normalized = normalizeLegacyStatus(status)
+  const s = STATUS[normalized] ?? { label: normalized, cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' }
   return (
     <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-caption font-semibold ring-1 ring-inset', s.cls)}>
       {s.label}
@@ -78,12 +79,12 @@ export default function Dashboard({
   // ── Derived stats ──────────────────────────────────────────────────────────
   const stats = useMemo(() => ({
     total:     enquiries.length,
-    pending:   enquiries.filter(e => e.status === 'new').length,
-    accepted:  enquiries.filter(e => e.status === 'contacted').length,
-    completed: enquiries.filter(e => e.status === 'completed').length,
+    pending:   enquiries.filter(e => normalizeLegacyStatus(e.status) === 'new').length,
+    accepted:  enquiries.filter(e => normalizeLegacyStatus(e.status) === 'contacted').length,
+    completed: enquiries.filter(e => normalizeLegacyStatus(e.status) === 'completed').length,
     pipeline:  enquiries
-      .filter(e => ACTIVE_ENQUIRY_STATUSES.includes(e.status))
-      .reduce((s, e) => s + (e.total_amount ?? 0), 0),
+      .filter(e => ACTIVE_ENQUIRY_STATUSES.includes(normalizeLegacyStatus(e.status)))
+      .reduce((s, e) => s + enquiryAmount(e), 0),
   }), [enquiries])
 
   const chart = useMemo(() => {
@@ -102,21 +103,21 @@ export default function Dashboard({
   const counts: Record<string, number> = useMemo(() => {
     const result: Record<string, number> = { all: enquiries.length }
     ENQUIRY_STATUSES.forEach((status) => {
-      result[status] = enquiries.filter(e => e.status === status).length
+      result[status] = enquiries.filter(e => normalizeLegacyStatus(e.status) === status).length
     })
     return result
   }, [enquiries])
 
   const filtered = useMemo(() => {
-    let list = filter === 'all' ? enquiries : enquiries.filter(e => e.status === filter)
+    let list = filter === 'all' ? enquiries : enquiries.filter(e => normalizeLegacyStatus(e.status) === filter)
     const q = search.trim().toLowerCase()
     if (q) list = list.filter(e =>
       (e.display_id ?? '').toLowerCase().includes(q) ||
       (e.profile?.full_name ?? e.guest_name ?? '').toLowerCase().includes(q) ||
       (e.profile?.phone ?? e.guest_phone ?? '').includes(q))
     return [...list].sort((a, b) => {
-      if (sort === 'amount_asc')  return (a.total_amount ?? 0) - (b.total_amount ?? 0)
-      if (sort === 'amount_desc') return (b.total_amount ?? 0) - (a.total_amount ?? 0)
+      if (sort === 'amount_asc')  return enquiryAmount(a) - enquiryAmount(b)
+      if (sort === 'amount_desc') return enquiryAmount(b) - enquiryAmount(a)
       const da = +new Date(a.created_at ?? ''), db = +new Date(b.created_at ?? '')
       return sort === 'oldest' ? da - db : db - da
     })
@@ -176,7 +177,7 @@ export default function Dashboard({
       const name  = e.profile?.full_name || e.guest_name  || ''
       const phone = e.profile?.phone     || e.guest_phone || ''
       const devices = ((e.devices ?? []) as any[]).map(d => [d.model, d.variant, d.chip, d.storage].filter(Boolean).join(' ')).join(' | ')
-      return [e.display_id, name, phone, devices, e.total_amount ?? 0, cap(e.status), e.pincode, fmtDate(e.created_at)].map(cell).join(',')
+      return [e.display_id, name, phone, devices, enquiryAmount(e), cap(e.status), e.pincode, fmtDate(e.created_at)].map(cell).join(',')
     })
     const csv = '﻿' + [header.join(','), ...lines].join('\r\n')   // BOM for Excel/₹
     const a = document.createElement('a')
@@ -261,7 +262,7 @@ export default function Dashboard({
             <div className="px-4 py-2 bg-primary-50 border-b border-primary-100 flex flex-wrap items-center gap-2">
               <span className="text-brand text-caption font-bold">{selected.size} selected</span>
               <span className="text-border-strong">·</span>
-              {(['contacted','pickup_scheduled','price_confirmed','completed','cancelled'] as EnquiryStatus[]).map(s => (
+              {(['contacted','price_confirmed','pickup_scheduled','payment_completed','completed','cancelled'] as EnquiryStatus[]).map(s => (
                 <button key={s} onClick={() => bulkStatusMutation.mutate(s)}
                   disabled={bulkStatusMutation.isPending}
                   className="h-6 px-2.5 rounded bg-surface border border-border text-caption font-medium text-text-secondary hover:text-text-primary capitalize transition-colors disabled:opacity-50">
@@ -312,7 +313,7 @@ export default function Dashboard({
                           Awaiting Call
                         </span>
                       ) : (
-                        inr(e.total_amount ?? 0)
+                        inr(enquiryAmount(e))
                       )}
                     </p>
                     <p className="text-caption text-text-tertiary">{new Date(e.created_at ?? '').toLocaleDateString('en-IN', { day:'numeric', month:'short' })}</p>

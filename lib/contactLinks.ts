@@ -12,13 +12,10 @@ export function getContactHref(message = "Hi Mobronix, I need help with selling 
 }
 
 export function getCustomerContactHref(phone: string, message: string) {
-  if (isWhatsAppMailtoMode()) {
-    const subject = encodeURIComponent("Mobronix customer update");
-    const body = encodeURIComponent(message);
-    return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
-  }
-
-  return phone ? `https://wa.me/91${phone}?text=${encodeURIComponent(message)}` : "#";
+  const digits = phone.replace(/\D/g, "");
+  if (!digits) return "#";
+  const number = digits.length === 10 ? `91${digits}` : digits;
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
 export function openContact(message?: string) {

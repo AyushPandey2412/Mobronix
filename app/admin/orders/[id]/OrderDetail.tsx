@@ -8,6 +8,7 @@ import { useToast } from '@/components/ToastHost'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import { cn } from '@/lib/utils'
 import { inr } from '@/lib/format'
+import { enquiryAmount, enquiryDeviceAmount } from '@/lib/enquiryPricing'
 import { getCustomerContactHref } from '@/lib/contactLinks'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import {
@@ -15,20 +16,22 @@ import {
   fetchEnquiryHistory,
   updateEnquiryStatus,
   deleteEnquiry,
+  updateEnquiryPrice,
+  updateEnquiryPayment,
 } from '@/lib/adminQueries'
-import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, normalizeLegacyStatus } from '@/lib/enquiryStatus'
-import { TRACKING_STEPS, type Enquiry, type EnquiryDevice, type EnquiryHistory, type EnquiryStatus } from '@/lib/types'
+import { ENQUIRY_STATUSES, ENQUIRY_STATUS_LABELS, ENQUIRY_STATUS_STEPS, normalizeLegacyStatus } from '@/lib/enquiryStatus'
+import { TRACKING_STEPS, type Enquiry, type EnquiryDevice, type EnquiryHistory, type EnquiryStatus, type PaymentMode } from '@/lib/types'
+import { Check, PencilLine, X } from 'lucide-react'
 
 const ADMIN_STATUSES: EnquiryStatus[] = [...ENQUIRY_STATUSES]
 
 const STATUS: Record<string, { label: string; cls: string }> = {
   new:               { label: 'New',               cls: 'bg-warning-50 text-warning-700 ring-warning-200'  },
   contacted:         { label: 'Contacted',         cls: 'bg-primary-50 text-primary-700 ring-primary-200'  },
-  pickup_scheduled:  { label: 'Pickup Scheduled',  cls: 'bg-primary-50 text-primary-700 ring-primary-200'  },
-  inspection:        { label: 'Inspection',        cls: 'bg-warning-50 text-warning-700 ring-warning-200'  },
+  pickup_scheduled:  { label: 'Pickup',            cls: 'bg-primary-50 text-primary-700 ring-primary-200'  },
   price_confirmed:   { label: 'Price Confirmed',   cls: 'bg-warning-50 text-warning-700 ring-warning-200'  },
-  payment_completed: { label: 'Payment Completed', cls: 'bg-success-50 text-success-700 ring-success-200'  },
-  completed:         { label: 'Completed',         cls: 'bg-success-50 text-success-700 ring-success-200'  },
+  payment_completed: { label: 'Paid',              cls: 'bg-success-50 text-success-700 ring-success-200'  },
+  completed:         { label: 'Done',              cls: 'bg-success-50 text-success-700 ring-success-200'  },
   cancelled:         { label: 'Cancelled',         cls: 'bg-neutral-100 text-neutral-500 ring-neutral-200' },
 }
 
@@ -57,10 +60,15 @@ export default function OrderDetail({
   const qc     = useQueryClient()
 
   const [status,     setStatus]     = useState<EnquiryStatus>(normalizeLegacyStatus(initial.status))
-  const [step,       setStep]       = useState(initial.tracking_step ?? 0)
+  const [step,       setStep]       = useState(ENQUIRY_STATUS_STEPS[normalizeLegacyStatus(initial.status)] ?? 0)
   const [note,       setNote]       = useState(initial.internal_note || '')
   const [confirmDel, setConfirmDel] = useState(false)
   const [showResponses, setShowResponses] = useState<Record<number, boolean>>({})
+  const [editingPriceIndex, setEditingPriceIndex] = useState<number | null>(null)
+  const [priceDraft, setPriceDraft] = useState('')
+  const [editingPayment, setEditingPayment] = useState(false)
+  const [paymentDraft, setPaymentDraft] = useState<PaymentMode>(initial.payment_mode || 'Cash')
+  const [paymentDateDraft, setPaymentDateDraft] = useState(initial.payment_date || '')
 
   // ── Refetch history from Supabase (always fresh) ──────────────────────────
   const { data: history = initialHistory } = useQuery({
@@ -77,6 +85,46 @@ export default function OrderDetail({
   const phone       = phoneRaw.replace(/\D/g, '') || ''
   const devices     = (initial.devices ?? []) as DeviceSummary[]
   const deviceLabel = devices.map((device) => device.model).filter(Boolean).join(', ')
+  const isSkippedPickupText = (value?: string | null) => {
+    const clean = (value ?? '').trim().toLowerCase()
+    return !clean || clean === 'to be collected by phone' || clean === '000000'
+  }
+  const skippedPickupValue = (
+    <span className="inline-flex max-w-full flex-col items-end gap-1 text-right">
+      <span className="rounded-full bg-warning-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-warning-700 ring-1 ring-inset ring-warning-200">
+        Skipped
+      </span>
+      <span className="text-[11px] font-medium leading-snug text-text-tertiary">
+        Needs to be filled by customer
+      </span>
+    </span>
+  )
+  const addressParts = [initial.address, initial.pincode].filter((part) => !isSkippedPickupText(part)).join(', ')
+  const customerValue = (label: string, value: ReactNode) => {
+    if (label === 'Payment') return paymentDisplay
+    if (label === 'Slot' && isSkippedPickupText(initial.pickup_slot)) return skippedPickupValue
+    if (label === 'Address') return addressParts || skippedPickupValue
+    return value
+  }
+  const formatPaymentDate = (value?: string | null) =>
+    value ? new Date(`${value}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not set'
+  const paymentDisplay = (
+    <span className="inline-flex items-center justify-end gap-2">
+      <span>{initial.payment_mode ?? 'Not set'}</span>
+      <button
+        type="button"
+        onClick={() => {
+          setPaymentDraft(initial.payment_mode || 'Cash')
+          setPaymentDateDraft(initial.payment_date || '')
+          setEditingPayment(true)
+        }}
+        className="inline-flex h-6 items-center gap-1 rounded-md border border-border bg-surface px-2 text-[11px] font-semibold text-text-secondary transition-colors hover:border-primary-200 hover:text-brand"
+      >
+        <PencilLine className="h-3 w-3" />
+        Edit
+      </button>
+    </span>
+  )
 
   // ── Mutations ──────────────────────────────────────────────────────────────
   const saveMutation = useMutation({
@@ -101,11 +149,45 @@ export default function OrderDetail({
     onError: (error: Error) => toast(error.message ?? 'Delete failed', 'error'),
   })
 
+  const priceMutation = useMutation({
+    mutationFn: () => {
+      if (editingPriceIndex === null) throw new Error('Choose a device first')
+      const finalAmount = Number(priceDraft.replace(/[^\d]/g, ''))
+      if (!Number.isFinite(finalAmount) || finalAmount <= 0) throw new Error('Enter a valid final price')
+      return updateEnquiryPrice({ id: initial.id, deviceIndex: editingPriceIndex, finalAmount })
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QK.enquiries() })
+      qc.invalidateQueries({ queryKey: QK.enquiryHistory(initial.id) })
+      toast('Final price updated', 'success')
+      setEditingPriceIndex(null)
+      setPriceDraft('')
+      router.refresh()
+    },
+    onError: (error: Error) => toast(error.message ?? 'Price update failed', 'error'),
+  })
+
+  const paymentMutation = useMutation({
+    mutationFn: () => updateEnquiryPayment({
+      id: initial.id,
+      paymentMode: paymentDraft,
+      paymentDate: paymentDateDraft || null,
+    }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QK.enquiries() })
+      qc.invalidateQueries({ queryKey: QK.enquiryHistory(initial.id) })
+      toast('Payment details updated', 'success')
+      setEditingPayment(false)
+      router.refresh()
+    },
+    onError: (error: Error) => toast(error.message ?? 'Payment update failed', 'error'),
+  })
+
   const waMessages = [
     { key: 'contacted', label: 'Contacted',       text: `Hi ${firstName}, your ${deviceLabel} sell request (#${initial.display_id}) has been received. Our spokesperson will call you shortly.` },
-    { key: 'price',    label: 'Price Confirmed',   text: `Hi ${firstName}, your price of ${inr(initial.total_amount ?? 0)} for ${deviceLabel} has been confirmed.` },
-    { key: 'pickup',   label: 'Pickup Scheduled',  text: `Hi ${firstName}, our executive is scheduled to pick up your ${deviceLabel} today at your chosen slot.` },
-    { key: 'paid',     label: 'Payment Completed', text: `Hi ${firstName}, payment of ${inr(initial.total_amount ?? 0)} is done! Thank you for choosing us.` },
+    { key: 'price',    label: 'Price Confirmed',   text: `Hi ${firstName}, your price of ${inr(enquiryAmount(initial))} for ${deviceLabel} has been confirmed.` },
+    { key: 'pickup',   label: 'Pickup',            text: `Hi ${firstName}, our pickup is scheduled for your ${deviceLabel} today at your chosen slot.` },
+    { key: 'paid',     label: 'Paid',              text: `Hi ${firstName}, payment of ${inr(enquiryAmount(initial))} is done! Thank you for choosing us.` },
     { key: 'cancelled', label: 'Cancelled',        text: `Hi ${firstName}, your ${deviceLabel} sell request (#${initial.display_id}) has been cancelled. Please contact us for details.` },
   ]
 
@@ -168,24 +250,85 @@ export default function OrderDetail({
             ].map((r: { label: string; value: ReactNode }) => (
               <div key={r.label} className="flex justify-between gap-2">
                 <dt className="text-caption text-text-tertiary font-medium flex-shrink-0">{r.label}</dt>
-                <dd className="text-caption text-text-primary font-medium text-right">{r.value}</dd>
+                <dd className="min-w-0 text-right text-caption font-medium text-text-primary">{customerValue(r.label, r.value)}</dd>
               </div>
             ))}
+            <div className="flex justify-between gap-2">
+              <dt className="text-caption font-medium text-text-tertiary">Payment date</dt>
+              <dd className="min-w-0 text-right text-caption font-medium text-text-primary">
+                {formatPaymentDate(initial.payment_date)}
+              </dd>
+            </div>
           </dl>
+          {editingPayment && (
+            <div className="mt-4 rounded-lg border border-primary-100 bg-primary-50/50 p-3">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label>
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
+                    Payment
+                  </span>
+                  <select
+                    value={paymentDraft}
+                    onChange={(e) => setPaymentDraft(e.target.value as PaymentMode)}
+                    className="h-9 w-full rounded-md border border-border bg-surface px-3 text-body-sm font-semibold text-text-primary outline-none transition-all focus:border-brand"
+                  >
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                  </select>
+                </label>
+                <label>
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
+                    Payment date
+                  </span>
+                  <input
+                    type="date"
+                    value={paymentDateDraft}
+                    onChange={(e) => setPaymentDateDraft(e.target.value)}
+                    className="h-9 w-full rounded-md border border-border bg-surface px-3 text-body-sm font-semibold text-text-primary outline-none transition-all focus:border-brand"
+                  />
+                </label>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => paymentMutation.mutate()}
+                  disabled={paymentMutation.isPending}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-md bg-brand px-3 text-caption font-bold text-white shadow-xs transition-colors hover:bg-brand-hover disabled:opacity-60"
+                >
+                  <Check className="h-3.5 w-3.5" />
+                  {paymentMutation.isPending ? 'Saving' : 'Save'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingPayment(false)
+                    setPaymentDraft(initial.payment_mode || 'Cash')
+                    setPaymentDateDraft(initial.payment_date || '')
+                  }}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-surface px-3 text-caption font-semibold text-text-secondary transition-colors hover:bg-neutral-50"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Devices */}
         <div className="rounded-xl border border-border bg-surface p-5 shadow-xs">
           <p className="text-label font-semibold text-text-secondary mb-3">Devices</p>
           <div className="space-y-3">
-            {devices.map((d, i) => (
-              <div key={i} className="rounded-lg bg-neutral-50 border border-border px-3 py-2.5">
-                <div className="flex items-start justify-between">
-                  <div>
+            {devices.map((d, i) => {
+              const editingThisPrice = editingPriceIndex === i
+              return (
+              <div key={i} className="overflow-hidden rounded-lg border border-border bg-neutral-50 px-3 py-2.5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
                     <p className="text-body-sm font-semibold text-text-primary">{d.model}</p>
                     <p className="text-caption text-text-tertiary mt-0.5">{[d.variant, d.chip, d.storage].filter(Boolean).join(' · ')}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="shrink-0 text-left sm:text-right">
                     {d.category === 'android' ? (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-[10px] font-semibold uppercase">
                         Awaiting Call
@@ -193,11 +336,64 @@ export default function OrderDetail({
                     ) : (
                       <>
                         <p className="text-caption text-text-tertiary">Base {inr(d.base ?? 0)}</p>
-                        <p className="text-body-sm font-bold text-success-600">{inr(d.final ?? 0)}</p>
+                        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                          <p className="text-body-sm font-bold text-success-600">{inr(enquiryDeviceAmount(d))}</p>
+                          {!editingThisPrice && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingPriceIndex(i)
+                                setPriceDraft(String(enquiryDeviceAmount(d)))
+                              }}
+                              className="inline-flex h-6 items-center gap-1 rounded-md border border-border bg-surface px-2 text-[11px] font-semibold text-text-secondary hover:border-primary-200 hover:text-brand transition-colors"
+                            >
+                              <PencilLine className="h-3 w-3" />
+                              Edit
+                            </button>
+                          )}
+                        </div>
                       </>
                     )}
                   </div>
                 </div>
+                {editingThisPrice && (
+                  <div className="mt-3 flex flex-col gap-2 rounded-lg border border-primary-100 bg-primary-50/50 p-3 sm:flex-row sm:items-center">
+                    <label className="flex-1">
+                      <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-text-tertiary">
+                        Customer final price
+                      </span>
+                      <input
+                        value={priceDraft}
+                        onChange={(e) => setPriceDraft(e.target.value)}
+                        inputMode="numeric"
+                        placeholder="e.g. 116500"
+                        className="h-9 w-full rounded-md border border-border bg-surface px-3 font-mono text-body-sm text-text-primary outline-none transition-all focus:border-brand"
+                      />
+                    </label>
+                    <div className="flex gap-2 sm:self-end">
+                      <button
+                        type="button"
+                        onClick={() => priceMutation.mutate()}
+                        disabled={priceMutation.isPending}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-md bg-brand px-3 text-caption font-bold text-white shadow-xs transition-colors hover:bg-brand-hover disabled:opacity-60"
+                      >
+                        <Check className="h-3.5 w-3.5" />
+                        {priceMutation.isPending ? 'Saving' : 'Save'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingPriceIndex(null)
+                          setPriceDraft('')
+                        }}
+                        className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-surface px-3 text-caption font-semibold text-text-secondary transition-colors hover:bg-neutral-50"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {d.responses && d.responses.length > 0 && (
                   <div className="mt-2.5 pt-2.5 border-t border-dashed border-border-strong">
                     <button
@@ -214,19 +410,19 @@ export default function OrderDetail({
                       )}
                     </button>
                     {showResponses[i] && (
-                      <div className="mt-3 space-y-2.5 pl-3 border-l-2 border-brand/40 animate-m-fade-in bg-white/40 p-3 rounded-r-xl border border-border/60">
+                      <div className="mt-3 animate-m-fade-in rounded-xl border border-border/70 bg-surface p-3 shadow-2xs sm:p-4">
                         {d.responses.map((resp: any, ri: number) => {
                           const isYes = resp.answer?.toLowerCase() === 'yes';
                           const isNo = resp.answer?.toLowerCase() === 'no';
                           return (
-                            <div key={ri} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 py-1 border-b border-border/30 last:border-b-0">
-                              <span className="text-[12px] font-medium text-text-secondary pr-4 leading-normal">{resp.question}</span>
-                              <div className="shrink-0 flex sm:justify-end">
+                            <div key={ri} className="flex flex-col gap-2 border-b border-border/40 py-2.5 last:border-b-0 xl:flex-row xl:items-center xl:justify-between">
+                              <span className="min-w-0 break-words text-[12px] font-medium leading-relaxed text-text-secondary xl:pr-4">{resp.question}</span>
+                              <div className="min-w-0 xl:max-w-[52%] xl:shrink-0 xl:text-right">
                                 <span className={cn(
-                                  "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all shadow-2xs",
+                                  "inline-flex max-w-full items-center justify-center rounded-full px-2.5 py-1 text-left text-[10px] font-bold uppercase leading-snug tracking-wide shadow-2xs transition-all break-words whitespace-normal",
                                   isYes && "bg-success-50 text-success-700 ring-1 ring-inset ring-success-200",
                                   isNo && "bg-error-50 text-error-700 ring-1 ring-inset ring-error-200",
-                                  !isYes && !isNo && "bg-neutral-100 text-text-primary ring-1 ring-inset ring-neutral-200"
+                                  !isYes && !isNo && "rounded-lg bg-neutral-100 text-text-primary ring-1 ring-inset ring-neutral-200"
                                 )}>
                                   {resp.answer}
                                 </span>
@@ -239,7 +435,7 @@ export default function OrderDetail({
                   </div>
                 )}
               </div>
-            ))}
+            )})}
           </div>
           <div className="flex justify-between items-center border-t border-border mt-3 pt-3">
             <span className="text-body-sm font-semibold text-text-primary">Total</span>
@@ -249,7 +445,7 @@ export default function OrderDetail({
                   Awaiting Call
                 </span>
               ) : (
-                inr(initial.total_amount ?? 0)
+                inr(enquiryAmount(initial))
               )}
             </span>
           </div>

@@ -3,9 +3,8 @@ import type { EnquiryStatus } from './types'
 export const ENQUIRY_STATUSES = [
   'new',
   'contacted',
-  'pickup_scheduled',
-  'inspection',
   'price_confirmed',
+  'pickup_scheduled',
   'payment_completed',
   'completed',
   'cancelled',
@@ -14,42 +13,38 @@ export const ENQUIRY_STATUSES = [
 export const ACTIVE_ENQUIRY_STATUSES: EnquiryStatus[] = [
   'new',
   'contacted',
-  'pickup_scheduled',
-  'inspection',
   'price_confirmed',
+  'pickup_scheduled',
   'payment_completed',
 ]
 
 export const ENQUIRY_STATUS_LABELS: Record<EnquiryStatus, string> = {
   new: 'New',
   contacted: 'Contacted',
-  pickup_scheduled: 'Pickup Scheduled',
-  inspection: 'Inspection',
+  pickup_scheduled: 'Pickup',
   price_confirmed: 'Price Confirmed',
-  payment_completed: 'Payment Completed',
-  completed: 'Completed',
+  payment_completed: 'Paid',
+  completed: 'Done',
   cancelled: 'Cancelled',
 }
 
 export const ENQUIRY_STATUS_STEPS: Record<EnquiryStatus, number> = {
   new: 0,
   contacted: 1,
-  pickup_scheduled: 2,
-  inspection: 3,
-  price_confirmed: 4,
-  payment_completed: 5,
-  completed: 6,
-  cancelled: 7,
+  price_confirmed: 2,
+  pickup_scheduled: 3,
+  payment_completed: 4,
+  completed: 5,
+  cancelled: 6,
 }
 
 export const TRACKING_STEPS = [
   'New',
   'Contacted',
-  'Pickup Scheduled',
-  'Inspection',
   'Price Confirmed',
-  'Payment Completed',
-  'Completed',
+  'Pickup',
+  'Paid',
+  'Done',
   'Cancelled',
 ] as const
 
@@ -63,6 +58,8 @@ export function normalizeLegacyStatus(status: string | null | undefined): Enquir
       return 'new'
     case 'accepted':
       return 'contacted'
+    case 'inspection':
+      return 'price_confirmed'
     case 'rejected':
       return 'cancelled'
     case 'completed':

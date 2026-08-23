@@ -245,9 +245,9 @@ interface OrderLike {
   display_id?: string;
   model: string;
   storage: string;
-  amount: number;
+  amount: number | null;
   step: number;
-  exec?: string;
+  status: string;
 }
 
 function TrackInner() {
@@ -263,11 +263,37 @@ function TrackInner() {
   const [searchResult, setSearchResult] = useState<OrderLike | null>(null);
   const [searchState, setSearchState] = useState<"idle" | "loading" | "found" | "notfound">("idle");
   const [refreshing, setRefreshing] = useState(false);
+  const [remoteEnquiries, setRemoteEnquiries] = useState<OrderLike[]>([]);
+  const [loadingLatest, setLoadingLatest] = useState(false);
 
   // Mark current status as seen when viewing the page.
   useEffect(() => {
     markStepSeen();
   }, [markStepSeen, enquiry?.step]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoadingLatest(true);
+    fetch("/api/enquiry/current")
+      .then(async (res) => {
+        if (!res.ok) return null;
+        const data = await res.json();
+        return (data.enquiries ?? (data.enquiry ? [data.enquiry] : [])) as OrderLike[];
+      })
+      .then((data) => {
+        if (!cancelled) setRemoteEnquiries(data ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setRemoteEnquiries([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingLatest(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [enquiry?.id]);
 
   const onEdit = () => {
     startEditPickup();
@@ -311,16 +337,33 @@ function TrackInner() {
     }
   };
 
+  const localEnquiry = enquiry ? (enquiry as unknown as OrderLike) : null;
+  const enquiryList = (() => {
+    const items = [...remoteEnquiries];
+    if (localEnquiry && !items.some((item) => item.id === localEnquiry.id)) {
+      items.unshift(localEnquiry);
+    }
+    return items;
+  })();
+  const currentEnquiry = enquiryList[0] ?? null;
+
   // Re-fetch the REAL status from the server (no fake advancing).
   const onRefresh = async () => {
-    const enq = useStore.getState().enquiry;
+    const enq = currentEnquiry;
     if (!enq?.id) { toast("No active enquiry to refresh"); return; }
     setRefreshing(true);
     try {
       const res = await fetch(`/api/enquiry/status?id=${encodeURIComponent(enq.id)}`);
       if (!res.ok) { toast("Couldn't refresh status right now"); return; }
       const data = await res.json();
-      patchCurrentEnquiry({ status: data.status, step: data.step });
+      if (useStore.getState().enquiry?.id === enq.id) {
+        patchCurrentEnquiry({ status: data.status, step: data.step, amount: data.amount ?? enq.amount });
+      }
+      setRemoteEnquiries((items) =>
+        items.map((item) =>
+          item.id === enq.id ? { ...item, status: data.status, step: data.step, amount: data.amount ?? item.amount } : item
+        )
+      );
     } catch {
       toast("Couldn't refresh status right now");
     } finally {
@@ -331,9 +374,9 @@ function TrackInner() {
   // Auto-refresh once when the page loads, so admin's status changes show
   // up immediately instead of requiring a manual "Refresh" tap.
   useEffect(() => {
-    if (enquiry?.id) onRefresh();
+    if (enquiry?.id || remoteEnquiries[0]?.id) onRefresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [remoteEnquiries[0]?.id]);
 
   return (
     <div className="container-app mx-auto max-w-2xl pb-24 pt-2 md:pb-12">
@@ -366,7 +409,7 @@ function TrackInner() {
         {searchState === "found" && searchResult && (
           <div className="mt-5 space-y-4 animate-m-fade-up">
             <OrderCard order={searchResult} />
-            <StatusTimeline step={searchResult.step} exec={searchResult.exec} />
+            <StatusTimeline step={searchResult.step} />
           </div>
         )}
       </div>
@@ -374,15 +417,21 @@ function TrackInner() {
       {/* Current enquiry */}
       <div className="mt-8">
         <h2 className="text-h4 font-bold text-text-primary">Current enquiry</h2>
-        {enquiry ? (
+        {loadingLatest ? (
+          <div className="mt-4 rounded-xl border border-border bg-surface p-5 text-body-sm text-text-secondary">
+            Loading your latest enquiry...
+          </div>
+        ) : currentEnquiry ? (
           <>
-            <p className="mt-0.5 text-body-sm text-text-secondary">Live status of your most recent request.</p>
+            <p className="mt-0.5 text-body-sm text-text-secondary">
+              {enquiryList.length > 1 ? `Showing ${enquiryList.length} requests. Latest request is expanded below.` : "Live status of your most recent request."}
+            </p>
 
             <div className="mt-4 space-y-4">
-              <OrderCard order={enquiry} />
+              <OrderCard order={currentEnquiry} />
 
               <div className="flex items-center justify-between gap-3">
-                {enquiry.status === "new" ? (
+                {enquiry && enquiry.status === "new" ? (
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" onClick={onEdit} leftIcon={<Pencil className="h-4 w-4" />}>
                       Edit address
@@ -391,7 +440,7 @@ function TrackInner() {
                       Cancel
                     </Button>
                   </div>
-                ) : enquiry.status === "cancelled" ? (
+                ) : currentEnquiry.status === "cancelled" ? (
                   <span className="text-body-sm text-text-tertiary">This request was cancelled.</span>
                 ) : (
                   <span />
@@ -401,9 +450,18 @@ function TrackInner() {
                 </Button>
               </div>
 
-              <StatusTimeline step={enquiry.step} exec={enquiry.exec} />
+              <StatusTimeline step={currentEnquiry.step} />
 
-              {enquiry.step >= TRACK_STEPS.length - 1 && (
+              {enquiryList.length > 1 && (
+                <div className="space-y-3">
+                  <h3 className="px-1 text-label text-text-primary">All enquiries</h3>
+                  {enquiryList.map((item) => (
+                    <OrderCard key={item.id} order={item} />
+                  ))}
+                </div>
+              )}
+
+              {currentEnquiry.step >= TRACK_STEPS.length - 1 && enquiry && (
                 <div className="rounded-xl border border-border bg-surface p-5 text-center">
                   <h4 className="text-body-md font-bold text-text-primary">How was your experience?</h4>
                   <p className="mt-0.5 text-body-sm text-text-secondary">Rate the pickup and payment for {enquiry.id}</p>
@@ -422,7 +480,7 @@ function TrackInner() {
                 <MessageCircle className="h-5 w-5 text-whatsapp" />
                 <p className="flex-1 text-body-sm text-text-secondary">Need help with this enquiry?</p>
                 <button
-                  onClick={() => openContact(`Hi Mobronix, I need help with my enquiry ${enquiry.display_id || enquiry.id}.`)}
+                  onClick={() => openContact(`Hi Mobronix, I need help with my enquiry ${currentEnquiry.display_id || currentEnquiry.id}.`)}
                   className="text-body-sm font-bold text-brand"
                 >
                   Chat with us

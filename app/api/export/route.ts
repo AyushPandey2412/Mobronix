@@ -1,7 +1,9 @@
 // GET /api/export?ids=uuid1,uuid2 — stream selected enquiries as CSV (admin only).
 import { NextResponse } from 'next/server'
 import { createRouteClient } from '@/lib/supabase/server'
+import { enquiryAmount } from '@/lib/enquiryPricing'
 import { TRACKING_STEPS, type Enquiry } from '@/lib/types'
+import { ENQUIRY_STATUS_STEPS, normalizeLegacyStatus, statusLabel } from '@/lib/enquiryStatus'
 
 function csvCell(v: unknown): string {
   let s = String(v ?? '')
@@ -22,8 +24,6 @@ function fmtDate(iso?: string): string {
   })
 }
 
-const cap = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '')
-
 export async function GET(req: Request) {
   const supabase = await createRouteClient()
 
@@ -39,14 +39,14 @@ export async function GET(req: Request) {
 
   let query = supabase
     .from('enquiries')
-    .select('display_id, total_amount, status, tracking_step, pickup_slot, payment_mode, address, pincode, assigned_exec, created_at, devices, guest_name, guest_phone, profiles(full_name, phone)')
+    .select('display_id, total_amount, status, tracking_step, pickup_slot, payment_mode, address, pincode, created_at, devices, guest_name, guest_phone, profiles(full_name, phone)')
     .order('created_at', { ascending: false })
   if (ids.length) query = query.in('id', ids)
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const header = ['Enquiry ID', 'Name', 'Phone', 'Devices', 'Total (₹)', 'Status', 'Stage', 'Pickup slot', 'Payment', 'Address', 'Pincode', 'Executive', 'Submitted']
+  const header = ['Enquiry ID', 'Name', 'Phone', 'Devices', 'Total (₹)', 'Status', 'Stage', 'Pickup slot', 'Payment', 'Address', 'Pincode', 'Submitted']
   const rows = (data ?? []).map((e: any) => {
     // Fall back to the guest contact when there's no linked profile (guest orders).
     const name  = e.profiles?.full_name || e.guest_name  || ''
@@ -59,14 +59,13 @@ export async function GET(req: Request) {
       name,
       phone,
       devices,
-      e.total_amount ?? 0,                                  // raw number — spreadsheet-friendly
-      cap(e.status),
-      TRACKING_STEPS[e.tracking_step ?? 0] ?? e.tracking_step,
+      enquiryAmount(e as any),                              // raw number — spreadsheet-friendly
+      statusLabel(normalizeLegacyStatus(e.status)),
+      TRACKING_STEPS[ENQUIRY_STATUS_STEPS[normalizeLegacyStatus(e.status)] ?? 0],
       e.pickup_slot,
       e.payment_mode,
       e.address,
       e.pincode,
-      e.assigned_exec ?? '',
       fmtDate(e.created_at),
     ].map(csvCell).join(',')
   })

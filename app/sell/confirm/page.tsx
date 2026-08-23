@@ -34,8 +34,7 @@ export default function ConfirmPage() {
         <p
           className="mx-auto mt-2 max-w-sm text-body-md text-text-secondary animate-m-fade-up"
         >
-          Thank you! {enquiry.exec ? <b className="text-text-primary">{enquiry.exec}</b> : "Our spokesperson"} from our
-          team will call you shortly to verify your device and confirm the final price &amp; pickup slot.
+          Thank you! Our team will call you shortly to verify your device and confirm the final price &amp; pickup slot.
         </p>
 
         <div

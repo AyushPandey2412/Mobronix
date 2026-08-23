@@ -326,7 +326,7 @@ export function SiteHeader() {
               variant="outline"
               size="sm"
               leftIcon={<UserIcon className="h-[18px] w-[18px]" />}
-              onClick={() => router.push("/account")}
+              onClick={() => router.push(user.role === "admin" ? "/admin" : "/account")}
             >
               {user.name.split(" ")[0]}
             </Button>

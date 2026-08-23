@@ -5,6 +5,8 @@
 import { NextResponse } from 'next/server'
 import { createRouteClient, createServiceClient } from '@/lib/supabase/server'
 import { createEnquiryService, updateStatusSchema } from '@/lib/enquiries/service'
+import { enquiryAmount } from '@/lib/enquiryPricing'
+import { ENQUIRY_STATUS_STEPS, normalizeLegacyStatus } from '@/lib/enquiryStatus'
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
@@ -18,7 +20,7 @@ export async function GET(req: Request) {
   const svc = createServiceClient()
   let query = svc
     .from('enquiries')
-    .select('id, display_id, devices, total_amount, status, tracking_step, assigned_exec')
+    .select('id, display_id, devices, total_amount, status, tracking_step')
 
   // Exact match only. display_id is sequential and guessable, so the `ref` path
   // is treated as UNTRUSTED; the unguessable UUID `id` path proves ownership.
@@ -32,6 +34,7 @@ export async function GET(req: Request) {
   const devices = Array.isArray(data.devices) ? data.devices : []
   const first   = (devices[0] ?? {}) as { model?: string; storage?: string }
   const model   = devices.length > 1 ? `${first.model ?? 'Device'} +${devices.length - 1} more` : (first.model ?? 'Device')
+  const status   = normalizeLegacyStatus(data.status)
 
   // Sensitive fields (payout amount, assigned executive) are only returned when
   // the caller supplied the UUID `id` — which only the order owner has. Lookups
@@ -44,10 +47,9 @@ export async function GET(req: Request) {
     display_id: data.display_id,
     model,
     storage:    first.storage ?? '',
-    amount:     ownerVerified ? (data.total_amount ?? 0) : null,
-    step:       data.tracking_step ?? 0,
-    status:     data.status ?? 'new',
-    exec:       ownerVerified ? (data.assigned_exec ?? '') : '',
+    amount:     ownerVerified ? enquiryAmount(data as any) : null,
+    step:       ENQUIRY_STATUS_STEPS[status] ?? 0,
+    status,
   })
 }
 

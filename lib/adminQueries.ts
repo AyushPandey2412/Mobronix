@@ -121,6 +121,44 @@ export async function bulkDeleteEnquiries(sb: SupabaseClient, ids: string[]) {
   if (error) throw error
 }
 
+export async function updateEnquiryPrice({
+  id,
+  deviceIndex,
+  finalAmount,
+}: {
+  id: string
+  deviceIndex: number
+  finalAmount: number
+}) {
+  const res = await fetch('/api/admin/enquiry-price', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, deviceIndex, finalAmount }),
+  })
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(body.error || 'Price update failed')
+  return body as { enquiry: Enquiry }
+}
+
+export async function updateEnquiryPayment({
+  id,
+  paymentMode,
+  paymentDate,
+}: {
+  id: string
+  paymentMode: 'UPI' | 'Cash'
+  paymentDate?: string | null
+}) {
+  const res = await fetch('/api/admin/enquiry-payment', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id, paymentMode, paymentDate: paymentDate || null }),
+  })
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(body.error || 'Payment update failed')
+  return body as { enquiry: Enquiry }
+}
+
 export async function upsertModel(
   sb: SupabaseClient,
   { payload, existingId }: { payload: Omit<Model, 'id' | 'created_at' | 'updated_at'>; existingId?: string }
