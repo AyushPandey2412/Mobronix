@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createRouteClient, createServiceClient } from '@/lib/supabase/server'
-import { enquiryAmount } from '@/lib/enquiryPricing'
+import { enquiryAmount, hasAdminFinalPrice } from '@/lib/enquiryPricing'
 import { ENQUIRY_STATUS_STEPS, normalizeLegacyStatus } from '@/lib/enquiryStatus'
 
 export async function GET() {
@@ -39,6 +39,7 @@ export async function GET() {
       model,
       storage: first.storage ?? '',
       amount: enquiryAmount(row as any),
+      priceFinalized: hasAdminFinalPrice(row as any),
       step: ENQUIRY_STATUS_STEPS[status] ?? 0,
       status,
       mobile: phone || row.guest_phone || '',

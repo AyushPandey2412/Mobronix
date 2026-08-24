@@ -5,7 +5,7 @@
 import { NextResponse } from 'next/server'
 import { createRouteClient, createServiceClient } from '@/lib/supabase/server'
 import { createEnquiryService, updateStatusSchema } from '@/lib/enquiries/service'
-import { enquiryAmount } from '@/lib/enquiryPricing'
+import { enquiryAmount, hasAdminFinalPrice } from '@/lib/enquiryPricing'
 import { ENQUIRY_STATUS_STEPS, normalizeLegacyStatus } from '@/lib/enquiryStatus'
 
 export async function GET(req: Request) {
@@ -48,6 +48,7 @@ export async function GET(req: Request) {
     model,
     storage:    first.storage ?? '',
     amount:     ownerVerified ? enquiryAmount(data as any) : null,
+    priceFinalized: ownerVerified ? hasAdminFinalPrice(data as any) : false,
     step:       ENQUIRY_STATUS_STEPS[status] ?? 0,
     status,
   })

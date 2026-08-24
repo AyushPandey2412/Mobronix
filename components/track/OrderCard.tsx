@@ -95,6 +95,7 @@ interface OrderLike {
   model:        string;
   storage:      string;
   amount:       number | null;
+  priceFinalized?: boolean;
   step:         number;
   mobile?:      string;
 }
@@ -131,7 +132,7 @@ function StatusChip({ step }: { step: number }) {
 export function OrderCard({ order }: { order: OrderLike }) {
   const displayRef = order.display_id ?? order.id;
   const priceConfirmedStep = TRACK_STEPS.indexOf("Price Confirmed");
-  const canShowPrice = order.amount != null && priceConfirmedStep >= 0 && order.step >= priceConfirmedStep;
+  const canShowPrice = order.amount != null && (order.priceFinalized || (priceConfirmedStep >= 0 && order.step >= priceConfirmedStep));
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-xs">
       <div className="flex items-center gap-3 border-b border-border p-4">

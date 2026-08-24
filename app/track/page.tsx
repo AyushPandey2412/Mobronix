@@ -246,6 +246,7 @@ interface OrderLike {
   model: string;
   storage: string;
   amount: number | null;
+  priceFinalized?: boolean;
   step: number;
   status: string;
 }
@@ -361,7 +362,9 @@ function TrackInner() {
       }
       setRemoteEnquiries((items) =>
         items.map((item) =>
-          item.id === enq.id ? { ...item, status: data.status, step: data.step, amount: data.amount ?? item.amount } : item
+          item.id === enq.id
+            ? { ...item, status: data.status, step: data.step, amount: data.amount ?? item.amount, priceFinalized: data.priceFinalized ?? item.priceFinalized }
+            : item
         )
       );
     } catch {

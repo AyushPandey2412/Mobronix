@@ -321,6 +321,8 @@ export default function OrderDetail({
           <div className="space-y-3">
             {devices.map((d, i) => {
               const editingThisPrice = editingPriceIndex === i
+              const deviceAmount = enquiryDeviceAmount(d)
+              const devicePriceFinalized = Boolean((d as any).admin_final_price)
               return (
               <div key={i} className="overflow-hidden rounded-lg border border-border bg-neutral-50 px-3 py-2.5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -329,31 +331,29 @@ export default function OrderDetail({
                     <p className="text-caption text-text-tertiary mt-0.5">{[d.variant, d.chip, d.storage].filter(Boolean).join(' · ')}</p>
                   </div>
                   <div className="shrink-0 text-left sm:text-right">
-                    {d.category === 'android' ? (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-[10px] font-semibold uppercase">
-                        Awaiting Call
-                      </span>
-                    ) : (
-                      <>
-                        <p className="text-caption text-text-tertiary">Base {inr(d.base ?? 0)}</p>
-                        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                          <p className="text-body-sm font-bold text-success-600">{inr(enquiryDeviceAmount(d))}</p>
-                          {!editingThisPrice && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditingPriceIndex(i)
-                                setPriceDraft(String(enquiryDeviceAmount(d)))
-                              }}
-                              className="inline-flex h-6 items-center gap-1 rounded-md border border-border bg-surface px-2 text-[11px] font-semibold text-text-secondary hover:border-primary-200 hover:text-brand transition-colors"
-                            >
-                              <PencilLine className="h-3 w-3" />
-                              Edit
-                            </button>
-                          )}
-                        </div>
-                      </>
-                    )}
+                    <p className="text-caption text-text-tertiary">{d.base ? `Base ${inr(d.base)}` : 'Manual price'}</p>
+                    <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                      {deviceAmount > 0 || devicePriceFinalized ? (
+                        <p className="text-body-sm font-bold text-success-600">{inr(deviceAmount)}</p>
+                      ) : (
+                        <span className="inline-flex items-center rounded bg-warning-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-warning-700 ring-1 ring-inset ring-warning-200">
+                          Awaiting Call
+                        </span>
+                      )}
+                      {!editingThisPrice && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingPriceIndex(i)
+                            setPriceDraft(deviceAmount > 0 ? String(deviceAmount) : '')
+                          }}
+                          className="inline-flex h-6 items-center gap-1 rounded-md border border-border bg-surface px-2 text-[11px] font-semibold text-text-secondary transition-colors hover:border-primary-200 hover:text-brand"
+                        >
+                          <PencilLine className="h-3 w-3" />
+                          Edit
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
                 {editingThisPrice && (
@@ -440,7 +440,7 @@ export default function OrderDetail({
           <div className="flex justify-between items-center border-t border-border mt-3 pt-3">
             <span className="text-body-sm font-semibold text-text-primary">Total</span>
             <span className="text-body-sm font-bold text-success-600">
-              {((initial.devices as any[])?.some(d => d.category === 'android') || initial.total_amount === 0) ? (
+              {enquiryAmount(initial) <= 0 ? (
                 <span className="inline-flex items-center px-2 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-caption font-semibold uppercase">
                   Awaiting Call
                 </span>
