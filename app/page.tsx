@@ -11,9 +11,23 @@ import type { Model } from "@/lib/types";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.mobronix.com";
 
 export const metadata: Metadata = {
-  title: "Mobronix Sell Used Phones, iPhones & MacBooks in Mumbai",
+  title: {
+    absolute: "Mobronix Official Website | Sell Used Phones, iPhones and MacBooks",
+  },
   description:
-    "Sell your used phone, iPhone or MacBook in Mumbai, Navi Mumbai, Thane and Sangli. Free doorstep pickup, quick inspection and same-day UPI or cash payout.",
+    "Mobronix official website. Sell your used phone, iPhone or MacBook in Mumbai, Navi Mumbai, Thane and Sangli with free doorstep pickup and same-day UPI or cash payout.",
+  alternates: {
+    canonical: APP_URL,
+  },
+  openGraph: {
+    type: "website",
+    url: APP_URL,
+    siteName: "Mobronix",
+    title: "Mobronix Official Website | Sell Used Phones, iPhones and MacBooks",
+    description:
+      "Mobronix official website for selling used phones, iPhones and MacBooks with free doorstep pickup and same-day payout.",
+    images: ["/og-default.png"],
+  },
 };
 
 // Revalidate the page every 5 minutes — model prices occasionally change.
@@ -74,7 +88,13 @@ export default async function HomePage() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Mobronix",
+    alternateName: ["Mobronix Official Website", "Mobronix India"],
     url: APP_URL,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${APP_URL}/sell/iphone?search={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
   };
 
   const faqJsonLd = {

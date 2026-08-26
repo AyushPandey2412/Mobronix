@@ -85,13 +85,14 @@ export default function CheckoutPage() {
     checkout.address.trim().length > 0 ||
     checkout.pincode.trim().length > 0 ||
     !!checkout.pay;
+  const maskedOffer = "\u20B9XX,XXX";
   const submitLabel = submitted
     ? "Request submitted"
     : editing
       ? "Save changes"
       : hasPickupDetails
         ? "Submit request"
-        : "Skip for now";
+        : "Get exact value";
 
   const submit = async () => {
     setError(null);
@@ -256,27 +257,13 @@ export default function CheckoutPage() {
           {devices.map((d, i) => (
             <div key={i} className="flex items-center justify-between text-body-sm">
               <span className="text-text-secondary">{d.model} · {d.storage}</span>
-              {d.category === 'android' || d.final === 0 ? (
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-[10px] font-semibold uppercase">
-                  Awaiting Call
-                </span>
-              ) : (
-                <span className="font-mono font-semibold text-text-primary">
-                  ₹XX,XXX
-                </span>
-              )}
+              <span className="font-mono font-semibold text-text-primary">{maskedOffer}</span>
             </div>
           ))}
           <div className="flex items-center justify-between border-t border-dashed border-border pt-2.5">
             <span className="text-body-md font-bold text-text-primary">Total offer</span>
             <span className="font-mono text-body-md font-extrabold text-text-primary">
-              {devices.some(d => d.category === 'android' || d.final === 0) ? (
-                <span className="inline-flex items-center px-2 py-0.5 rounded bg-warning-50 text-warning-700 ring-1 ring-inset ring-warning-200 text-caption font-semibold uppercase">
-                  Awaiting Call
-                </span>
-              ) : (
-                "₹XX,XXX"
-              )}
+              {maskedOffer}
             </span>
           </div>
           {!editing && loggedIn && user && (
@@ -294,7 +281,7 @@ export default function CheckoutPage() {
       {!editing && loggedIn && (
         <div className="mt-5 rounded-xl border border-primary-100 bg-primary-50/70 px-4 py-3 animate-m-fade-up">
           <p className="text-body-sm font-medium text-text-secondary">
-            Pickup address, pincode and payment mode are optional. You can add or edit them later from Track Order.
+            Pickup address, pincode and payment mode are optional. Submit now to get the exact value for your iPhone, Android phone or MacBook.
           </p>
         </div>
       )}

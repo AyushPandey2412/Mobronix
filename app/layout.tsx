@@ -68,9 +68,6 @@ export const metadata: Metadata = {
       "Sell your used phone, iPhone or MacBook with free doorstep pickup and same-day payout across Mumbai, Navi Mumbai, Thane and Sangli.",
     images: ["/og-default.png"],
   },
-  alternates: {
-    canonical: APP_URL,
-  },
   robots: {
     index: true,
     follow: true,

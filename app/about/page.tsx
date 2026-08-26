@@ -3,9 +3,14 @@ import {
   BadgeIndianRupee, Recycle, ShieldCheck, Zap, Heart, CheckCircle2, Globe, Compass, Phone, Mail
 } from "lucide-react";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.mobronix.com";
+
 export const metadata: Metadata = {
   title: "About Us",
   description: "Learn more about Mobronix, our mission, values, and how we recycle and buy back devices responsibly.",
+  alternates: {
+    canonical: `${APP_URL}/about`,
+  },
 };
 
 export default function AboutPage() {
