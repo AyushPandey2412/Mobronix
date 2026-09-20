@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, MapPin, ShieldCheck, Wallet, Banknote, X } from "lucide-react";
+import { Check, MapPin, ShieldCheck, Wallet, Banknote, X, MessageCircle } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
 import { StickyBar } from "@/components/shared/StickyBar";
 import { Textarea, Input } from "@/components/ui/Input";
@@ -11,11 +11,12 @@ import { Sheet } from "@/components/ui/Sheet";
 import { SelectorRow } from "@/components/ui/Selectable";
 import { useStore, useActiveModel } from "@/lib/store";
 import { SLOTS } from "@/lib/data";
-import { cn } from "@/lib/utils";
+import { cn, fmt } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import type { DeviceLine } from "@/lib/types";
 import { LoginModal } from "@/components/shared/LoginModal";
 import { getResponses } from "@/lib/answers";
+import { openWhatsApp, getDirectWhatsAppHref } from "@/lib/contactLinks";
 
 export default function CheckoutPage() {
   const router             = useRouter();
@@ -38,6 +39,7 @@ export default function CheckoutPage() {
   const [submitting,   setSubmitting]   = useState(false);
   const [submitted,    setSubmitted]    = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
+  const [whatsappUrl,  setWhatsappUrl]  = useState<string | null>(null);
 
   const closeThankYou = useCallback(() => {
     setShowThankYou(false);
@@ -207,6 +209,19 @@ export default function CheckoutPage() {
 
       const { enquiryId, displayId, assignedExec } = await res.json();
 
+      // Build WhatsApp message sent to Mobronix with exact details
+      const deviceText = bodyDevices
+        .map((d) => `${d.model} (${d.storage}) - ${fmt(d.final)}`)
+        .join(", ");
+      const displayRef = displayId || enquiryId;
+      const waMsg = `Hi Mobronix, I submitted a request to sell my device.\n\n*Enquiry:* ${displayRef}\n*Name:* ${name}\n*Phone:* +91 ${phone}\n*Device:* ${deviceText}\n*Estimated Value:* ${fmt(total)}\n${checkout.address.trim() ? `*Address:* ${checkout.address.trim()}\n` : ""}${checkout.pincode.trim() ? `*Pincode:* ${checkout.pincode.trim()}\n` : ""}*Status:* Request submitted\n\nPlease verify and confirm my exact value and pickup.`;
+
+      const targetWaUrl = getDirectWhatsAppHref(waMsg);
+      setWhatsappUrl(targetWaUrl);
+
+      // Open WhatsApp link to send message directly to Mobronix
+      openWhatsApp(waMsg);
+
       setSubmitted(true);
       setShowThankYou(true);
 
@@ -355,6 +370,19 @@ export default function CheckoutPage() {
             <p className="mx-auto mt-3 max-w-md text-body-sm leading-relaxed text-text-secondary sm:mt-4 sm:text-body-lg">
               Your message has been submitted. Someone from our team will contact you shortly.
             </p>
+            {whatsappUrl && (
+              <div className="mt-6 flex flex-col items-center gap-3">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-body-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Chat with Mobronix on WhatsApp
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}

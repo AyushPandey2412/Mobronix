@@ -18,6 +18,19 @@ export function getCustomerContactHref(phone: string, message: string) {
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
+export function getDirectWhatsAppHref(message: string) {
+  const configuredNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "";
+  const number = /^\d{10,15}$/.test(configuredNumber) ? configuredNumber : "917700902077";
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
+
+export function openWhatsApp(message: string) {
+  const href = getDirectWhatsAppHref(message);
+  if (typeof window !== "undefined") {
+    window.open(href, "_blank", "noopener,noreferrer");
+  }
+}
+
 export function openContact(message?: string) {
   const href = getContactHref(message);
   if (href.startsWith("mailto:")) {
