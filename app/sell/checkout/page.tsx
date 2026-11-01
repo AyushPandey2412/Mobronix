@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, MapPin, ShieldCheck, Wallet, Banknote, X, MessageCircle } from "lucide-react";
 import { FlowHeader } from "@/components/shared/FlowHeader";
@@ -15,6 +15,7 @@ import { cn, fmt } from "@/lib/utils";
 import { toast } from "@/lib/toast";
 import type { DeviceLine } from "@/lib/types";
 import { LoginModal } from "@/components/shared/LoginModal";
+import { Modal } from "@/components/ui/Modal";
 import { getResponses } from "@/lib/answers";
 import { openWhatsApp, getDirectWhatsAppHref } from "@/lib/contactLinks";
 
@@ -40,6 +41,35 @@ export default function CheckoutPage() {
   const [submitted,    setSubmitted]    = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [whatsappUrl,  setWhatsappUrl]  = useState<string | null>(null);
+  const [availability, setAvailability] = useState<{ pincode: string; serviceable: boolean; message: string } | null>(null);
+  const [checkingArea, setCheckingArea] = useState(false);
+  const [areaError, setAreaError] = useState("");
+  const [availabilityAttempt, setAvailabilityAttempt] = useState(0);
+  const [unavailablePincode, setUnavailablePincode] = useState<string | null>(null);
+  const pincodeInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const pincode = checkout.pincode.trim();
+    setAvailability(null); setAreaError(""); setCheckingArea(false);
+    setUnavailablePincode(null);
+    if (!/^[1-9]\d{5}$/.test(pincode)) return;
+    const controller = new AbortController();
+    setCheckingArea(true);
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/serviceability?pincode=${pincode}`, { cache: "no-store", signal: controller.signal });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not check availability.");
+        if (!controller.signal.aborted) {
+          setAvailability({ pincode, ...data });
+          if (!data.serviceable) setUnavailablePincode(pincode);
+        }
+      } catch (e) {
+        if (!controller.signal.aborted) setAreaError(e instanceof Error ? e.message : "Could not check availability.");
+      } finally { if (!controller.signal.aborted) setCheckingArea(false); }
+    }, 300);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [checkout.pincode, availabilityAttempt]);
 
   const closeThankYou = useCallback(() => {
     setShowThankYou(false);
@@ -99,6 +129,10 @@ export default function CheckoutPage() {
   const submit = async () => {
     setError(null);
     setPincodeError(false);
+    if (!/^[1-9]\d{5}$/.test(checkout.pincode.trim())) { setPincodeError(true); return; }
+    if (!availability?.serviceable || availability.pincode !== checkout.pincode.trim()) {
+      setError(availability?.pincode === checkout.pincode.trim() ? availability.message : "Please wait for pickup availability to be confirmed."); return;
+    }
 
     // ── Editing existing enquiry — local update only (no contact needed) ───
     if (editing) {
@@ -296,7 +330,7 @@ export default function CheckoutPage() {
       {!editing && loggedIn && (
         <div className="mt-5 rounded-xl border border-primary-100 bg-primary-50/70 px-4 py-3 animate-m-fade-up">
           <p className="text-body-sm font-medium text-text-secondary">
-            Pickup address, pincode and payment mode are optional. Submit now to get the exact value for your iPhone, Android phone or MacBook.
+            Enter your pincode to check pickup availability, then add your pickup address.
           </p>
         </div>
       )}
@@ -311,7 +345,9 @@ export default function CheckoutPage() {
           onChange={(e) => setCheckout({ address: e.target.value })}
         />
         <Input
-          label="Pincode (optional)"
+          label="Pincode"
+          ref={pincodeInput}
+          required
           inputMode="numeric"
           maxLength={6}
           placeholder="e.g. 400001"
@@ -325,7 +361,11 @@ export default function CheckoutPage() {
           error={pincodeError ? "Please enter a valid 6-digit pincode." : null}
         />
 
-        {/* Preferred slot section removed */}
+        <div aria-live="polite" className="text-body-sm">
+          {checkingArea && <p>Checking pickup availability…</p>}
+          {availability?.pincode === checkout.pincode.trim() && <p className={availability.serviceable ? "text-brand" : "text-error-600"}>{availability.message}</p>}
+          {areaError && <div><p role="alert" className="text-error-600">{areaError}</p><Button variant="ghost" onClick={() => setAvailabilityAttempt(value => value + 1)}>Retry availability check</Button></div>}
+        </div>
 
         <div>
           <label className="mb-2 block text-label text-text-primary">Payment mode (optional)</label>
@@ -342,8 +382,21 @@ export default function CheckoutPage() {
         )}
       </div>
 
+      <Modal open={!!unavailablePincode} onClose={() => setUnavailablePincode(null)} title="Pickup unavailable">
+        <div className="space-y-4">
+          <div className="grid h-12 w-12 place-items-center rounded-full bg-primary-50 text-brand"><MapPin className="h-6 w-6" aria-hidden="true" /></div>
+          <p className="text-body-md font-semibold text-text-primary">We can’t pick up at {unavailablePincode} right now.</p>
+          <p className="text-body-sm leading-relaxed text-text-secondary">{availability?.message}</p>
+          <p className="text-body-sm text-text-secondary">You can try another pickup address with a serviceable pincode.</p>
+          <Button fullWidth onClick={() => {
+            setUnavailablePincode(null);
+            pincodeInput.current?.focus();
+          }}>Try another pincode</Button>
+        </div>
+      </Modal>
+
       <StickyBar className="mt-6">
-        <Button fullWidth isLoading={submitting} disabled={submitted} onClick={submit}>
+        <Button fullWidth isLoading={submitting} disabled={submitted || checkingArea || !availability?.serviceable || availability.pincode !== checkout.pincode.trim()} onClick={submit}>
           {submitLabel}
         </Button>
       </StickyBar>

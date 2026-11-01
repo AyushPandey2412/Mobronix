@@ -1,15 +1,17 @@
 'use client'
 import { useEffect, useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { createBrowserClient } from '@/lib/supabase/client'
 
 export default function AdminAuthGate({ children }: { children: React.ReactNode }) {
   const router     = useRouter()
+  const pathname = usePathname()
   const sb         = useMemo(() => createBrowserClient(), [])
   const [ready, setReady]   = useState(false)
   const [allowed, setAllowed] = useState(false)
 
   useEffect(() => {
+    if (pathname === '/admin/login') return
     async function check() {
       // Authorization is enforced server-side in middleware.ts. This client gate
       // only trusts a REAL Supabase session with profiles.role = 'admin' — the
@@ -25,10 +27,12 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
       }
 
       // Not an admin — send to login
-      router.replace('/login')
+      router.replace('/admin/login')
     }
     check()
-  }, [sb, router])
+  }, [sb, router, pathname])
+
+  if (pathname === '/admin/login') return <>{children}</>
 
   if (!ready) {
     return (

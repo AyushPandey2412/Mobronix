@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { MapPin } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { createBrowserClient } from '@/lib/supabase/client'
@@ -22,6 +23,7 @@ const LINKS = [
     href: '/admin/questions', label: 'Questions', exact: false,
     icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
   },
+  { href: '/admin/serviceable-areas', label: 'Serviceable Areas', exact: false, icon: <MapPin size={15} /> },
 ]
 
 export default function AdminNav({ horizontal = false }: { horizontal?: boolean }) {

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { requireServiceablePincode } from '@/lib/serviceability'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createServiceClient } from '@/lib/supabase/server'
 import { ENQUIRY_STATUS_STEPS, normalizeLegacyStatus, statusLabel } from '@/lib/enquiryStatus'
@@ -24,7 +25,7 @@ const deviceSchema = z.object({
 export const createEnquirySchema = z.object({
   devices: z.array(deviceSchema).min(1),
   address: z.string().min(3).optional(),
-  pincode: z.string().regex(/^\d{6}$/).optional(),
+  pincode: z.string().trim().regex(/^[1-9]\d{5}$/),
   pickup_slot: z.string().min(1).optional(),
   payment_mode: z.enum(['UPI', 'Cash']).optional(),
   photos: z.array(z.object({ slot: z.string(), path: z.string() })).optional().default([]),
@@ -98,6 +99,7 @@ export class EnquiryService {
   ) {}
 
   async create(input: CreateEnquiryInput, context: CreateContext) {
+    await requireServiceablePincode(this.supabase, input.pincode)
     const devices = input.devices as EnquiryDevice[]
     await validateDevicePrices(this.supabase, devices)
 

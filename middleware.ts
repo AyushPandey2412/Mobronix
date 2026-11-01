@@ -37,7 +37,7 @@ export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
   if (path.startsWith('/admin') && path !== '/admin/login') {
     if (!user) {
-      return NextResponse.redirect(new URL('/login', req.url))
+      return NextResponse.redirect(new URL('/admin/login', req.url))
     }
     const { data: profile } = await supabase
       .from('profiles')
@@ -45,7 +45,7 @@ export async function middleware(req: NextRequest) {
       .eq('id', user.id)
       .single()
     if (profile?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/login', req.url))
+      return NextResponse.redirect(new URL('/admin/login', req.url))
     }
   }
 

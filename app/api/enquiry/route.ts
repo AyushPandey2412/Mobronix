@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { requireServiceablePincode, ServiceabilityError } from '@/lib/serviceability'
 import { z } from 'zod'
 import { createRouteClient, createServiceClient } from '@/lib/supabase/server'
 import { rateLimit, clientIp } from '@/lib/ratelimit'
@@ -53,7 +54,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error('[api/enquiry] create failed', error)
     const message = error?.message || 'Could not create enquiry'
-    const status = /price|invalid|mismatch/i.test(message) ? 400 : 500
+    const status = error instanceof ServiceabilityError ? error.status : /price|invalid|mismatch/i.test(message) ? 400 : 500
     return NextResponse.json({ error: message }, { status })
   }
 }
@@ -89,6 +90,12 @@ export async function PATCH(req: Request) {
 
   const allowed = current.user_id === user.id || profile?.role === 'admin'
   if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  try {
+    await requireServiceablePincode(serviceClient, parsed.pincode || current.pincode || '')
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unable to check availability.' }, { status: error instanceof ServiceabilityError ? error.status : 503 })
+  }
 
   const update = {
     address: parsed.address || current.address || 'To be collected by phone',
