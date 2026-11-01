@@ -1,6 +1,6 @@
 create table if not exists public.customer_reviews (
   id uuid primary key default gen_random_uuid(),
-  enquiry_id uuid not null unique references public.enquiries(id),
+  enquiry_id uuid unique references public.enquiries(id) on delete set null,
   user_id uuid not null references auth.users(id),
   name text not null,
   device text not null default '',

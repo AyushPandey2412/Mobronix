@@ -106,6 +106,7 @@ export async function addEnquiryHistory(
 
 export async function deleteEnquiry(sb: SupabaseClient, id: string) {
   const { error } = await sb.from('enquiries').delete().eq('id', id)
+  if (error?.code === '23503') throw new Error('This enquiry has linked records that prevent deletion. Apply database migration 013, then try again.')
   if (error) throw error
 }
 

@@ -140,11 +140,16 @@ export default function OrderDetail({
   })
 
   const deleteMutation = useMutation({
+    retry: false,
     mutationFn: () => deleteEnquiry(sb, initial.id),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: QK.enquiries() })
+      setConfirmDel(false)
+      qc.setQueryData<Enquiry[]>(QK.enquiries(), items => items?.filter(item => item.id !== initial.id))
+      qc.removeQueries({ queryKey: QK.enquiry(initial.id) })
+      qc.removeQueries({ queryKey: QK.enquiryHistory(initial.id) })
+      void qc.invalidateQueries({ queryKey: QK.enquiries(), refetchType: 'none' })
       toast('Enquiry deleted', 'info')
-      router.push('/admin')
+      router.replace('/admin/orders')
     },
     onError: (error: Error) => toast(error.message ?? 'Delete failed', 'error'),
   })
@@ -552,7 +557,7 @@ export default function OrderDetail({
       <div className="rounded-xl border border-error-100 bg-error-50 p-5">
         <p className="text-label font-semibold text-error-700 mb-1">Danger zone</p>
         <p className="text-caption text-error-600/70 mb-3">This permanently removes the enquiry and its history.</p>
-        <button onClick={() => setConfirmDel(true)}
+        <button disabled={deleteMutation.isPending} onClick={() => setConfirmDel(true)}
           className="h-9 px-4 rounded-md bg-error-600 hover:bg-error-700 text-white text-body-sm font-medium transition-colors shadow-xs">
           Delete enquiry
         </button>
@@ -561,7 +566,8 @@ export default function OrderDetail({
       <ConfirmDialog open={confirmDel} title="Delete this enquiry?"
         message="This permanently removes the enquiry, photos, and history."
         confirmLabel={deleteMutation.isPending ? 'Deleting…' : 'Delete'}
-        onConfirm={() => deleteMutation.mutate()}
+        isPending={deleteMutation.isPending}
+        onConfirm={() => deleteMutation.mutateAsync()}
         onCancel={() => setConfirmDel(false)} />
     </div>
   )

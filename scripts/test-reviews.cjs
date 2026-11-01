@@ -76,12 +76,16 @@ async function main() {
   assert.equal(selectedFields, 'id, name, device, rating, review_text')
   let adminRole = 'customer'
   let moderated = null
+  let permanentlyDeleted = false
   const adminApi = compile('app/api/admin/reviews/route.ts', {
     zod,
     'next/server': { NextResponse: { json: (body, options = {}) => ({ body, status: options.status || 200 }) } },
     '@/lib/supabase/server': {
       createRouteClient: async () => ({ auth: { getUser: async () => ({ data: { user: { id: userId } } }) }, from: () => ({ select: () => ({ eq: () => ({ single: async () => ({ data: { role: adminRole } }) }) }) }) }),
-      createServiceClient: () => ({ from: () => ({ update: row => { moderated = row; return { eq: () => ({ neq: () => ({ select: () => ({ maybeSingle: async () => ({ data: { id }, error: null }) }) }) }) } } }) }),
+      createServiceClient: () => ({ from: () => ({
+        update: row => { moderated = row; return { eq: () => ({ neq: () => ({ select: () => ({ maybeSingle: async () => ({ data: { id }, error: null }) }) }) }) } },
+        delete: () => { permanentlyDeleted = true; return { eq: (field, value) => { assert.equal(field, 'id'); assert.equal(value, id); return { select: () => ({ maybeSingle: async () => ({ data: { id }, error: null }) }) } } } },
+      }) }),
     },
   })
   const moderation = { method: 'PATCH', json: async () => ({ id, status: 'published', review_text: 'Admin rewrite' }) }
@@ -91,6 +95,8 @@ async function main() {
   assert.equal((await adminApi.PATCH(moderation)).status, 200)
   assert.equal(moderated.status, 'published')
   assert.equal(Object.keys(moderated).length, 1)
+  assert.equal((await adminApi.PATCH({ method: 'PATCH', json: async () => ({ id, status: 'deleted' }) })).status, 200)
+  assert.equal(permanentlyDeleted, true)
   console.log('Review checks passed: ownership, completed status, validation, first-name privacy, pending moderation, duplicate prevention, and authentication.')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

@@ -141,7 +141,8 @@ export default function QuestionsClient({ questions }: { questions: Question[] }
       <ConfirmDialog open={!!confirmDel} title="Delete this question?"
         message="This removes it from the condition quiz. Existing enquiries are not affected."
         confirmLabel={deleteMutation.isPending ? 'Deleting…' : 'Delete'}
-        onConfirm={() => confirmDel && deleteMutation.mutate(confirmDel)}
+        isPending={deleteMutation.isPending}
+        onConfirm={() => { if (confirmDel) return deleteMutation.mutateAsync(confirmDel) }}
         onCancel={() => setConfirmDel(null)} />
     </div>
   )

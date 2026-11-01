@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { StarRow } from '@/components/ui/Stars'
 import { cn } from '@/lib/utils'
 
-type Review = { id: string; enquiry_id: string; name: string; device: string; rating: number; review_text: string; status: 'pending' | 'published' | 'hidden'; created_at: string; enquiries: { display_id: string } | null }
+type Review = { id: string; enquiry_id: string | null; name: string; device: string; rating: number; review_text: string; status: 'pending' | 'published' | 'hidden'; created_at: string; enquiries: { display_id: string } | null }
 type Filter = 'all' | Review['status']
 
 export default function ReviewsPage() {
@@ -27,7 +27,7 @@ export default function ReviewsPage() {
   }, [])
   useEffect(() => { load().catch(e => setError(e.message)).finally(() => setLoading(false)) }, [load])
   async function update(review: Review, status: 'published' | 'hidden' | 'deleted') {
-    if (status === 'deleted' && !window.confirm('Delete this review? It will be removed from the website and this list.')) return
+    if (status === 'deleted' && !window.confirm('Permanently delete this review? This removes it from the database and website and cannot be undone.')) return
     setBusy(true); setError(''); setNotice('')
     try {
       const response = await fetch('/api/admin/reviews', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: review.id, status }) })
@@ -54,7 +54,7 @@ export default function ReviewsPage() {
       <div className="mt-2"><StarRow value={review.rating} /></div>
       <p className="mt-3 flex items-center gap-1 text-caption text-brand"><BadgeCheck size={14} />Verified customer · {review.device}</p>
       <p className="my-4 flex-1 whitespace-pre-wrap break-words text-body-sm leading-relaxed text-text-secondary">{review.review_text}</p>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-caption text-text-tertiary"><Link className="text-brand hover:underline" href={`/admin/orders/${review.enquiry_id}`}>{review.enquiries?.display_id || 'View order'}</Link><time dateTime={review.created_at}>{new Date(review.created_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' })}</time></div>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-caption text-text-tertiary">{review.enquiry_id ? <Link className="text-brand hover:underline" href={`/admin/orders/${review.enquiry_id}`}>{review.enquiries?.display_id || 'View order'}</Link> : <span>Order removed</span>}<time dateTime={review.created_at}>{new Date(review.created_at).toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: 'numeric', month: 'short', year: 'numeric' })}</time></div>
       <div className="flex flex-wrap gap-2 border-t border-border pt-4">{review.status !== 'published' && <Button size="sm" disabled={busy} onClick={() => update(review, 'published')}>Publish on website</Button>}{review.status !== 'hidden' && <Button size="sm" variant="outline" disabled={busy} onClick={() => update(review, 'hidden')}>Hide</Button>}<Button size="sm" variant="ghost" className="text-error-600" disabled={busy} onClick={() => update(review, 'deleted')}>Delete</Button></div>
     </article>)}</div>}
   </div>

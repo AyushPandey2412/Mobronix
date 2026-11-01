@@ -18,7 +18,10 @@ async function handle(req: Request) {
     }
     const parsed = z.object({ id: z.string().uuid(), status: z.enum(['published', 'hidden', 'deleted']) }).safeParse(await req.json().catch(() => null))
     if (!parsed.success) return NextResponse.json({ error: 'Invalid review update.' }, { status: 400 })
-    const { data, error } = await db.from('customer_reviews').update({ status: parsed.data.status }).eq('id', parsed.data.id).neq('status', 'deleted').select('id').maybeSingle()
+    const query = parsed.data.status === 'deleted'
+      ? db.from('customer_reviews').delete().eq('id', parsed.data.id)
+      : db.from('customer_reviews').update({ status: parsed.data.status }).eq('id', parsed.data.id).neq('status', 'deleted')
+    const { data, error } = await query.select('id').maybeSingle()
     if (error) throw error
     if (!data) return NextResponse.json({ error: 'Review not found.' }, { status: 404 })
     return NextResponse.json({ ok: true })
