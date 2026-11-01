@@ -87,6 +87,7 @@ import { CheckCircle2, Clock, BadgeCheck, X } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { MiniStepper } from "@/components/ui/Stepper";
 import { TRACK_STEPS, TRACK_SHORT } from "@/lib/data";
+import { OrderReview } from "@/components/track/OrderReview";
 import { inr } from "@/lib/format";
 
 interface OrderLike {
@@ -95,6 +96,7 @@ interface OrderLike {
   model:        string;
   storage:      string;
   amount:       number | null;
+  status?: string;
   priceFinalized?: boolean;
   step:         number;
   mobile?:      string;
@@ -167,6 +169,7 @@ export function OrderCard({ order }: { order: OrderLike }) {
           <b className="font-mono text-text-primary">+91 {order.mobile}</b>
         </div>
       )}
+      {order.status === "completed" && <OrderReview enquiryId={order.id} />}
     </div>
   );
 }

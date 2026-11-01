@@ -31,7 +31,7 @@
 //   const enquiry = useStore((s) => s.enquiry);
 //   const startEditPickup = useStore((s) => s.startEditPickup);
 //   const cancelEnquiry = useStore((s) => s.cancelEnquiry);
-//   const rateEnquiry = useStore((s) => s.rateEnquiry);
+//
 //   const patchCurrentEnquiry = useStore((s) => s.patchCurrentEnquiry);
 //   const markStepSeen = useStore((s) => s.markStepSeen);
 
@@ -233,10 +233,8 @@ import { OrderCard } from "@/components/track/OrderCard";
 import { StatusTimeline } from "@/components/track/StatusTimeline";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Stars } from "@/components/ui/Stars";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useStore } from "@/lib/store";
-import { TRACK_STEPS } from "@/lib/data";
 import { toast } from "@/lib/toast";
 import { openContact } from "@/lib/contactLinks";
 
@@ -461,21 +459,6 @@ function TrackInner() {
                   {enquiryList.map((item) => (
                     <OrderCard key={item.id} order={item} />
                   ))}
-                </div>
-              )}
-
-              {currentEnquiry.step >= TRACK_STEPS.length - 1 && enquiry && (
-                <div className="rounded-xl border border-border bg-surface p-5 text-center">
-                  <h4 className="text-body-md font-bold text-text-primary">How was your experience?</h4>
-                  <p className="mt-0.5 text-body-sm text-text-secondary">Rate the pickup and payment for {enquiry.id}</p>
-                  <div className="mt-4 flex justify-center">
-                    <Stars value={enquiry.rating ?? 0} onRate={(n) => rateEnquiry(n)} />
-                  </div>
-                  {enquiry.rating ? (
-                    <p className="mt-3 text-body-sm font-semibold text-success-700">
-                      Thanks for rating us {enquiry.rating} star{enquiry.rating > 1 ? "s" : ""}!
-                    </p>
-                  ) : null}
                 </div>
               )}
 

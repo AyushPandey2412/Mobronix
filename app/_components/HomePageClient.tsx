@@ -17,12 +17,11 @@ import { fmt } from "@/lib/utils";
 import { SectionHeading } from "@/components/shared/SectionHeading";
 import { CartBar } from "@/components/shared/CartBar";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Accordion } from "@/components/ui/Accordion";
-import { StarRow } from "@/components/ui/Stars";
 import { useMemo } from "react";
 import { useStore } from "@/lib/store";
-import { REVIEWS, FAQS, STATS } from "@/lib/data";
+import { CustomerReviews } from "@/components/marketing/CustomerReviews";
+import { FAQS, STATS } from "@/lib/data";
 import type { Model } from "@/lib/types";
 import { openContact } from "@/lib/contactLinks";
 
@@ -300,43 +299,7 @@ export function HomePageClient({ initialModels }: { initialModels: Model[] }) {
         </div>
       </section>
 
-      {/* REVIEWS */}
-      {/* <section className="container-app py-14 md:py-20">
-        <SectionHeading eyebrow="Reviews" title="What sellers say" center />
-        <div className="mt-10 grid gap-4 md:grid-cols-3">
-          {REVIEWS.map((r) => (
-            <Card key={r.name} padded className="h-full">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-body-md font-bold text-text-primary">{r.name}</div>
-                  <div className="text-caption text-text-tertiary">{r.city}</div>
-                </div>
-                <StarRow value={r.rating} />
-              </div>
-              <p className="mt-3 text-body-sm leading-relaxed text-text-secondary">"{r.text}"</p>
-            </Card>
-          ))}
-        </div>
-      </section> */}
-
-
-          <section className="container-app py-10 md:py-20">
-        <SectionHeading eyebrow="Reviews" title="What sellers say" center />
-        <div className="mt-6 grid gap-3 md:mt-10 md:grid-cols-3 md:gap-4">
-          {REVIEWS.map((r) => (
-            <Card key={r.name} padded className="h-full">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-[13px] font-bold text-text-primary md:text-body-md">{r.name}</div>
-                  <div className="text-[11px] text-text-tertiary md:text-caption">{r.city}</div>
-                </div>
-                <StarRow value={r.rating} />
-              </div>
-              <p className="mt-2.5 text-[12px] leading-relaxed text-text-secondary md:mt-3 md:text-body-sm">&quot;{r.text}&quot;</p>
-            </Card>
-          ))}
-        </div>
-      </section>
+      <CustomerReviews />
 
       {/* FAQ */}
       <section id="faq" className="scroll-mt-24 bg-surface py-10 md:py-20">
